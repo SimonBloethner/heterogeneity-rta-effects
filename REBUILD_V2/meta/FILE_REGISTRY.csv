@@ -53,7 +53,10 @@ code/S12_gradient_fix.R,code,manual,data/S6_population.rds;data/S5_bhat.rds;data
 output/T3b_size_gradient_fixed.csv,output,code/S12_gradient_fix.R,data/S6_population.rds;data/S5_bhat.rds;data/S1_ppml.rds,NONE,equal_bins,8,BUILT
 meta/T3b_size_gradient_fixed.csv.sidecar,meta,code/S12_gradient_fix.R,output/T3b_size_gradient_fixed.csv,NONE,exists,8,BUILT
 code/S13_matching_sensitivity.R,code,manual,data/S6_population.rds;data/S3_theta.rds;data/S2_pairs.rds;data/S1_ppml.rds,MULTIPLE,syntax_valid,8,BUILT
-output/T6_matching_sensitivity.csv,output,code/S13_matching_sensitivity.R,data/S6_population.rds;data/S3_theta.rds;data/S2_pairs.rds;data/S1_ppml.rds,MULTIPLE,8_configs_complete,8,BUILT
-meta/T6_matching_sensitivity.csv.sidecar,meta,code/S13_matching_sensitivity.R,output/T6_matching_sensitivity.csv,NONE,exists,8,BUILT
+output/T6_matching_sensitivity.csv,output,code/S13_matching_sensitivity.R,data/S6_population.rds;data/S3_theta.rds;data/S2_pairs.rds;data/S1_ppml.rds,MULTIPLE,8_configs_complete,8,SUPERSEDED
+meta/T6_matching_sensitivity.csv.sidecar,meta,code/S13_matching_sensitivity.R,output/T6_matching_sensitivity.csv,NONE,exists,8,SUPERSEDED
+code/S13b_matching_sensitivity.R,code,manual,data/S6_population.rds;data/S3_theta.rds;data/S2_pairs.rds;data/S1_ppml.rds;data/S5_bhat.rds,MULTIPLE,syntax_valid,8,BUILT
+output/T6b_matching_sensitivity.csv,output,code/S13b_matching_sensitivity.R,data/S6_population.rds;data/S3_theta.rds;data/S2_pairs.rds;data/S1_ppml.rds;data/S5_bhat.rds,MULTIPLE,T3b_reproduction,8,BUILT
+meta/T6b_matching_sensitivity.csv.sidecar,meta,code/S13b_matching_sensitivity.R,output/T6b_matching_sensitivity.csv,NONE,exists,8,BUILT
 output/canonical_facts.md,output,code/build_facts.R,all,NONE,all_ids_sourced,9,BUILT
 meta/DEPENDENCY_GRAPH.txt,meta,code/enforce.R,all,NONE,complete_trace,9,BUILT

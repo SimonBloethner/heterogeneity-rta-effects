@@ -1,0 +1,14 @@
+FILE:      T6b_matching_sensitivity.csv
+SHA256:    3203594788e66bc0bd6fe65e7547a08bf489624b2a778dd9a495868be5b3ba2b
+PRODUCER:  code/S13b_matching_sensitivity.R (SHA256: 60ca382b5fbe8ca64d9307816f564d4a0d0798ed9f0d1245eaef5ed085babc51)
+INPUTS:    data/S6_population.rds (SHA256: 42c6211c9c6fd957421623f575f9acc77f0c5aadf7267ac6e9cd4935f196be70)
+           data/S3_theta.rds (SHA256: 9fd6f3de20236721df2c10a707989e3bc4fc6974d83f093f665ab7c9343ef860)
+           data/S2_pairs.rds (SHA256: f72f7cc21b9fdcc922bf400026fb5357be9a9c6aeb631f8d0d4587d58fbbfad8)
+           data/S1_ppml.rds (SHA256: cb72379201724d067c7fd8368a586861dbc55d05bd10bdf31db3f19ca1f7384e)
+           data/S5_bhat.rds (SHA256: e7287358552e8385d347fa640d9e541261a155a2f353e4e95c4106e1cfea5b18)
+SEEDS:     20260719, 42, 999, 12345
+GATE:      T3b_reproduction [PASS, Q1_diff=2.78e-16, Q5_diff=3.47e-17]
+CREATED:   2026-07-25 21:55:52
+
+NOTE: Uses SAME quintile construction as S12 (equal bins on pre_trade_sum).
+      Supersedes T6_matching_sensitivity.csv which used wrong quintiles.
