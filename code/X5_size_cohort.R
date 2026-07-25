@@ -13,15 +13,75 @@ suppressPackageStartupMessages({
 })
 
 # -----------------------------------------------------------------------------
-# PATH CONSTANTS (E4: consolidated, no dead code)
+# J4(a): TOOLCHAIN VERSION CHECK
 # -----------------------------------------------------------------------------
-REFERENCE_PATH <- "/scratch/bt307958/X5_rng_reference.rds"
+REQUIRED_R_VERSION <- "4.4.1"
+REQUIRED_DT_VERSION <- "1.16.4"
+
+running_R <- paste0(R.version$major, ".", R.version$minor)
+running_DT <- as.character(packageVersion("data.table"))
+
+cat("TOOLCHAIN:\n")
+cat("  R version:         ", running_R, "\n")
+cat("  data.table version:", running_DT, "\n")
+cat("  Required R:        ", REQUIRED_R_VERSION, "\n")
+cat("  Required data.table:", REQUIRED_DT_VERSION, "\n")
+
+if (running_R != REQUIRED_R_VERSION) {
+    cat("  WARNING: R version mismatch! H3 gate may fail due to RNG differences.\n")
+}
+if (running_DT != REQUIRED_DT_VERSION) {
+    cat("  WARNING: data.table version mismatch! Results may differ.\n")
+}
+cat("\n")
+
+# -----------------------------------------------------------------------------
+# PATH CONSTANTS
+# -----------------------------------------------------------------------------
 OUTPUT_PATH <- "/scratch/bt307958/X5_results.rds"
-# E2: Correct repository path, determined from location of W1_pop_canon.rds and X1_results.rds
-REPO_DATA_PATH <- "/groups/m-larch/bt307958/replication_package/data/X5_results.rds"
+# F1: Correct path determined from N0_setup.R line 118: copies to /groups/m-larch/bt307958/gates/
+REPO_DATA_PATH <- "/groups/m-larch/bt307958/gates/X5_results.rds"
+
+# -----------------------------------------------------------------------------
+# J1: Reference path resolution - RELATIVE TO SCRIPT LOCATION
+# Default: ../data/X5_rng_reference.rds relative to this script
+# Override: X5_RNG_REFERENCE_PATH env var
+# K2(a): No getwd() fallback - HALT if script location unknown
+# -----------------------------------------------------------------------------
+# Get script directory
+script_args <- commandArgs(trailingOnly = FALSE)
+script_path_arg <- grep("--file=", script_args, value = TRUE)
+if (length(script_path_arg) > 0) {
+    SCRIPT_PATH <- normalizePath(sub("--file=", "", script_path_arg[1]))
+    SCRIPT_DIR <- dirname(SCRIPT_PATH)
+} else {
+    # K2(a): No fallback - interactive/source() cannot reliably detect script location
+    SCRIPT_DIR <- NULL
+}
+
+REFERENCE_PATH_OVERRIDE <- Sys.getenv("X5_RNG_REFERENCE_PATH", unset = "")
+
+if (nzchar(REFERENCE_PATH_OVERRIDE)) {
+    REFERENCE_PATH <- REFERENCE_PATH_OVERRIDE
+    REFERENCE_SOURCE <- "env:X5_RNG_REFERENCE_PATH"
+} else if (!is.null(SCRIPT_DIR)) {
+    REFERENCE_PATH <- file.path(SCRIPT_DIR, "..", "data", "X5_rng_reference.rds")
+    REFERENCE_SOURCE <- "default (relative to script: ../data/)"
+} else {
+    stop("FATAL: Cannot determine script location for relative path resolution.\n",
+         "When running interactively or via source(), set:\n",
+         "  export X5_RNG_REFERENCE_PATH=/path/to/data/X5_rng_reference.rds")
+}
+
+# K2(b): Normalize path for clean logging
+REFERENCE_PATH <- normalizePath(REFERENCE_PATH, mustWork = FALSE)
 
 cat("PATHS:\n")
+if (!is.null(SCRIPT_DIR)) {
+    cat("  SCRIPT_DIR:    ", SCRIPT_DIR, "\n")
+}
 cat("  REFERENCE_PATH:", REFERENCE_PATH, "\n")
+cat("  (resolved from:", REFERENCE_SOURCE, ")\n")
 cat("  OUTPUT_PATH:   ", OUTPUT_PATH, "\n")
 cat("  REPO_DATA_PATH:", REPO_DATA_PATH, "\n\n")
 
@@ -45,9 +105,11 @@ cat("PATH GUARD (literal): REFERENCE_PATH != OUTPUT_PATH: PASS\n")
 # Guard: reference file must exist
 if (!file.exists(REFERENCE_PATH)) {
     stop("FATAL: Reference file does not exist: ", REFERENCE_PATH,
-         "\nRun X5_freeze_reference.R first to create it.")
+         "\nEither:\n",
+         "  1. Run X5_freeze_reference.R to create it, or\n",
+         "  2. Set X5_RNG_REFERENCE_PATH env var to an existing reference file.")
 }
-cat("REFERENCE GUARD: ", REFERENCE_PATH, " exists: PASS\n")
+cat("REFERENCE GUARD:", REFERENCE_PATH, "exists: PASS\n")
 
 # E5: normalizePath check after both files exist (catches symlinks, relative paths)
 # OUTPUT_PATH may not exist yet, so use mustWork=FALSE
@@ -62,6 +124,36 @@ cat("PATH GUARD (normalized): paths differ: PASS\n\n")
 
 # Load reference for later comparison
 rng_reference <- readRDS(REFERENCE_PATH)
+
+# H2: Print provenance stamp from reference
+cat("REFERENCE PROVENANCE:\n")
+if (!is.null(rng_reference$provenance)) {
+    cat("  source_sha:      ", rng_reference$provenance$source_sha, "\n")
+    cat("  created:         ", format(rng_reference$provenance$created), "\n")
+    cat("  R_version:       ", rng_reference$provenance$R_version, "\n")
+    cat("  data.table_version:", rng_reference$provenance$data_table_version, "\n")
+    cat("  seed:            ", rng_reference$provenance$seed, "\n")
+
+    # J4(a): Warn if toolchain differs from reference
+    ref_R <- rng_reference$provenance$R_version
+    ref_DT <- rng_reference$provenance$data_table_version
+    # Extract version number from ref_R (e.g., "R version 4.4.1 (2024-06-14)" -> "4.4.1")
+    ref_R_num <- if (!is.null(ref_R)) gsub("R version ([0-9.]+).*", "\\1", ref_R) else NULL
+    if (!is.null(ref_R_num) && ref_R_num != running_R) {
+        cat("\n  *** WARNING: R VERSION MISMATCH ***\n")
+        cat("  Reference was created with:", ref_R, "\n")
+        cat("  Currently running:         R version", running_R, "\n")
+        cat("  H3 gate may fail due to RNG stream differences!\n")
+    }
+    if (!is.null(ref_DT) && nzchar(ref_DT) && ref_DT != running_DT) {
+        cat("\n  *** WARNING: data.table VERSION MISMATCH ***\n")
+        cat("  Reference was created with:", ref_DT, "\n")
+        cat("  Currently running:        ", running_DT, "\n")
+    }
+} else {
+    cat("  (no provenance stamp - legacy reference)\n")
+}
+cat("\n")
 
 set.seed(20260721)
 
@@ -214,8 +306,8 @@ h3_pass <- TRUE
 # Check pearson_ci
 if (!identical(as.numeric(pearson_ci), as.numeric(rng_reference$pearson_ci))) {
     cat("FAIL: pearson_ci mismatch\n")
-    cat("  Computed:", as.numeric(pearson_ci), "\n")
-    cat("  Reference:", as.numeric(rng_reference$pearson_ci), "\n")
+    cat("  Computed:", format(as.numeric(pearson_ci), digits = 17), "\n")
+    cat("  Reference:", format(as.numeric(rng_reference$pearson_ci), digits = 17), "\n")
     h3_pass <- FALSE
 } else {
     cat("PASS: pearson_ci matches reference\n")
@@ -224,8 +316,8 @@ if (!identical(as.numeric(pearson_ci), as.numeric(rng_reference$pearson_ci))) {
 # Check spearman_ci
 if (!identical(as.numeric(spearman_ci), as.numeric(rng_reference$spearman_ci))) {
     cat("FAIL: spearman_ci mismatch\n")
-    cat("  Computed:", as.numeric(spearman_ci), "\n")
-    cat("  Reference:", as.numeric(rng_reference$spearman_ci), "\n")
+    cat("  Computed:", format(as.numeric(spearman_ci), digits = 17), "\n")
+    cat("  Reference:", format(as.numeric(rng_reference$spearman_ci), digits = 17), "\n")
     h3_pass <- FALSE
 } else {
     cat("PASS: spearman_ci matches reference\n")
@@ -234,8 +326,8 @@ if (!identical(as.numeric(spearman_ci), as.numeric(rng_reference$spearman_ci))) 
 # Check quintile_ci_low
 if (!identical(as.numeric(quintile_ci_low), as.numeric(rng_reference$quintile_ci_low))) {
     cat("FAIL: quintile_ci_low mismatch\n")
-    cat("  Computed:", as.numeric(quintile_ci_low), "\n")
-    cat("  Reference:", as.numeric(rng_reference$quintile_ci_low), "\n")
+    cat("  Computed:", format(as.numeric(quintile_ci_low), digits = 17), "\n")
+    cat("  Reference:", format(as.numeric(rng_reference$quintile_ci_low), digits = 17), "\n")
     h3_pass <- FALSE
 } else {
     cat("PASS: quintile_ci_low matches reference\n")
@@ -244,8 +336,8 @@ if (!identical(as.numeric(quintile_ci_low), as.numeric(rng_reference$quintile_ci
 # Check quintile_ci_high
 if (!identical(as.numeric(quintile_ci_high), as.numeric(rng_reference$quintile_ci_high))) {
     cat("FAIL: quintile_ci_high mismatch\n")
-    cat("  Computed:", as.numeric(quintile_ci_high), "\n")
-    cat("  Reference:", as.numeric(rng_reference$quintile_ci_high), "\n")
+    cat("  Computed:", format(as.numeric(quintile_ci_high), digits = 17), "\n")
+    cat("  Reference:", format(as.numeric(rng_reference$quintile_ci_high), digits = 17), "\n")
     h3_pass <- FALSE
 } else {
     cat("PASS: quintile_ci_high matches reference\n")
@@ -501,15 +593,18 @@ saveRDS(results, OUTPUT_PATH)
 cat("Saved:", OUTPUT_PATH, "\n")
 
 # -----------------------------------------------------------------------------
-# E2: COPY TO REPOSITORY DATA PATH (provenance)
+# F1: COPY TO GATES DIRECTORY (provenance)
 # -----------------------------------------------------------------------------
-# Pattern from N0_setup.R: explicit copy so artefact path is pipeline-produced
-# REPO_DATA_PATH defined at top, points to /groups/m-larch/bt307958/replication_package/data/
+# Pattern from N0_setup.R line 118: copies to /groups/m-larch/bt307958/gates/
+# REPO_DATA_PATH defined at top
 
-# Ensure directory exists
+# F1: Guard that destination directory EXISTS - do NOT create it
+# A copy step that manufactures its own destination cannot detect a wrong path
 if (!dir.exists(dirname(REPO_DATA_PATH))) {
-    dir.create(dirname(REPO_DATA_PATH), recursive = TRUE)
+    stop("FATAL: Destination directory does not exist: ", dirname(REPO_DATA_PATH),
+         "\nThis suggests REPO_DATA_PATH is misconfigured. Halting.")
 }
+cat("REPO_DATA_PATH directory exists: PASS\n")
 
 copy_success <- file.copy(OUTPUT_PATH, REPO_DATA_PATH, overwrite = TRUE)
 if (!copy_success) {

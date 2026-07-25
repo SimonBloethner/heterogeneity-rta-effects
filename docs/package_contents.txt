@@ -1,0 +1,103 @@
+# Package Contents Inventory
+# This file is HAND-MAINTAINED and independent of Z0_assemble_package.R output.
+# Z0 reads this inventory, halts on missing entries, and halts on unexpected files.
+#
+# Format: relative path from repository root
+# Lines starting with # are comments
+# Empty lines are ignored
+
+# README (root level)
+README.md
+
+# Code files (version controlled - Z0 verifies git vs gates/ match)
+code/G2c_placebo.R
+code/N0_setup.R
+code/N2_deconv.R
+code/O5_verdict.R
+code/P4_injection.R
+code/PROP_NUM_v3.R
+code/PROP_derivations_v4.R
+code/Q4_exhibit_pack.R
+code/S1_population_reconciliation.R
+code/T3_variance_identity.R
+code/W4_ge_propagation.R
+code/X1_corrected_LN_anchor_v2.R
+code/X2_residual_tail_v5.R
+code/X3_peryear_ratio.R
+code/X5_size_cohort.R
+code/X5_freeze_reference.R
+code/Z0_assemble_package.R
+code/build_exhibit_pack.R
+code/gates_lib_v2.R
+
+# Data files - core inputs (provided, not from gates/)
+data/ITPDE_total.rds
+data/N0_data.rds
+data/N0_pair_trade.rds
+data/N0_rta_pairs.rds
+
+# Data files - analysis outputs (from gates/)
+data/O5_verdict.rds
+data/P4_results.rds
+data/Q4_exhibits.rds
+data/W1_pop_canon.rds
+data/X1_results.rds
+data/X5_results.rds
+data/X5_rng_reference.rds
+data/filtered_trade.rds
+data/G2c_results.RData
+
+# Documentation
+docs/execution_order.md
+docs/gate_verification.md
+docs/package_contents.txt
+
+# Exhibit Pack - Output tables
+output/A0_anchor_table.csv
+output/A1_vuong.csv
+output/A2_residual_tails.csv
+output/A3_kappa_convergence.csv
+output/A4_per_year_anchor.csv
+output/A5_proposition_verification.csv
+output/T1_correction_path.csv
+output/T2_effect_distribution.csv
+output/T3_gradient_cohorts.csv
+output/T3b_cohort_table.csv
+output/T4_fe_reconciliation.csv
+output/T5_injection.csv
+output/T6_ge_propagation.csv
+output/T7_pearson_loggap_2x2.csv
+output/gate_report.csv
+output/gate_report.rds
+output/cross_check_register.R
+
+# Exhibit Pack - Figures
+output/F1_moment_convergence.pdf
+output/F2_effect_density.pdf
+output/F3_tail_adequacy.pdf
+output/F4_thetaD_convergence.pdf
+output/F1_moment_convergence.png
+output/F2_effect_density.png
+output/F3_tail_adequacy.png
+output/F4_thetaD_convergence.png
+
+# Exhibit Pack - Human-curated (NOT written by Z0)
+output/canonical_facts.md
+output/invalidation_register.md
+
+# Sidecars (meta files)
+output/.A0_anchor_table.csv.meta.txt
+output/.A1_vuong.csv.meta.txt
+output/.A2_residual_tails.csv.meta.txt
+output/.A3_kappa_convergence.csv.meta.txt
+output/.A4_per_year_anchor.csv.meta.txt
+output/.A5_proposition_verification.csv.meta.txt
+output/.F2_effect_density.pdf.meta.txt
+output/.T1_correction_path.csv.meta.txt
+output/.T2_effect_distribution.csv.meta.txt
+output/.T3_gradient_cohorts.csv.meta.txt
+output/.T3b_cohort_table.csv.meta.txt
+output/.T4_fe_reconciliation.csv.meta.txt
+output/.T5_injection.csv.meta.txt
+output/.T6_ge_propagation.csv.meta.txt
+output/.T7_pearson_loggap_2x2.csv.meta.txt
