@@ -1,0 +1,4 @@
+"Comparison","Vuong_Stat","P_Value","Preferred"
+"Lognormal vs Normal",3.42,0.001,"Lognormal"
+"Lognormal vs GPD",1.87,0.062,"Lognormal (marginal)"
+"Lognormal vs Mixture K=2",-0.34,0.734,"Indistinguishable"

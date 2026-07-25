@@ -1,0 +1,8 @@
+"Definition","Mean","SD","SplitHalf_r","Placebo_Mean","Placebo_SD","Placebo_r","Source"
+"A (log-ratio)",-0.2738,1.6641,0.9720,-0.7121,1.1165,0.62,"NAIVE_GROUND_TRUTH.rds"
+"B (ratio-of-logs)",0.0854,1.5819,NA,NA,NA,NA,"NAIVE_GROUND_TRUTH.rds"
+"D (canonical)",0.2138,0.5950,NA,NA,NA,NA,"W1_pop_canon.rds"
+"D (deconv idset lo)",0.2138,0.39,NA,NA,NA,NA,"SD_THETA_IDSET lower"
+"D (deconv idset hi)",0.2138,0.46,NA,NA,NA,NA,"SD_THETA_IDSET upper"
+"D (deconv K=2)",0.2138,0.324,NA,NA,NA,NA,"W2_results.rds DECONV_K2"
+"D (deconv K=3)",0.2138,0.306,NA,NA,NA,NA,"W2_results.rds DECONV_K3"

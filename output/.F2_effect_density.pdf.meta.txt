@@ -1,0 +1,6 @@
+# F2 metadata
+Generated: 2026-07-24 15:03:33.046796
+IMPORTANT: Densities are DECONVOLVED scale
+K3 mode: 6.383 (>4.0)
+sha_K2: 72e405aa74ea72ab238d8d68c3139524a8f9b34d805f34ff913cadc61a2087cc
+sha_K3: f9fe84cd489bb02c4d3935ea24d7b4c4bec9f504a4a14ad75a8191a8dcfaa5b7

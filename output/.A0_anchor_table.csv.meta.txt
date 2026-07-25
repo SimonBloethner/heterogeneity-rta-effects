@@ -1,0 +1,25 @@
+# A0_anchor_table.csv metadata
+# Generated: 2026-07-24
+# Source: X1_results.rds$anchor_table
+
+## Description
+Year-by-year Step-1 estimates from X1 corrected log-normal anchor computation.
+
+## Columns
+- year: Calendar year (1988-2019)
+- u: Mean log trade flow
+- mu_hat: Estimated mu parameter
+- sigma_hat: Estimated sigma parameter
+- H_hat: Estimated H (pair count)
+- E_S: Expected count above threshold
+- empirical: Observed count above threshold
+- omega: Ratio empirical/E_S (diagnostic)
+- share_above_ES: Share of observations above E_S
+
+## Verification Gates
+- 2019 E_S: 7011.25 (target: 7009 +/- 20) PASS
+- 2019 omega: 1.058 (target: 1.058 +/- 0.01) PASS
+- All omega in [0.948, 1.091] subset of [0.94, 1.10] PASS
+
+## Source SHA256
+- X1_results.rds: 6d4898372e775926d538e570a3b74f9e22749e85c4be02ee7f70682bfdd64d65

@@ -1,0 +1,5 @@
+"Correlation","Pearson_R","P_Value","N"
+"Pre-Post within pair",0.83,"<0.001",4182
+"Across pairs (pre)",0.42,"<0.001",4182
+"Across pairs (post)",0.38,"<0.001",4182
+"Split-half reliability",0.76,"<0.001",2091

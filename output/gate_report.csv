@@ -1,0 +1,11 @@
+"Gate","Formula","Source_SHA","Value","Lower","Upper","Pass"
+"Anchor_n","nrow(W1_pop_canon)","27bed9d2c07b452ea5b7bdaa1873c0974f48e0e5db72760bc89aafa9111feeab",4182,4182,4182,TRUE
+"Anchor_mean","mean(theta_D)","27bed9d2c07b452ea5b7bdaa1873c0974f48e0e5db72760bc89aafa9111feeab",0.213790352516708,0.2118,0.2158,TRUE
+"Anchor_sd","sd(theta_D)","27bed9d2c07b452ea5b7bdaa1873c0974f48e0e5db72760bc89aafa9111feeab",0.595001613084413,0.59,0.6,TRUE
+"T6_q50","tc_q50[MED,5,A]","870066261740aa6fcb02d1d864326e4d79e0ef705f6da69963ddc6b5cab97af2",0.2208,0.2,0.24,TRUE
+"T6_RANGE_1090","(1+tc_q90)/(1+tc_q10) arm A","870066261740aa6fcb02d1d864326e4d79e0ef705f6da69963ddc6b5cab97af2",1.35888439046334,1.3,1.42,TRUE
+"T6_RANGE_NORMAL","(1+tc_q90)/(1+tc_q10) arm B","870066261740aa6fcb02d1d864326e4d79e0ef705f6da69963ddc6b5cab97af2",2.2488,2.0,2.3,TRUE
+"T3_Q1","mean(theta_D|Q1)","5db7cac2ca5cc5524e1eeba3240c5940e46f5da123fd5d194592cf6e0adf0935",0.561463938019527,0.5,0.62,TRUE
+"T3_Q5","mean(theta_D|Q5)","5db7cac2ca5cc5524e1eeba3240c5940e46f5da123fd5d194592cf6e0adf0935",0.0967934918578997,0.06,0.14,TRUE
+"T3_Spearman","cor(log_pre_mean,theta_D,spearman)","5db7cac2ca5cc5524e1eeba3240c5940e46f5da123fd5d194592cf6e0adf0935",-0.49981786414667,-0.56,-0.44,TRUE
+"T1_placebo_mean","G2c_results$mean_placebo","65ca4db1537aa747fade8c13e51e9fc8b4fc8ce8ce562bad66f5fbabdc29fe8d",-0.71214410265464,-0.72,-0.7,TRUE

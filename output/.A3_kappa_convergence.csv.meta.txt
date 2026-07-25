@@ -1,0 +1,6 @@
+source_script: V2_kappa_estimation.R
+sha256: 638a342e59141c1e041cb7b438f07f78794e4590a4a847d50d2115d29fd7aaed
+assertions:
+  - Kappa converges to 1
+  - 15-year canonical
+generated: 2026-07-23 18:22:54.830617

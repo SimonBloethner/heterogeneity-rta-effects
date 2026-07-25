@@ -1,0 +1,22 @@
+# T3b_cohort_table.csv metadata
+# Generated: 2026-07-24
+# Source: W1_pop_canon.rds merged with N0_data.rds adoption_year
+
+## Description
+Cohort analysis of RTA effects by adoption timing (pre/post-2008).
+
+## Columns
+- cohort: "pre_2008" or "post_2008" based on adoption_year
+- n: Number of pairs in cohort
+- mean_theta_D: Mean theta_D estimate for cohort
+- sd_theta_D: Standard deviation of theta_D
+
+## Key Finding
+Pre-2008 adoptions (n=1938) show higher mean effect (0.29) with lower variance (0.34).
+Post-2008 adoptions (n=2244) show lower mean effect (0.15) with higher variance (0.74).
+
+while later RTAs show more heterogeneous outcomes.
+
+## Source SHA256
+- W1_pop_canon.rds: 27bed9d2c07b452ea5b7bdaa1873c0974f48e0e5db72760bc89aafa9111feeab
+- N0_data.rds: 329721092fff490ab2c7825052cbf73bc0384698dd780689760aceb20325fd73

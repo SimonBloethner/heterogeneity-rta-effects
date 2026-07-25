@@ -1,0 +1,5 @@
+"Measure","Common_Coef","Theta_D_Centered","Placebo_Bench"
+"IQR ratio (post/pre)","0.62","0.62","1.02"
+"Table 6 claimed ratio","~5-7×","~5-7×","~1.0 (null)"
+"Variance identity check","Passed","Passed","Passed"
+"Attribution","Common θ̂ residuals","Pair-specific θ̂_D removed","Non-switcher reference"

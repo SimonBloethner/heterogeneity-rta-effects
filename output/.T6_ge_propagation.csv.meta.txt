@@ -1,0 +1,6 @@
+source_script: O5_deconvolution.R
+sha256: f1f60c99bd30af0e7981549c482ac813badff46c1d0a8378aebbead2e528d6f1
+assertions:
+  - exp(IQR) in [1.30,1.42]
+  - Median dyad propagation
+generated: 2026-07-23 18:22:54.814814

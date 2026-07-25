@@ -1,0 +1,6 @@
+source_script: PROP_verify_all.R
+sha256: 7bf37cee7b93feaf2c0bb7787700d6854622d0571c4b94a2192357a267f2860e
+assertions:
+  - All four propositions verified
+  - P4 critical
+generated: 2026-07-23 18:22:54.838573

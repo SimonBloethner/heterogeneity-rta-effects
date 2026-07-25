@@ -1,0 +1,6 @@
+source_script: D2_distribution_tests.R
+sha256: 9845d2cc35d348b244b26d6d39456320be86018211ce0f264dc0b9b3123bedb8
+assertions:
+  - Lognormal preferred
+  - GPD marginal
+generated: 2026-07-23 18:22:54.822811

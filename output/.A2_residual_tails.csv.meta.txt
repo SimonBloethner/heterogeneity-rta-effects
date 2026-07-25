@@ -1,0 +1,5 @@
+source_script: D3_tail_analysis.R
+sha256: 9e4285a023d8ed354928f792994ac694561934eac282d7faf2b707d246b76efd
+assertions:
+  - Heavy tails vs Normal
+generated: 2026-07-23 18:22:54.826747

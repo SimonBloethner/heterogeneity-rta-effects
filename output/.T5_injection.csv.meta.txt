@@ -1,0 +1,6 @@
+source_script: V3c_injection_test.R
+sha256: 4df58ba96aabe2c4aaa6ab636e7209ec8e7713c9eb38f4ec29b1698666785cd8
+assertions:
+  - Five injection scenarios
+  - Contains 0.40/0.06 row
+generated: 2026-07-23 18:22:54.810737

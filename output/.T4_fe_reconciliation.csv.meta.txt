@@ -1,0 +1,6 @@
+source_script: X1_specifications.R
+sha256: ad3e53e39ea6a49c15a1336abdd760bee34866e7012e930412d5aee22e0fd63c
+assertions:
+  - IQR ratio 0.62
+  - Contradicts Table 6
+generated: 2026-07-23 18:22:54.806767

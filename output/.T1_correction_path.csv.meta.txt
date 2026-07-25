@@ -1,0 +1,6 @@
+source_script: Q4_build_exhibits.R
+sha256: 6a4cebdaa711b4a34883af03c70f475bde74de11c450fd1b81dca2f5a6e45ad8
+assertions:
+  - Six correction steps
+  - Row A shows naive bias
+generated: 2026-07-23 18:22:54.791723

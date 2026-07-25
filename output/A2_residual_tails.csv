@@ -1,0 +1,3 @@
+"Tail","N_Observed","Pct_Total","Expected_Normal","Expected_Lognormal","naive reference (retired estimator)"
+"Left (theta < -1)",412,9.9,167,398,2.1
+"Right (theta > 1)",389,9.3,167,401,2.3

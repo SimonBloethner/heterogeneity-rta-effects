@@ -1,0 +1,14 @@
+# T3_gradient_cohorts.csv metadata
+# Generated: %Y-%m-%d %H:%M:%S
+# Source: X5_results.rds (SHA256: 5db7cac2ca5cc5524e1eeba3240c5940e46f5da123fd5d194592cf6e0adf0935)
+# Description: Size gradient analysis - mean theta_D by pre-adoption mean trade quintile
+# 
+# Correlations (theta_D vs log_pre_mean):
+#   Pearson: -0.2687 [-0.3040, -0.2376]
+#   Spearman: -0.4998 [-0.5269, -0.4741]
+#
+# Columns:
+#   size_quintile: Quintile of pre-adoption mean trade (1=smallest, 5=largest)
+#   n: Number of pairs in quintile
+#   mean_theta_D: Mean theta_D estimate for quintile
+
