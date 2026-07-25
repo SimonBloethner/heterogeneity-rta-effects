@@ -1,0 +1,6 @@
+file: T2_variance_decomposition.csv
+sha256: f240bdae8878526f2d9c07b1fd32ed2930808ecd0921ad2372e378a672efd9ca
+created: 2026-07-25 20:57:03
+script: S10_exhibits.R
+description: Variance decomposition: Var(theta) = Var(theta_hat) - E[se^2]
+

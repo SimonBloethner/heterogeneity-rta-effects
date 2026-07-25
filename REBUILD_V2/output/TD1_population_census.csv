@@ -1,0 +1,7 @@
+rule,description,pairs_remaining,pairs_dropped
+R0,All pairs in data,46803,0
+R1,Single switchers (one 0->1 transition),6339,40464
+R2,"Adoption year in [1991, 2016]",5586,753
+R3,Has valid PPML predictions,5586,0
+R4,At least 3 pre-years (excl. anticipation),4712,874
+R5,At least 3 post-years,4639,73

@@ -1,0 +1,6 @@
+file: T1_spec_spread.csv
+sha256: 718628530452733a0f7aa88473640846c0d0d91522fbc023a9476992d6e7f184
+created: 2026-07-25 20:57:03
+script: S10_exhibits.R
+description: Four-specification RTA coefficient comparison
+

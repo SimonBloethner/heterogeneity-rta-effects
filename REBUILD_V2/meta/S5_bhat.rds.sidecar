@@ -1,0 +1,13 @@
+FILE:      S5_bhat.rds
+SHA256:    e7287358552e8385d347fa640d9e541261a155a2f353e4e95c4106e1cfea5b18
+PRODUCER:  code/S5_bhat.R (SHA256: b58831e00cbb5746c3e0cc5ff5d986766180fcd079e42d15355936481c5f81b4)
+INPUTS:    data/S3_theta.rds, data/S4_placebo.rds, data/S1_ppml.rds, data/S2_pairs.rds
+SEEDS:     20260719, 42, 999, 12345
+GATE:      finite_SD [PASS, 2026-07-25 20:24:49]
+GATE:      nonNA_bhat [PASS, 2026-07-25 20:24:49]
+R_VERSION: 4.4.1
+CREATED:   2026-07-25 20:24:49
+
+=== KEY RESULTS ===
+theta_D: n=6339, mean=0.030688, SD=0.796111
+Q1-Q5 spread (seed 20260719): -0.802484

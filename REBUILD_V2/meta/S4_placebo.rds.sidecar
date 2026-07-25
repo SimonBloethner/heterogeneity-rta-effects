@@ -1,0 +1,13 @@
+FILE:      S4_placebo.rds
+SHA256:    e0b576023bf987ea950676d36e22f787eb52674de1cdf29250211e394858e40b
+PRODUCER:  code/S4_placebo.R (SHA256: 0b9cd190a13c01c2a2483e33946a01fd105b36ce2d1cac6f8af71bd7e8ec0b02)
+INPUTS:    data/S1_ppml.rds (SHA256: cb72379201724d067c7fd8368a586861dbc55d05bd10bdf31db3f19ca1f7384e)
+           data/S2_pairs.rds (SHA256: f72f7cc21b9fdcc922bf400026fb5357be9a9c6aeb631f8d0d4587d58fbbfad8)
+SEED:      20260719
+MATCHING:  size_decile only
+GATE:      rta==0_always [PASS, 2026-07-25 20:23:21]
+GATE:      not_in_treated [PASS, 2026-07-25 20:23:21]
+GATE:      reproducible [PASS, 2026-07-25 20:23:21]
+R_VERSION: 4.4.1
+ROWS:      6339
+CREATED:   2026-07-25 20:23:21

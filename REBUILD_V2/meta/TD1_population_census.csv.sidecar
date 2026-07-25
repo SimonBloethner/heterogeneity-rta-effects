@@ -1,0 +1,12 @@
+FILE:      TD1_population_census.csv
+SHA256:    c2b092687d3ab47ca8dd046f5555f0c089d9014ce5a5be06dc16a233d72b6df8
+PRODUCER:  code/S6_population.R (SHA256: d0b1f8039be417e92046d42f06c29a31b1760e1dc2acad22a9d14d47f963bbe2)
+INPUTS:    data/S1_ppml.rds (SHA256: cb72379201724d067c7fd8368a586861dbc55d05bd10bdf31db3f19ca1f7384e)
+           data/S2_pairs.rds (SHA256: f72f7cc21b9fdcc922bf400026fb5357be9a9c6aeb631f8d0d4587d58fbbfad8)
+SEED:      NONE
+GATE:      census_sums_correct [PASS, 2026-07-25 20:28:07]
+GATE:      no_duplicate_pairs [PASS, 2026-07-25 20:28:07]
+R_VERSION: 4.4.1
+ROWS:      6
+FINAL_POPULATION: 4639
+CREATED:   2026-07-25 20:28:07

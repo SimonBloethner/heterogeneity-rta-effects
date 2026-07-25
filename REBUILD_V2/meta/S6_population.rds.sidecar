@@ -1,0 +1,9 @@
+FILE:      S6_population.rds
+SHA256:    42c6211c9c6fd957421623f575f9acc77f0c5aadf7267ac6e9cd4935f196be70
+PRODUCER:  code/S6_population.R
+INPUTS:    data/S1_ppml.rds, data/S2_pairs.rds
+SEED:      NONE
+GATE:      n == 4639 [PASS]
+R_VERSION: 4.4.1
+ROWS:      4639
+CREATED:   2026-07-25

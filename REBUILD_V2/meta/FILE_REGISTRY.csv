@@ -1,0 +1,43 @@
+file_path,kind,producer_script,inputs,seed,gate,stage,status
+meta/FILE_REGISTRY.csv,meta,manual,NONE,NONE,exists,0,DECLARED
+meta/SIDECAR_TEMPLATE.txt,meta,manual,NONE,NONE,exists,0,DECLARED
+code/gates_lib_v2.R,code,copy,NONE,NONE,sha256_match,0,DECLARED
+code/enforce.R,code,manual,NONE,NONE,syntax_valid,0,DECLARED
+code/S1_ppml.R,code,manual,data/ITPDE_total.rds,NONE,syntax_valid,1,DECLARED
+data/S1_ppml.rds,data,code/S1_ppml.R,data/ITPDE_total.rds,NONE,nrow==794720;year_range==1988-2019;no_NA_yhat,1,DECLARED
+meta/S1_ppml.rds.sidecar,meta,code/S1_ppml.R,data/S1_ppml.rds,NONE,exists,1,DECLARED
+code/S2_pairs.R,code,manual,data/S1_ppml.rds,NONE,syntax_valid,2,DECLARED
+data/S2_pairs.rds,data,code/S2_pairs.R,data/S1_ppml.rds,NONE,classifications_sum_to_total,2,DECLARED
+meta/S2_pairs.rds.sidecar,meta,code/S2_pairs.R,data/S2_pairs.rds,NONE,exists,2,DECLARED
+code/S3_theta.R,code,manual,data/S1_ppml.rds;data/S2_pairs.rds,NONE,syntax_valid,2,DECLARED
+data/S3_theta.rds,data,code/S3_theta.R,data/S1_ppml.rds;data/S2_pairs.rds,NONE,no_NA_theta_B;n_post>=1,2,DECLARED
+meta/S3_theta.rds.sidecar,meta,code/S3_theta.R,data/S3_theta.rds,NONE,exists,2,DECLARED
+code/S4_placebo.R,code,manual,data/S1_ppml.rds;data/S2_pairs.rds,20260719,syntax_valid,3,DECLARED
+data/S4_placebo.rds,data,code/S4_placebo.R,data/S1_ppml.rds;data/S2_pairs.rds,20260719,rta==0_always;not_in_treated;reproducible_seed,3,DECLARED
+meta/S4_placebo.rds.sidecar,meta,code/S4_placebo.R,data/S4_placebo.rds,NONE,exists,3,DECLARED
+code/S5_bhat.R,code,manual,data/S3_theta.rds;data/S4_placebo.rds,NONE,syntax_valid,3,DECLARED
+data/S5_bhat.rds,data,code/S5_bhat.R,data/S3_theta.rds;data/S4_placebo.rds,NONE,finite_SD;nonNA_per_decile,3,DECLARED
+meta/S5_bhat.rds.sidecar,meta,code/S5_bhat.R,data/S5_bhat.rds,NONE,exists,3,DECLARED
+code/S6_population.R,code,manual,data/S1_ppml.rds;data/S2_pairs.rds,NONE,syntax_valid,4,DECLARED
+output/TD1_population_census.csv,output,code/S6_population.R,data/S1_ppml.rds;data/S2_pairs.rds,NONE,rows_sum_to_final;no_duplicate_pairs,4,DECLARED
+meta/TD1_population_census.csv.sidecar,meta,code/S6_population.R,output/TD1_population_census.csv,NONE,exists,4,DECLARED
+data/S6_population.rds,data,code/S6_population.R,data/S1_ppml.rds;data/S2_pairs.rds,NONE,n==4639,4,DECLARED
+meta/S6_population.rds.sidecar,meta,code/S6_population.R,data/S6_population.rds,NONE,exists,4,DECLARED
+code/S7_deconv.R,code,manual,data/S5_bhat.rds;data/S3_theta.rds,20260719,syntax_valid,5,DECLARED
+data/S7_deconv.rds,data,code/S7_deconv.R,data/S5_bhat.rds;data/S3_theta.rds,20260719,identified_set_valid,5,DECLARED
+meta/S7_deconv.rds.sidecar,meta,code/S7_deconv.R,data/S7_deconv.rds,NONE,exists,5,DECLARED
+meta/DEPENDENCY_GRAPH.txt,meta,code/enforce.R,all,NONE,complete_trace,6,DECLARED
+output/canonical_facts.md,output,code/build_facts.R,all,NONE,all_ids_sourced,6,DECLARED
+code/S10_exhibits.R,code,S10: Generate exhibit tables
+output/T1_spec_spread.csv,output,Specification spread table
+output/T2_variance_decomposition.csv,output,Variance decomposition
+output/T3_size_gradient.csv,output,Size gradient by quintile
+output/T3b_cohort_table.csv,output,Cohort analysis
+output/T4_ge_propagation.csv,output,GE propagation quantiles
+output/T5_theta_summary.csv,output,Theta distribution summary
+meta/T1_spec_spread.csv.sidecar,meta,Sidecar
+meta/T2_variance_decomposition.csv.sidecar,meta,Sidecar
+meta/T3_size_gradient.csv.sidecar,meta,Sidecar
+meta/T3b_cohort_table.csv.sidecar,meta,Sidecar
+meta/T4_ge_propagation.csv.sidecar,meta,Sidecar
+meta/T5_theta_summary.csv.sidecar,meta,Sidecar

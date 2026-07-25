@@ -1,0 +1,22 @@
+FILE:      S1_ppml.rds
+SHA256:    cb72379201724d067c7fd8368a586861dbc55d05bd10bdf31db3f19ca1f7384e
+PRODUCER:  code/S1_ppml.R (SHA256: bddbb20d37041fe37ffeb28ae6857298af0d644d43cf770294c351fce75f177d)
+INPUTS:    /groups/m-larch/bt307958/tails/data/ITPDE_total.rds (SHA256: e488c36afdf7c9fd1d38667a18b7855eb39e4085430ef96eab946e2d89fe4c01)
+SEED:      NONE
+GATE:      nrow == 794720 [PASS, 2026-07-25 20:14:57]
+GATE:      year_range == 1988-2019 [PASS, 2026-07-25 20:14:57]
+GATE:      nobs_recorded == 791280 [PASS, 2026-07-25 20:14:57]
+GATE:      no_NA_yhat_in_model [PASS, 2026-07-25 20:14:57]
+GATE:      no_NA_yhat0_in_model [PASS, 2026-07-25 20:14:57]
+R_VERSION: 4.4.1
+ROWS:      794720
+ROWS_IN_MODEL: 791280
+COLS:      exporter, importer, pair, year, trade, rta, y_hat, y_hat_0, in_model
+CREATED:   2026-07-25 20:14:57
+
+=== MODEL RESULTS ===
+RTA coefficient: 0.094210
+RTA std. error:  0.030124
+Observations (fit nobs): 791280
+Rows with predictions: 791280
+Rows dropped: 3440

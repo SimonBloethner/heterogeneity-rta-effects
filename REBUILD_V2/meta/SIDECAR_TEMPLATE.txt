@@ -1,0 +1,12 @@
+FILE:      <name>
+SHA256:    <sha256sum of file>
+PRODUCER:  <script path> (SHA256: <sha256 of script>)
+INPUTS:    <path> (SHA256: <sha256>)
+           <additional inputs, one per line>
+SEED:      <integer or NONE>
+GATE:      <assertion> [PASS|FAIL, <timestamp>]
+           <additional gates, one per line>
+R_VERSION: <R --version string>
+ROWS:      <nrow() if applicable>
+COLS:      <column names if applicable>
+CREATED:   <timestamp>

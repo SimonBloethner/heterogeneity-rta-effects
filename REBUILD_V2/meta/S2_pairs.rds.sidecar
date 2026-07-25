@@ -1,0 +1,19 @@
+FILE:      S2_pairs.rds
+SHA256:    f72f7cc21b9fdcc922bf400026fb5357be9a9c6aeb631f8d0d4587d58fbbfad8
+PRODUCER:  code/S2_pairs.R (SHA256: 5756529e9407df6c0d3eb3d9b074f6a488bceb08e33d68e8189937fd25bf067c)
+INPUTS:    data/S1_ppml.rds (SHA256: cb72379201724d067c7fd8368a586861dbc55d05bd10bdf31db3f19ca1f7384e)
+SEED:      NONE
+GATE:      classifications_sum_to_total [PASS, 2026-07-25 20:18:02]
+GATE:      no_duplicate_pairs [PASS, 2026-07-25 20:18:02]
+R_VERSION: 4.4.1
+ROWS:      46803
+CREATED:   2026-07-25 20:18:02
+
+=== CLASSIFICATION COUNTS ===
+single_switcher:  6339
+multi_switcher:   258
+ever_treated:     6597
+always_treated:   3743
+never_treated:    36463
+other:            0
+TOTAL:            46803

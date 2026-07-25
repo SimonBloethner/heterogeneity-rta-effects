@@ -1,0 +1,21 @@
+FILE:      S3_theta.rds
+SHA256:    9fd6f3de20236721df2c10a707989e3bc4fc6974d83f093f665ab7c9343ef860
+PRODUCER:  code/S3_theta.R (SHA256: 932fbe95a0b9e3d5ae6a4936451d098cca96a8444e498da5254a38df2920df7f)
+INPUTS:    data/S1_ppml.rds (SHA256: cb72379201724d067c7fd8368a586861dbc55d05bd10bdf31db3f19ca1f7384e)
+           data/S2_pairs.rds (SHA256: f72f7cc21b9fdcc922bf400026fb5357be9a9c6aeb631f8d0d4587d58fbbfad8)
+SEED:      NONE
+DECISION:  Option A - Single switchers only
+GATE:      no_NA_theta_B_when_n_post>0 [PASS, 2026-07-25 20:20:11]
+GATE:      row_count == 6339 [PASS, 2026-07-25 20:20:11]
+R_VERSION: 4.4.1
+ROWS:      6339
+ROWS_VALID_THETA: 6339
+CREATED:   2026-07-25 20:20:11
+
+=== THETA STATISTICS ===
+theta_A mean: -0.590559
+theta_A SD:   1.139177
+theta_B mean: -0.122080
+theta_B SD:   0.811322
+n valid:      6339
+n invalid:    0

@@ -1,0 +1,13 @@
+FILE:      S7_deconv.rds
+SHA256:    c2b85d59166f3eaeeaa2194635984757acead64ab1a6226d2f44bc338178f793
+PRODUCER:  code/S7_deconv.R (SHA256: 23d33101f5f133f1d0a88062ed226b94947fb9f48238c6cfe5c764393bff09b2)
+INPUTS:    data/S5_bhat.rds, data/S3_theta.rds, data/S6_population.rds
+SEED:      20260719
+GATE:      identified_set_valid [PASS, 2026-07-25 20:31:14]
+R_VERSION: 4.4.1
+CREATED:   2026-07-25 20:31:14
+
+=== KEY RESULTS (BASELINE n=4639) ===
+Mean(theta_D): 0.043822
+SD(theta):     0.538717
+Q1-Q5 spread:  -0.434752

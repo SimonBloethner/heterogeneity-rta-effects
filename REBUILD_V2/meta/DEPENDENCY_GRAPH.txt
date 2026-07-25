@@ -1,0 +1,58 @@
+# DEPENDENCY GRAPH — REBUILD_V2
+# Generated: 2026-07-25
+
+## Input Data
+ITPDE_total.rds (external)
+  SHA256: e488c36afdf7c9fd1d38667a18b7855eb39e4085430ef96eab946e2d89fe4c01
+  Path: /groups/m-larch/bt307958/tails/data/ITPDE_total.rds
+
+## Stage 1: PPML
+ITPDE_total.rds --> S1_ppml.R --> S1_ppml.rds
+  Output SHA256: cb72379201724d067c7fd8368a586861dbc55d05bd10bdf31db3f19ca1f7384e
+
+## Stage 2: Pair Classification
+S1_ppml.rds --> S2_pairs.R --> S2_pairs.rds
+  Output SHA256: f72f7cc21b9fdcc922bf400026fb5357be9a9c6aeb631f8d0d4587d58fbbfad8
+
+S1_ppml.rds + S2_pairs.rds --> S3_theta.R --> S3_theta.rds
+  Output SHA256: 9fd6f3de20236721df2c10a707989e3bc4fc6974d83f093f665ab7c9343ef860
+
+## Stage 3: Placebo and b_hat
+S1_ppml.rds + S2_pairs.rds --> S4_placebo.R --> S4_placebo.rds
+  Seed: 20260719
+  Output SHA256: e0b576023bf987ea950676d36e22f787eb52674de1cdf29250211e394858e40b
+
+S3_theta.rds + S4_placebo.rds --> S5_bhat.R --> S5_bhat.rds
+  Output SHA256: e7287358552e8385d347fa640d9e541261a155a2f353e4e95c4106e1cfea5b18
+
+## Stage 4: Population Census
+S1_ppml.rds + S2_pairs.rds --> S6_population.R --> S6_population.rds
+  Output SHA256: 42c6211c9c6fd957421623f575f9acc77f0c5aadf7267ac6e9cd4935f196be70
+
+S6_population.R --> TD1_population_census.csv
+  Output SHA256: c2b092687d3ab47ca8dd046f5555f0c089d9014ce5a5be06dc16a233d72b6df8
+
+## Stage 5: Downstream
+S5_bhat.rds + S3_theta.rds + S6_population.rds --> S7_deconv.R --> S7_deconv.rds
+  Seed: 20260719
+  Output SHA256: c2b85d59166f3eaeeaa2194635984757acead64ab1a6226d2f44bc338178f793
+
+## Canonical Numbers Trace
+
+Mean theta_D = +0.044 (BASELINE)
+  <-- S7_deconv.rds
+  <-- S5_bhat.rds (b_hat)
+  <-- S4_placebo.rds (placebo theta_B)
+  <-- S3_theta.rds (real theta_B)
+  <-- S1_ppml.rds (y_hat_0)
+  <-- ITPDE_total.rds (trade)
+
+SD(theta) = 0.539
+  <-- S7_deconv.rds
+  <-- S3_theta.rds (se_B)
+  <-- S1_ppml.rds
+
+Q1-Q5 spread = -0.435
+  <-- S7_deconv.rds
+  <-- S5_bhat.rds
+  <-- S6_population.rds (BASELINE filter)

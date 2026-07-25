@@ -1,0 +1,14 @@
+file: S9_spec.rds
+sha256: 4585ede8d3272c00034a80168c5b33385919797f70f141e16dbef8690899782f
+created: 2026-07-25 20:46:53
+script: S9_spec_spread.R
+description: Four-specification comparison (B, C, CY, FULL)
+gates:
+  A_full_vs_s1: PASS (diff=0.000457)
+  B_monotonic: PASS
+summary:
+  B_bilateral: 1.4020
+  C_country: 0.9222
+  CY_country_year: 0.4108
+  FULL_full: 0.0947
+  spread_B_minus_FULL: 1.3073

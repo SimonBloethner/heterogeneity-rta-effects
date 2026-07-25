@@ -1,0 +1,6 @@
+file: T3b_cohort_table.csv
+sha256: 0e4dbaf54457011c07c3784a4d65c743917dc26c03c98d15ab6ac523aac824b1
+created: 2026-07-25 20:57:03
+script: S10_exhibits.R
+description: Cohort analysis: early vs late adopters, by 5-year bins
+

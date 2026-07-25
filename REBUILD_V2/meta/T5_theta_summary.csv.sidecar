@@ -1,0 +1,6 @@
+file: T5_theta_summary.csv
+sha256: 8c10c9174425a6773d0701370cffc4e5530f814f65a53a2bb1b0527bfa0129d1
+created: 2026-07-25 20:57:03
+script: S10_exhibits.R
+description: Theta distribution summary statistics
+

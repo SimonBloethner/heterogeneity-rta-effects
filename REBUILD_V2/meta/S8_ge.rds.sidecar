@@ -1,0 +1,7 @@
+file: S8_ge.rds
+sha256: fe28f6c225ede3b7d4d02dbc567ec51c5da3ecb83a0895209af5c1411ac7298e
+created: 2026-07-25 20:52:51
+script: S8_ge_propagation.R
+seed: 20260719
+summary: q50=0.1931, range=2.6955
+

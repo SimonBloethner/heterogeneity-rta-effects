@@ -1,0 +1,6 @@
+code/S8_ge_propagation.R,code,S8: GE propagation quantiles
+code/S9_spec_spread.R,code,S9: Four-specification comparison
+data/S8_ge.rds,data,GE trade cost change quantiles
+data/S9_spec.rds,data,Specification spread results
+meta/S8_ge.rds.sidecar,meta,Sidecar for S8_ge.rds
+meta/S9_spec.rds.sidecar,meta,Sidecar for S9_spec.rds
