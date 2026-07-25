@@ -1,0 +1,16 @@
+FILE:      T6_matching_sensitivity.csv
+SHA256:    48d6e52c779e3e3ba2a247cd25f99708147daa7b03b46c9d8da0211464242f73
+PRODUCER:  code/S13_matching_sensitivity.R (SHA256: d1a9056373bcb1e25025b7c3273dab296e28ace42121d06221eb3c8c4a45bec9)
+INPUTS:    data/S6_population.rds (SHA256: 42c6211c9c6fd957421623f575f9acc77f0c5aadf7267ac6e9cd4935f196be70)
+           data/S3_theta.rds (SHA256: 9fd6f3de20236721df2c10a707989e3bc4fc6974d83f093f665ab7c9343ef860)
+           data/S2_pairs.rds (SHA256: f72f7cc21b9fdcc922bf400026fb5357be9a9c6aeb631f8d0d4587d58fbbfad8)
+           data/S1_ppml.rds (SHA256: cb72379201724d067c7fd8368a586861dbc55d05bd10bdf31db3f19ca1f7384e)
+SEEDS:     20260719, 42, 999, 12345
+GATE:      8_configurations_complete [PASS, n=8]
+GATE:      all_gradients_finite [PASS]
+CREATED:   2026-07-25 21:37:45
+
+=== SENSITIVITY SUMMARY ===
+Q1-Q5 spread range: [0.6757, 1.9329]
+Q1-Q5 spread mean:  1.1634
+Q1-Q5 spread SD:    0.3804

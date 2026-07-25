@@ -1,0 +1,11 @@
+FILE:      T5b_theta_summary.csv
+SHA256:    4345a4e81d71c2bfc53fb7c937c8c9d331607497cfd64989b0d86e9a9ba86ae3
+PRODUCER:  code/S11_baseline_fix.R (SHA256: 828300b55e1aa9f44a1c16deb9f8841268cee2008233416df4a4382d2b8ef811)
+INPUTS:    data/S6_population.rds (SHA256: 42c6211c9c6fd957421623f575f9acc77f0c5aadf7267ac6e9cd4935f196be70)
+           data/S5_bhat.rds (SHA256: e7287358552e8385d347fa640d9e541261a155a2f353e4e95c4106e1cfea5b18)
+SEED:      NONE
+GATE:      BASELINE_n == 4639 [PASS, actual=4639]
+CREATED:   2026-07-25 21:32:47
+
+NOTE: This exhibit SUPERSEDES T5_theta_summary.csv which used n=4875 (naive BASELINE).
+      Corrected BASELINE uses S6_population.rds with anticipation exclusion.

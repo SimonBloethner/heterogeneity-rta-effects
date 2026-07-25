@@ -1,0 +1,15 @@
+FILE:      T3b_size_gradient_fixed.csv
+SHA256:    a450ce3a9cd2d98533f72e1968d686e4f4f890583ca3f3c13878add633738356
+PRODUCER:  code/S12_gradient_fix.R (SHA256: d84a737e98f8099270edd60f2418c7ca110416c0055e84f2dc4f437bfc72a853)
+INPUTS:    data/S6_population.rds (SHA256: 42c6211c9c6fd957421623f575f9acc77f0c5aadf7267ac6e9cd4935f196be70)
+           data/S5_bhat.rds (SHA256: e7287358552e8385d347fa640d9e541261a155a2f353e4e95c4106e1cfea5b18)
+           data/S1_ppml.rds (SHA256: cb72379201724d067c7fd8368a586861dbc55d05bd10bdf31db3f19ca1f7384e)
+SEED:      NONE
+GATE:      equal_bins [PASS, max_diff=1]
+GATE:      BASELINE_n == 4639 [PASS, n=4639]
+CREATED:   2026-07-25 21:32:57
+
+NOTE: This exhibit SUPERSEDES T3_size_gradient.csv which used fake quintiles.
+      OLD Q1-Q5 spread: -0.4348 (fake quintiles from size_decile)
+      NEW Q1-Q5 spread: 0.1048 (real equal quintiles within BASELINE)
+      GRADIENT DIRECTION REVERSED!
