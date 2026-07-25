@@ -11,6 +11,29 @@ suppressPackageStartupMessages({
     library(data.table)
 })
 
+# -----------------------------------------------------------------------------
+# D1: REFERENCE FILE AND PATH GUARDS
+# -----------------------------------------------------------------------------
+REFERENCE_PATH <- "/scratch/bt307958/X5_rng_reference.rds"
+OUTPUT_PATH <- "/scratch/bt307958/X5_results.rds"
+LOCAL_OUTPUT_PATH <- "/scratch/bt307958/data/X5_results.rds"
+
+# Guard: reference and output paths must differ (structural prevention of D1 defect)
+if (REFERENCE_PATH == OUTPUT_PATH) {
+    stop("FATAL: REFERENCE_PATH and OUTPUT_PATH are identical. This is structurally forbidden.")
+}
+cat("PATH GUARD: REFERENCE_PATH != OUTPUT_PATH: PASS\n")
+
+# Guard: reference file must exist
+if (!file.exists(REFERENCE_PATH)) {
+    stop("FATAL: Reference file does not exist: ", REFERENCE_PATH,
+         "\nThe H3 gate requires a frozen reference. Halting immediately.")
+}
+cat("REFERENCE GUARD: ", REFERENCE_PATH, " exists: PASS\n\n")
+
+# Load reference for later comparison
+rng_reference <- readRDS(REFERENCE_PATH)
+
 set.seed(20260721)
 
 # -----------------------------------------------------------------------------
@@ -149,6 +172,60 @@ quintile_ci_low <- apply(quintile_boot, 2, quantile, probs = 0.025, na.rm = TRUE
 quintile_ci_high <- apply(quintile_boot, 2, quantile, probs = 0.975, na.rm = TRUE)
 
 # -----------------------------------------------------------------------------
+# H3 VERIFICATION: RNG stream preservation (moved here per D1)
+# Compares against frozen reference, NOT against own output
+# -----------------------------------------------------------------------------
+cat("\n========================================================================\n")
+cat("H3 VERIFICATION: RNG stream preservation\n")
+cat("========================================================================\n")
+cat("Reference file:", REFERENCE_PATH, "\n\n")
+
+h3_pass <- TRUE
+
+# Check pearson_ci
+if (!identical(as.numeric(pearson_ci), as.numeric(rng_reference$pearson_ci))) {
+    cat("FAIL: pearson_ci mismatch\n")
+    cat("  Computed:", as.numeric(pearson_ci), "\n")
+    cat("  Reference:", as.numeric(rng_reference$pearson_ci), "\n")
+    h3_pass <- FALSE
+} else {
+    cat("PASS: pearson_ci matches reference\n")
+}
+
+# Check spearman_ci
+if (!identical(as.numeric(spearman_ci), as.numeric(rng_reference$spearman_ci))) {
+    cat("FAIL: spearman_ci mismatch\n")
+    cat("  Computed:", as.numeric(spearman_ci), "\n")
+    cat("  Reference:", as.numeric(rng_reference$spearman_ci), "\n")
+    h3_pass <- FALSE
+} else {
+    cat("PASS: spearman_ci matches reference\n")
+}
+
+# Check quintile_ci_low
+if (!identical(as.numeric(quintile_ci_low), as.numeric(rng_reference$quintile_ci_low))) {
+    cat("FAIL: quintile_ci_low mismatch\n")
+    cat("  Computed:", as.numeric(quintile_ci_low), "\n")
+    cat("  Reference:", as.numeric(rng_reference$quintile_ci_low), "\n")
+    h3_pass <- FALSE
+} else {
+    cat("PASS: quintile_ci_low matches reference\n")
+}
+
+# Check quintile_ci_high
+if (!identical(as.numeric(quintile_ci_high), as.numeric(rng_reference$quintile_ci_high))) {
+    cat("FAIL: quintile_ci_high mismatch\n")
+    cat("  Computed:", as.numeric(quintile_ci_high), "\n")
+    cat("  Reference:", as.numeric(rng_reference$quintile_ci_high), "\n")
+    h3_pass <- FALSE
+} else {
+    cat("PASS: quintile_ci_high matches reference\n")
+}
+
+stopifnot(h3_pass)
+cat("\nH3 VERIFICATION: ALL PASS\n")
+
+# -----------------------------------------------------------------------------
 # OUTPUT: X5-1
 # -----------------------------------------------------------------------------
 cat("\n========================================================================\n")
@@ -182,6 +259,22 @@ cat("========================================================================\n\
 
 # Identify valid subset for pre-period weights
 merged_valid_pre <- merged[!is.na(pre_sum_trade) & pre_sum_trade > 0]
+
+# -----------------------------------------------------------------------------
+# D3: POPULATION EQUIVALENCE ASSERTION
+# -----------------------------------------------------------------------------
+# merged_valid: pairs with finite log(pre_mean_trade), i.e., pre_mean_trade > 0
+# merged_valid_pre: pairs with pre_sum_trade > 0
+# These should be identical because trade > 0 filter in N0_setup.R ensures
+# pre_sum > 0 iff pre_mean > 0. Assert this equivalence explicitly.
+cat("D3 POPULATION EQUIVALENCE CHECK:\n")
+cat(sprintf("  merged_valid rows:     %d\n", nrow(merged_valid)))
+cat(sprintf("  merged_valid_pre rows: %d\n", nrow(merged_valid_pre)))
+stopifnot(nrow(merged_valid_pre) == nrow(merged_valid))
+cat("  Row count match: PASS\n")
+stopifnot(setequal(merged_valid_pre$pair, merged_valid$pair))
+cat("  Pair set equivalence: PASS\n\n")
+
 n_full <- nrow(merged)
 n_valid <- nrow(merged_valid_pre)
 
@@ -290,14 +383,7 @@ year_stats <- merged[adoption_year >= 1991 & adoption_year <= 2016, .(
     sd_theta_D = sd(theta_D, na.rm = TRUE)
 ), by = adoption_year][order(adoption_year)]
 
-# Global row
-global_row <- data.table(
-    adoption_year = "GLOBAL",
-    n = nrow(merged),
-    mean_theta_D = global_mean,
-    tw_contribution = global_tw_mean,
-    sd_theta_D = sd(merged$theta_D, na.rm = TRUE)
-)
+# D4: global_row removed (was unused; confirmed no sampling calls - only data.table() and arithmetic)
 
 # -----------------------------------------------------------------------------
 # OUTPUT: X5-2
@@ -350,51 +436,13 @@ cat(sprintf("COHORT_MEANS = pre2008 %.4f (n=%d), 2008+ %.4f (n=%d)\n",
             cohort_stats_tw[cohort == "2008+", n]))
 
 # -----------------------------------------------------------------------------
-# H3 VERIFICATION: Compare CIs to saved values
+# SAVE RESULTS (H3 already verified above, before any saveRDS)
 # -----------------------------------------------------------------------------
 cat("\n========================================================================\n")
-cat("H3 VERIFICATION: RNG stream preservation\n")
+cat("SAVING RESULTS\n")
 cat("========================================================================\n")
 
-saved_x5 <- readRDS("/scratch/bt307958/X5_results.rds")
-h3_pass <- TRUE
-
-# Check pearson_ci
-if (!identical(as.numeric(pearson_ci), as.numeric(saved_x5$correlations$pearson_ci))) {
-    cat("FAIL: pearson_ci mismatch\n")
-    h3_pass <- FALSE
-} else {
-    cat("PASS: pearson_ci matches saved value\n")
-}
-
-# Check spearman_ci
-if (!identical(as.numeric(spearman_ci), as.numeric(saved_x5$correlations$spearman_ci))) {
-    cat("FAIL: spearman_ci mismatch\n")
-    h3_pass <- FALSE
-} else {
-    cat("PASS: spearman_ci matches saved value\n")
-}
-
-# Check quintile_ci
-if (!identical(as.numeric(quintile_ci_low), as.numeric(saved_x5$quintile_ci$low))) {
-    cat("FAIL: quintile_ci_low mismatch\n")
-    h3_pass <- FALSE
-} else {
-    cat("PASS: quintile_ci_low matches saved value\n")
-}
-
-if (!identical(as.numeric(quintile_ci_high), as.numeric(saved_x5$quintile_ci$high))) {
-    cat("FAIL: quintile_ci_high mismatch\n")
-    h3_pass <- FALSE
-} else {
-    cat("PASS: quintile_ci_high matches saved value\n")
-}
-
-stopifnot(h3_pass)
-cat("\nH3 VERIFICATION: ALL PASS\n")
-
-# Save results
-saveRDS(list(
+results <- list(
     correlations = list(
         pearson = pearson_r,
         pearson_ci = pearson_ci,
@@ -418,6 +466,34 @@ saveRDS(list(
         n_full = n_full,
         n_valid = n_valid
     )
-), "/scratch/bt307958/X5_results.rds")
+)
+
+saveRDS(results, OUTPUT_PATH)
+cat("Saved:", OUTPUT_PATH, "\n")
+
+# -----------------------------------------------------------------------------
+# D2: COPY TO LOCAL DATA PATH (provenance)
+# -----------------------------------------------------------------------------
+# Match pattern from N0_setup.R: explicit copy step so artefact path is pipeline-produced
+LOCAL_DATA_PATH <- "/scratch/bt307958/data/X5_results.rds"
+
+# Ensure directory exists
+if (!dir.exists(dirname(LOCAL_DATA_PATH))) {
+    dir.create(dirname(LOCAL_DATA_PATH), recursive = TRUE)
+}
+
+file.copy(OUTPUT_PATH, LOCAL_DATA_PATH, overwrite = TRUE)
+cat("Copied to:", LOCAL_DATA_PATH, "\n")
+
+# Print SHA256 for verification (using system call)
+sha_output <- system(paste("shasum -a 256", OUTPUT_PATH), intern = TRUE)
+sha_local <- system(paste("shasum -a 256", LOCAL_DATA_PATH), intern = TRUE)
+cat("SHA256 (OUTPUT_PATH):    ", sha_output, "\n")
+cat("SHA256 (LOCAL_DATA_PATH):", sha_local, "\n")
+# Extract just the hash for comparison
+hash_output <- strsplit(sha_output, "  ")[[1]][1]
+hash_local <- strsplit(sha_local, "  ")[[1]][1]
+stopifnot(hash_output == hash_local)
+cat("Copy integrity: PASS\n")
 
 cat("\nX5 COMPLETE:", format(Sys.time()), "\n")
