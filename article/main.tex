@@ -67,7 +67,7 @@ Assembled, the exposures compound. Whoever relies on an average agreement effect
 
 % --------------------------------------------------------------------------- % P7 — Why the distribution should have structure: multiplicativity as the % default character of economic change (grounds the mechanism section). % ---------------------------------------------------------------------------
 
-There is, moreover, a reason to expect this distribution to have structure rather than being an amorphous cloud of noise. Economic magnitudes evolve by compounding: growth arrives as relative change applied to an existing state, so that trade between two economies at any moment is the residue of multiplied increments rather than summed ones \citep{gibrat1931, sutton1997gibrat, Jones2016, Beare2022}. A policy acting on such a process plausibly acts the same way — scaling what is there rather than adding to it — and multiplicative action by unmeasured conditions carries testable signatures: particular tail behavior in outcomes, asymmetry in effects, effects graded in the size of what they act upon \citep{mitzenmacher2004brief}. These signatures are the bridge between the motivation above and the evidence below: they are what the data would display if the contingency argued for in this introduction is real, and what they should not jointly display if it is not.
+There is, moreover, a reason to expect this distribution to have structure rather than being an amorphous cloud of noise. Economic magnitudes evolve by compounding: growth arrives as relative change applied to an existing state, so that trade between two economies at any moment is the residue of multiplied increments rather than summed ones \citep{gibrat1931, sutton1997gibrat, Jones2016, Beare2022}. A policy acting on such a process plausibly acts the same way — scaling what is there rather than adding to it — and multiplicative action by unmeasured conditions carries testable signatures: lognormal outcomes, asymmetry in effects, effects graded in the size of what they act upon, and selection of agreements on the very conditions that shape them \citep{mitzenmacher2004brief}. These signatures are the bridge between the motivation above and the evidence below: they are what the data would display if the contingency argued for in this introduction is real, and what they should not jointly display if it is not.
 
 % --------------------------------------------------------------------------- % P8 — Contributions, one qualitative paragraph. % ---------------------------------------------------------------------------
 
@@ -75,30 +75,304 @@ This paper estimates the distribution of agreement effects for the flagship empi
 
 % --------------------------------------------------------------------------- % P9 — Roadmap (compressed). % ---------------------------------------------------------------------------
 
-Section~\ref{sec:theory} develops the framework and derives the reliability results as formal propositions. Section~\ref{sec:data} describes the data and the construction of the estimating population. Section~\ref{sec:empirical} presents the naive estimator, its diagnostics, and the corrections. Section~\ref{sec:results} reports the corrected distribution, its slope across pair types, the reconciliation of the specification spread, and the identification boundary. Section~\ref{sec:robustness} propagates the distribution through general equilibrium. Section~\ref{sec:conclusion} concludes.
+Section~\ref{sec:theory} develops the mechanism and states the four predictions
+it commits to. Section~\ref{sec:data} describes the data and the construction of
+the estimating population. Section~\ref{sec:empirical} presents the naive
+estimator and its diagnostics, derives the reliability results as formal
+propositions, and sets out the corrections. Section~\ref{sec:results} reports the
+corrected distribution, its slope across pair types, the reconciliation of the
+specification spread, and the identification boundary.
+Section~\ref{sec:robustness} propagates the distribution through general
+equilibrium. Section~\ref{sec:conclusion} concludes and reports which of the four
+predictions survived. Proofs are collected in Appendix~\ref{app:proofs}.
 
 
+\section{\label{sec:theory}Theoretical Framework}
 
-\section{Literature Review}
-\label{sec:literature}
+\subsection{\label{sec:theory-primitive}The Economic Primitive}
 
-\section{Theoretical Framework}
-\label{sec:theory}
+% ¶1 — Hands off from the roadmap: fixes what structural gravity supplies and
+% names the residual pair-specific variation as this section's object.
 
-\section{Data}
-\label{sec:data}
+Structural gravity supplies the accounting within which bilateral trade is
+organised: an exporter's supply capacity, an importer's expenditure, and the
+trade costs between them measured relative to the costs each faces with every
+other partner, all disciplined by general-equilibrium consistency
+\citep{[NEEDED: anderson2003gravity]}, \citep{[NEEDED: head2014gravity]}. That
+apparatus fixes the size and distance terms and, in the fixed-effects form now
+standard, absorbs whatever varies by exporter-year and by importer-year. What it
+does not fix is the pair. Two dyads matched on exporter capacity, importer
+expenditure and distance routinely trade at volumes that differ by more than the
+residual variation the model treats as incidental, and the systematic part of
+that difference is the object of this section. The question is not whether such
+variation exists but what kind of object generates it, because the answer
+determines the shape of what a policy acting on such pairs can produce.
 
-\section{Empirical Strategy}
-\label{sec:empirical}
+% ¶2 — States the primitive: pair conditions are unobserved, non-substitutable,
+% and therefore compound rather than add.
 
-\section{Results}
-\label{sec:results}
+Trade between two economies requires that a series of conditions hold at once.
+What one economy produces must be what the other can use, at the stage of
+processing at which it is offered; contracts written under one legal order must
+be enforceable, in practice and not only on paper, under the other; the pair
+must sit on shipping, payment and correspondent-banking networks that already
+carry traffic between them; and the administrative apparatus of customs
+classification, standards recognition and documentation must be in place to a
+depth sufficient for goods to move without prohibitive delay. These conditions
+are specific to the pair, are individually unobserved, and no dataset records
+them. Decisively, they do not substitute for one another
+\citep{kremer1993oring}. A shipment occurs because every link in the chain
+holds; an unusually complementary production structure does not compensate for
+an unenforceable contract, and a well-functioning payments corridor does not
+compensate for goods the importer cannot use. Conditions of this kind enter the
+outcome multiplicatively rather than additively, and the compounding is not a
+modelling convenience but a restatement of what it means for a chain to hold.
+Multiplicativity is itself a consequence of heterogeneity under complementarity:
+when the value of an activity depends on which others are present, the
+combinations available expand as a function of those already realised, and
+growth that builds on the existing stock in this way is multiplicative by
+construction.
 
-\section{Robustness}
-\label{sec:robustness}
+% ¶3 — Establishes that multiplicative structure is the discipline's default,
+% not an exotic assumption imported for convenience.
 
-\section{Conclusion}
-\label{sec:conclusion}
+This structure is neither peculiar to trade nor unfamiliar. It is the production
+structure of the weak-link literature, in which output under complementarity is
+governed by the least functional element rather than by the average of the
+elements, so that a defect at any point in a chain reduces the value of
+competence everywhere else \citep{kremer1993oring, jones2011weaklinks}. The same
+logic organises the older capital-theoretic treatment of complementarity, in
+which the productivity of an addition to the capital stock depends on the
+composition of the stock it joins rather than on its own quantity
+\citep{von1921positive, hayek1941, lachmann1956}. More broadly, economic
+processes are characterised by mechanisms that reinforce what is already in
+place: network effects and increasing returns that compound over time
+\citep{pietronero2001explaining, gabaix2009power}; agglomeration
+\citep{krugman1991increasing}; and learning-by-doing, in which capability is a
+function of accumulated activity \citep{arrow1962economic, romer1986increasing}.
+In each case the marginal contribution of a factor is conditioned on the
+configuration of the others rather than being fixed. Taking the bilateral pair
+as the unit at which such configurations are realised, the residual variation
+left by structural gravity is what a multiplicative interaction of unobserved
+pair conditions would look like when viewed through a specification that has no
+place to put them.
+
+\subsection{\label{sec:theory-distribution}From Primitive to Distribution}
+
+% ¶4 — Derives prediction (i) from the primitive, and immediately discounts its
+% evidentiary weight; sets up why the paper needs a conjunction.
+
+If bilateral outcomes are the product of many pair-specific factors that vary
+independently enough not to move as one, the logarithm of the outcome is a sum
+of many varying components, and the distribution of outcomes across pairs
+belongs to the lognormal family --- Gibrat's law of proportionate effect applied
+to the dyad rather than the firm \citep{gibrat1931, sutton1997gibrat}. This is
+the mechanism's first prediction: (i) bilateral trade flows are distributed
+lognormally across pairs, with the right-tail weight that family implies. The
+prediction is genuine, in that a mechanism generating additively separable
+conditions would not produce it, but its discriminating power is limited and it
+would be dishonest to present it otherwise. Lognormal outcomes are
+overdetermined: random proportionate growth, the aggregation of heterogeneous
+sub-units, and several other generative stories produce the same signature, and
+distinguishing among them from the shape of a single cross-section is generally
+not possible \citep{mitzenmacher2004brief}. Confirming (i) therefore removes
+rival mechanisms that predict something else while leaving standing every rival
+that predicts the same thing, which is why this paper does not rest its case on
+this signature, and why the mechanism must be made to commit to predictions
+about the treatment effect and not only about the outcome.
+
+\subsection{\label{sec:theory-nonsep}Non-Separable Treatment Effects}
+
+% ¶5 — Locates where the agreement enters, and contrasts the two error
+% structures available to it; the legacy specification argument, inline.
+
+The empirical models used to estimate trade flows are themselves multiplicative.
+The workhorse specification writes the flow as $y_{ij} =
+\exp(\mathbf{x}_{ij}'\boldsymbol{\beta} + \epsilon_{ij})$, estimated by Poisson
+pseudo-maximum likelihood under $\mathbb{E}[e^{\epsilon_{ij}} \mid
+\mathbf{x}_{ij}] = 1$ \citep{silva2006log}. The functional form is
+multiplicative but the shock is not: $\epsilon_{ij}$ enters in parallel to the
+covariates, so that whatever the pair's unobserved conditions do to its trade,
+they do independently of the policy variable sitting in $\mathbf{x}_{ij}$. An
+agreement then shifts every pair's trade by the same proportion, and the pair
+conditions of Section~\ref{sec:theory-primitive} are confined to setting the
+level from which that common proportion is taken. This is a substantive
+restriction, not a normalisation. It asserts that the conditions determining
+whether the chain holds have no bearing on what happens when one link in the
+chain is loosened.
+
+% ¶6 — States the alternative and its two readings; carries the section's one
+% display equation and defines the effect as a modulated object.
+
+The alternative is to let the covariates interact with the shock, $y_{ij} =
+\exp(\mathbf{x}_{ij}'(\boldsymbol{\beta} + \boldsymbol{\epsilon}_{ij}))$, under
+the corresponding normalisation
+$\mathbb{E}[e^{\mathbf{x}_{ij}'\boldsymbol{\epsilon}_{ij}} \mid \mathbf{x}_{ij}]
+= 1$, which preserves the familiar conditional mean $\mathbb{E}[y_{ij}\mid
+\mathbf{x}_{ij}] = e^{\mathbf{x}_{ij}'\boldsymbol{\beta}}$ and which we maintain
+throughout. This form has two readings. Structurally, it is a random-coefficients
+model in which the effect of each covariate, the agreement among them, varies
+across bilateral pairs, with the variation governed by the distribution of
+$\boldsymbol{\epsilon}_{ij}$. Empirically, it generates heteroskedasticity of the
+kind long documented in trade data \citep{silva2006log}: pairs facing higher
+systematic trade costs are more exposed to idiosyncratic frictions in
+implementation, and therefore deviate more widely, in absolute terms, from what
+the model predicts for them. Written in terms of the object of interest, the
+agreement effect for a pair is
+%
+\begin{equation}
+\theta_{ij} \;=\; f\!\left(A_{ij},\, c_{ij}\right),
+\label{eq:nonsep}
+\end{equation}
+%
+where $A_{ij}$ denotes the agreement and $c_{ij}$ the pair's unobserved
+conditions --- rather than a scalar $\theta$ common to all pairs.
+% [OPTIONAL — the following two sentences may be cut without consequence.]
+Neither argument of $f$ is homogeneous. Agreements enter the empirical
+literature as a binary indicator, but the legal instruments so indicated range
+from tariff schedules with little else attached to architectures governing
+services, procurement, standards and dispute settlement, and treating these as
+one object imposes a second homogeneity assumption alongside the first; we cannot
+separate the two sources of dispersion with the data available, and note only
+that both are suppressed by the same specification and neither is consistent
+with a scalar $\theta$.
+% [END OPTIONAL]
+The economics of the modulation is the economics of a chain. An agreement does
+not create trade directly; it relaxes a constraint, lowering a tariff,
+recognising a standard, binding a dispute procedure. Whether relaxing that
+constraint moves anything depends on whether the other links were holding, which
+is precisely what $c_{ij}$ records. The effect is therefore modulated by the
+pair's conditions rather than added to them, and three further predictions
+follow from that modulation.
+
+% ¶7 — Prediction (ii): right skew with a bounded floor, from the chain logic.
+
+The first concerns shape. If the effect is the product of the relaxation and the
+conditions it acts through, the effect distribution inherits the compounding of
+the conditions and is therefore right-skewed rather than symmetric: (ii) most
+pairs gain modestly, a minority whose conditions are aligned gain
+multiplicatively, and the left tail is thin. The asymmetry has a specific
+source, and it is worth stating plainly because it is what distinguishes this
+prediction from a generic appeal to skewness. The upside is unbounded, in the
+sense that the conditions can reinforce one another without limit; the downside
+is bounded, because an agreement that fails to bind is inert rather than
+destructive. A pair whose chain was broken before the agreement, and remains
+broken after it, records no effect --- it does not record a loss. There are
+channels through which an agreement could reduce a particular pair's trade,
+diversion towards a third partner most obviously, but these operate against the
+floor rather than mirroring the upside, so the mechanism predicts an effect
+distribution with a short left tail and a long right one.
+
+% ¶8 — Prediction (iii): effects graded in observables, which makes the
+% mechanism falsifiable against something measurable.
+
+The second concerns gradation, and it is the prediction that gives the mechanism
+purchase on observable data. If an agreement works by relaxing constraints, its
+effect is largest where the constraints bind hardest. A pair already trading at
+volume through established channels has, by revealed behaviour, few binding
+constraints left for a treaty to remove; the margin on which the agreement could
+operate has largely been exhausted by the trade that already occurs. A small,
+thinly integrated pair has the opposite profile: much of what a treaty addresses
+is still in the way. The prediction is therefore that (iii) effects decline in
+pair size and in prior integration --- a gradient in observables, running from
+large positive effects among the smallest and least integrated pairs towards
+small effects among the largest and most integrated. This prediction is sharp in
+a way that (i) and (ii) are not, because it names the direction of a slope
+against a variable the data contain, and a mechanism in which agreements act
+uniformly, or act most strongly where trade is already thick, predicts the
+opposite sign.
+
+% ¶9 — Prediction (iv): selection on the same unobservables, framed as
+% assortative matching rather than as a caveat about identification.
+
+The third concerns who signs. The conditions in $c_{ij}$ are not observed by the
+econometrician, but they are observed, imperfectly and in the aggregate, by the
+governments and the exporters who lobby them. Agreements are negotiated where
+there is something to negotiate over, which is to say where enough of the chain
+already holds that the parties can foresee gains from relaxing what remains. The
+prediction is that (iv) agreements are selected on the same unobserved conditions
+that modulate their effects: treated pairs are drawn from the stable end of the
+condition distribution rather than at random from it. This is assortative
+matching of the kind that complementarity produces generally, where partners of
+similar reliability are matched together in equilibrium precisely because
+reliability is complementary \citep{kremer1993oring}, applied to governments
+choosing whom to negotiate with. Two consequences follow, and they should be
+stated together because they pull in different directions. Any estimate recovered
+from treated pairs is an effect on self-selected matches and does not license
+extrapolation to a pair that has not signed, which limits the external reach of
+what the sections below can report. But the same selection is a testable
+implication rather than only a limitation: it predicts that the treated
+population is more stable in its pre-agreement behaviour than the untreated, and
+that prediction can be checked without observing $c_{ij}$.
+
+% ¶10 — Reconciles (iii) with (iv): they run on disjoint subsets of the pair's
+% conditions, and their conjunction is sharper than either alone.
+
+Predictions (iii) and (iv) may appear to pull against one another, the first
+locating the largest effects among small and thinly integrated pairs, the second
+locating agreements among pairs whose conditions already hold. They operate,
+however, on disjoint parts of $c_{ij}$. Selection runs on the links a treaty does
+not address: contractual enforceability, payment and correspondent-banking
+infrastructure, the administrative capacity of the counterparty --- the
+conditions that make gains foreseeable and therefore worth the cost of
+negotiating. Gradation runs on the links a treaty does address: tariffs,
+administrative barriers at the border, standards recognition --- the constraints
+still binding that an agreement can relax. A pair may have a functioning
+non-policy chain, and so be a plausible negotiating partner, while its
+policy-addressable constraints remain fully binding and its realised volume
+correspondingly low. That combination describes a small, thinly integrated pair
+with a competent counterparty, and it is not unusual. The two predictions are
+therefore compatible, and their conjunction is sharper than either alone: the
+mechanism predicts that the treated population is drawn from the stable end of
+the condition distribution and not from the large end, and stability and size are
+separable in the data.
+
+% ¶11 — Legacy closing: names the empirical distinction between the two error
+% structures and defers it, so the empirical section inherits an obligation.
+
+The distinction between the non-separable form and the additive alternative, in
+which the shock enters in parallel to the covariates rather than multiplying
+them, is consequential rather than conventional: only the non-separable form
+generates dispersion through the interaction of the shock with treatment, and
+only it implies that the dispersion of the outcome varies with treatment. That
+implication is testable directly, on pairs observed before and after adoption,
+and the test bears the weight of everything that follows: if the additive form
+survives it, the modulation in Equation~\eqref{eq:nonsep} is a redescription
+rather than a mechanism, and the corrections built upon it are unmotivated. We
+defer the argument for the non-separable structure, and the test that
+distinguishes it from the additive alternative, to
+Section~\ref{sec:empirical}~[X-REF: dispersion subsection], where it underpins
+the analysis of how the adjustment interacts with the fixed-effects structure.
+
+\subsection{\label{sec:theory-standard}The Evidentiary Standard}
+
+% ¶12 — Sets the abductive standard explicitly, disclaims uniqueness, and hands
+% each prediction to a named later section.
+
+Each of these four predictions is weak taken alone, and we ask the reader to hold
+the argument to the standard the mechanism actually meets rather than to one it
+does not. Lognormal outcomes are overdetermined, as
+Section~\ref{sec:theory-distribution} conceded. Right-skewed effects are
+consistent with any story in which gains are bounded below and unbounded above. A
+size gradient is consistent with diminishing returns of a wholly different
+origin, or with measurement error correlated with volume. Selection on
+unobservables is consistent with almost any account of why governments negotiate.
+What the mechanism claims is not that any one of these is decisive but that their
+conjunction is jointly predicted: lognormal outcomes \emph{and} right-skewed
+effects \emph{and} effects graded in size and prior integration \emph{and}
+selection on the conditions that do the modulating. Each rival that explains one
+of these comfortably explains at least one of the others badly or not at all,
+and to our knowledge no single alternative currently on the table predicts all
+four together. This is abduction, not proof: the conjunction is evidence for the
+mechanism in the sense that the mechanism would render it unsurprising and its
+rivals would not, and a mechanism we have not considered may do as well or
+better. Sections~\ref{sec:empirical} and~\ref{sec:results} test each prediction
+in turn --- (i) in the distributional diagnostics, (ii) and (iii) in the
+corrected effect distribution and its slope across pair types, and (iv) in the
+composition of the treated population --- and Section~\ref{sec:conclusion}
+reports which survived.
+
+
 
 \newpage
 \bibliographystyle{aer}

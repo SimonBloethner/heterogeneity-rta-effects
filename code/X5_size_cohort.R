@@ -27,7 +27,7 @@ stopifnot(nrow(w1) == 4182)
 o1 <- as.data.table(readRDS("/scratch/bt307958/O1_switcher_theta.rds"))
 
 # Merge
-merged <- merge(w1[, .(pair, s_hat)], o1[, .(pair, theta_D, adoption_year, size_decile)], 
+merged <- merge(w1[, .(pair, s_hat)], o1[, .(pair, theta_D, adoption_year, size_decile)],
                 by = "pair", all.x = TRUE)
 merged <- merged[!is.na(theta_D)]
 cat("  Merged pairs:", nrow(merged), "\n")
@@ -45,33 +45,19 @@ merged[is.na(total_trade), total_trade := 0]
 merged[, trade_weight := total_trade / sum(total_trade)]
 
 # -----------------------------------------------------------------------------
-# Compute pre-adoption mean trade for each pair
+# Compute pre-adoption mean and sum trade for each pair
 # -----------------------------------------------------------------------------
-cat("\nComputing pre-adoption mean trade...\n")
+cat("\nComputing pre-adoption trade statistics...\n")
 
-# Get pre-adoption trade for each pair
-compute_pre_mean <- function(pair_id, adopt_yr, data) {
-    pair_data <- data[pair == pair_id & year < adopt_yr]
-    if (nrow(pair_data) == 0) return(NA_real_)
-    mean(pair_data$trade, na.rm = TRUE)
-}
-
-# Vectorized version
-pre_means <- raw_data[, .(pre_mean_trade = mean(trade[year < adopt_yr[1]], na.rm = TRUE)),
-                       by = .(pair, adopt_yr = merged$adoption_year[match(pair, merged$pair)])]
-
-# Filter to pairs in merged
-pre_means <- pre_means[pair %in% merged$pair]
-pre_means <- pre_means[!is.na(adopt_yr)]
-
-# Actually, let me do this more carefully
 merged[, pre_mean_trade := NA_real_]
+merged[, pre_sum_trade := NA_real_]
 for (i in 1:nrow(merged)) {
     p <- merged$pair[i]
     ay <- merged$adoption_year[i]
     pre_data <- raw_data[pair == p & year < ay, trade]
     if (length(pre_data) > 0) {
         merged$pre_mean_trade[i] <- mean(pre_data, na.rm = TRUE)
+        merged$pre_sum_trade[i] <- sum(pre_data, na.rm = TRUE)
     }
 }
 
@@ -133,7 +119,7 @@ cat(sprintf("  Spearman 95%% CI: [%.4f, %.4f]\n", spearman_ci[1], spearman_ci[2]
 
 # Quintile analysis
 cat("\nMean theta_D by pre-adoption size quintile:\n")
-merged_valid[, size_quintile := cut(log_pre_mean, 
+merged_valid[, size_quintile := cut(log_pre_mean,
                                      breaks = quantile(log_pre_mean, probs = seq(0, 1, 0.2)),
                                      labels = 1:5, include.lowest = TRUE)]
 
@@ -148,7 +134,7 @@ quintile_boot <- matrix(NA, n_boot, 5)
 for (b in 1:n_boot) {
     idx <- sample(nrow(merged_valid), replace = TRUE)
     boot_data <- merged_valid[idx]
-    boot_data[, size_quintile := cut(log_pre_mean, 
+    boot_data[, size_quintile := cut(log_pre_mean,
                                       breaks = quantile(merged_valid$log_pre_mean, probs = seq(0, 1, 0.2)),
                                       labels = 1:5, include.lowest = TRUE)]
     boot_means <- boot_data[, mean(theta_D, na.rm = TRUE), by = size_quintile][order(size_quintile)]
@@ -188,6 +174,91 @@ for (i in 1:nrow(quintile_stats)) {
 }
 
 # -----------------------------------------------------------------------------
+# PRE-PERIOD WEIGHTINGS (CHANGE 1 & 2)
+# -----------------------------------------------------------------------------
+cat("\n========================================================================\n")
+cat("PRE-PERIOD WEIGHTING ANALYSIS\n")
+cat("========================================================================\n\n")
+
+# Identify valid subset for pre-period weights
+merged_valid_pre <- merged[!is.na(pre_sum_trade) & pre_sum_trade > 0]
+n_full <- nrow(merged)
+n_valid <- nrow(merged_valid_pre)
+
+cat(sprintf("Population sizes:\n"))
+cat(sprintf("  Full population (merged):       n = %d\n", n_full))
+cat(sprintf("  Pre-period valid (merged_valid_pre): n = %d\n", n_valid))
+cat(sprintf("  Difference:                     %d pairs excluded\n\n", n_full - n_valid))
+
+# Build three weight vectors
+# W_total: total_trade (existing, outcome-inclusive)
+W_total_full <- merged$trade_weight  # already normalized to sum to 1
+W_total_valid <- merged_valid_pre$total_trade / sum(merged_valid_pre$total_trade)
+
+# W_presum: pre_sum_trade (pre-period only, sum aggregation)
+W_presum <- merged_valid_pre$pre_sum_trade / sum(merged_valid_pre$pre_sum_trade)
+
+# W_premean: pre_mean_trade (pre-period only, mean aggregation)
+W_premean <- merged_valid_pre$pre_mean_trade / sum(merged_valid_pre$pre_mean_trade)
+
+# Compute weighted means
+tw_mean_total_full <- sum(merged$theta_D * W_total_full, na.rm = TRUE)
+tw_mean_total_valid <- sum(merged_valid_pre$theta_D * W_total_valid, na.rm = TRUE)
+tw_mean_presum <- sum(merged_valid_pre$theta_D * W_presum, na.rm = TRUE)
+tw_mean_premean <- sum(merged_valid_pre$theta_D * W_premean, na.rm = TRUE)
+
+# Unweighted means
+unweighted_full <- mean(merged$theta_D, na.rm = TRUE)
+unweighted_valid <- mean(merged_valid_pre$theta_D, na.rm = TRUE)
+
+# Print comparison table
+cat("WEIGHTING COMPARISON TABLE:\n")
+cat(sprintf("  %-40s %8s %12s\n", "Quantity", "n", "Value"))
+cat(paste(rep("-", 64), collapse = ""), "\n")
+cat(sprintf("  %-40s %8d %12.4f\n", "Unweighted mean, full population", n_full, unweighted_full))
+cat(sprintf("  %-40s %8d %12.4f\n", "Unweighted mean, merged_valid_pre", n_valid, unweighted_valid))
+cat(sprintf("  %-40s %8d %12.4f\n", "TW mean (total_trade), full population", n_full, tw_mean_total_full))
+cat(sprintf("  %-40s %8d %12.4f\n", "TW mean (total_trade), merged_valid_pre", n_valid, tw_mean_total_valid))
+cat(sprintf("  %-40s %8d %12.4f\n", "TW mean (pre_sum_trade), merged_valid_pre", n_valid, tw_mean_presum))
+cat(sprintf("  %-40s %8d %12.4f\n", "TW mean (pre_mean_trade), merged_valid_pre", n_valid, tw_mean_premean))
+cat(paste(rep("-", 64), collapse = ""), "\n")
+
+cat("\nNOTE: The 'TW mean (total_trade), merged_valid_pre' row isolates the\n")
+cat("      sample-restriction effect from the reweighting effect.\n")
+
+# -----------------------------------------------------------------------------
+# BOOTSTRAP NEW MEANS (CHANGE 3) - uses local seed to preserve H3
+# -----------------------------------------------------------------------------
+cat("\nBootstrapping pre-period weighted means (local RNG)...\n")
+
+# Save current RNG state
+rng_state <- .Random.seed
+
+# Use local seed for new bootstrap
+set.seed(20260725)
+n_boot_new <- 500
+boot_presum <- numeric(n_boot_new)
+boot_premean <- numeric(n_boot_new)
+
+for (b in 1:n_boot_new) {
+    idx <- sample(nrow(merged_valid_pre), replace = TRUE)
+    boot_data <- merged_valid_pre[idx]
+    w_presum_b <- boot_data$pre_sum_trade / sum(boot_data$pre_sum_trade)
+    w_premean_b <- boot_data$pre_mean_trade / sum(boot_data$pre_mean_trade)
+    boot_presum[b] <- sum(boot_data$theta_D * w_presum_b, na.rm = TRUE)
+    boot_premean[b] <- sum(boot_data$theta_D * w_premean_b, na.rm = TRUE)
+}
+
+presum_ci <- quantile(boot_presum, c(0.025, 0.975))
+premean_ci <- quantile(boot_premean, c(0.025, 0.975))
+
+# Restore RNG state
+.Random.seed <- rng_state
+
+cat(sprintf("  TW mean (pre_sum_trade)  95%% CI: [%.4f, %.4f]\n", presum_ci[1], presum_ci[2]))
+cat(sprintf("  TW mean (pre_mean_trade) 95%% CI: [%.4f, %.4f]\n", premean_ci[1], premean_ci[2]))
+
+# -----------------------------------------------------------------------------
 # (b) COHORTS
 # -----------------------------------------------------------------------------
 cat("\n========================================================================\n")
@@ -197,26 +268,25 @@ cat("========================================================================\n\
 # Pre-2008 vs 2008+
 merged[, cohort := ifelse(adoption_year < 2008, "pre-2008", "2008+")]
 
-cohort_stats <- merged[, .(
-    n = .N,
-    mean_theta_D = mean(theta_D, na.rm = TRUE),
-    tw_mean = sum(theta_D * trade_weight, na.rm = TRUE) / sum(trade_weight, na.rm = TRUE),
-    sd_theta_D = sd(theta_D, na.rm = TRUE)
-), by = cohort][order(cohort)]
-
-# Correct tw_mean calculation (need global weights)
+# Correct tw_mean calculation (need global weights) - renamed to tw_contribution
 cohort_stats_tw <- merged[, .(
     n = .N,
     mean_theta_D = mean(theta_D, na.rm = TRUE),
-    tw_mean = sum(theta_D * trade_weight, na.rm = TRUE),
+    tw_contribution = sum(theta_D * trade_weight, na.rm = TRUE),
     sd_theta_D = sd(theta_D, na.rm = TRUE)
 ), by = cohort][order(cohort)]
+
+# Assert cohort contributions sum to global TW mean
+cohort_tw_sum <- sum(cohort_stats_tw$tw_contribution)
+stopifnot(abs(cohort_tw_sum - global_tw_mean) < 1e-6)
+cat("ASSERTION: Cohort TW contributions sum to global TW mean: PASS\n")
+cat(sprintf("  Sum of contributions: %.6f, Global TW mean: %.6f\n\n", cohort_tw_sum, global_tw_mean))
 
 # By year (1991-2016)
 year_stats <- merged[adoption_year >= 1991 & adoption_year <= 2016, .(
     n = .N,
     mean_theta_D = mean(theta_D, na.rm = TRUE),
-    tw_mean = sum(theta_D * trade_weight, na.rm = TRUE),
+    tw_contribution = sum(theta_D * trade_weight, na.rm = TRUE),
     sd_theta_D = sd(theta_D, na.rm = TRUE)
 ), by = adoption_year][order(adoption_year)]
 
@@ -225,7 +295,7 @@ global_row <- data.table(
     adoption_year = "GLOBAL",
     n = nrow(merged),
     mean_theta_D = global_mean,
-    tw_mean = global_tw_mean,
+    tw_contribution = global_tw_mean,
     sd_theta_D = sd(merged$theta_D, na.rm = TRUE)
 )
 
@@ -237,28 +307,28 @@ cat("X5-2: COHORT TABLES\n")
 cat("========================================================================\n\n")
 
 cat("Pre-2008 vs 2008+ cohorts:\n")
-cat(sprintf("  %-10s %6s %12s %12s %12s\n", "Cohort", "n", "Mean", "TW_Mean", "SD"))
+cat(sprintf("  %-10s %6s %12s %12s %12s\n", "Cohort", "n", "Mean", "TW_Contrib", "SD"))
 cat(paste(rep("-", 56), collapse = ""), "\n")
 for (i in 1:nrow(cohort_stats_tw)) {
     cat(sprintf("  %-10s %6d %12.4f %12.4f %12.4f\n",
                 cohort_stats_tw$cohort[i],
                 cohort_stats_tw$n[i],
                 cohort_stats_tw$mean_theta_D[i],
-                cohort_stats_tw$tw_mean[i],
+                cohort_stats_tw$tw_contribution[i],
                 cohort_stats_tw$sd_theta_D[i]))
 }
 cat(sprintf("  %-10s %6d %12.4f %12.4f %12.4f\n",
             "GLOBAL", nrow(merged), global_mean, global_tw_mean, sd(merged$theta_D)))
 
 cat("\nBy adoption year (1991-2016):\n")
-cat(sprintf("  %-6s %6s %12s %12s %12s\n", "Year", "n", "Mean", "TW_Mean", "SD"))
+cat(sprintf("  %-6s %6s %12s %12s %12s\n", "Year", "n", "Mean", "TW_Contrib", "SD"))
 cat(paste(rep("-", 52), collapse = ""), "\n")
 for (i in 1:nrow(year_stats)) {
     cat(sprintf("  %-6d %6d %12.4f %12.4f %12.4f\n",
                 year_stats$adoption_year[i],
                 year_stats$n[i],
                 year_stats$mean_theta_D[i],
-                year_stats$tw_mean[i],
+                year_stats$tw_contribution[i],
                 year_stats$sd_theta_D[i]))
 }
 
@@ -279,6 +349,50 @@ cat(sprintf("COHORT_MEANS = pre2008 %.4f (n=%d), 2008+ %.4f (n=%d)\n",
             cohort_stats_tw[cohort == "2008+", mean_theta_D],
             cohort_stats_tw[cohort == "2008+", n]))
 
+# -----------------------------------------------------------------------------
+# H3 VERIFICATION: Compare CIs to saved values
+# -----------------------------------------------------------------------------
+cat("\n========================================================================\n")
+cat("H3 VERIFICATION: RNG stream preservation\n")
+cat("========================================================================\n")
+
+saved_x5 <- readRDS("/scratch/bt307958/X5_results.rds")
+h3_pass <- TRUE
+
+# Check pearson_ci
+if (!identical(as.numeric(pearson_ci), as.numeric(saved_x5$correlations$pearson_ci))) {
+    cat("FAIL: pearson_ci mismatch\n")
+    h3_pass <- FALSE
+} else {
+    cat("PASS: pearson_ci matches saved value\n")
+}
+
+# Check spearman_ci
+if (!identical(as.numeric(spearman_ci), as.numeric(saved_x5$correlations$spearman_ci))) {
+    cat("FAIL: spearman_ci mismatch\n")
+    h3_pass <- FALSE
+} else {
+    cat("PASS: spearman_ci matches saved value\n")
+}
+
+# Check quintile_ci
+if (!identical(as.numeric(quintile_ci_low), as.numeric(saved_x5$quintile_ci$low))) {
+    cat("FAIL: quintile_ci_low mismatch\n")
+    h3_pass <- FALSE
+} else {
+    cat("PASS: quintile_ci_low matches saved value\n")
+}
+
+if (!identical(as.numeric(quintile_ci_high), as.numeric(saved_x5$quintile_ci$high))) {
+    cat("FAIL: quintile_ci_high mismatch\n")
+    h3_pass <- FALSE
+} else {
+    cat("PASS: quintile_ci_high matches saved value\n")
+}
+
+stopifnot(h3_pass)
+cat("\nH3 VERIFICATION: ALL PASS\n")
+
 # Save results
 saveRDS(list(
     correlations = list(
@@ -291,7 +405,19 @@ saveRDS(list(
     quintile_ci = list(low = quintile_ci_low, high = quintile_ci_high),
     cohort_stats = cohort_stats_tw,
     year_stats = year_stats,
-    global = list(mean = global_mean, tw_mean = global_tw_mean)
+    global = list(mean = global_mean, tw_mean = global_tw_mean),
+    weighting = list(
+        tw_mean_total_full = tw_mean_total_full,
+        tw_mean_total_valid = tw_mean_total_valid,
+        tw_mean_presum = tw_mean_presum,
+        tw_mean_premean = tw_mean_premean,
+        presum_ci = presum_ci,
+        premean_ci = premean_ci,
+        unweighted_full = unweighted_full,
+        unweighted_valid = unweighted_valid,
+        n_full = n_full,
+        n_valid = n_valid
+    )
 ), "/scratch/bt307958/X5_results.rds")
 
 cat("\nX5 COMPLETE:", format(Sys.time()), "\n")

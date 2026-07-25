@@ -1,7 +1,7 @@
 # MANIFEST - SHA256 checksums for replication package
-# Generated: 2026-07-24 (FIGURE-PIN complete)
+# Generated: 2026-07-25 (X5 REWEIGHTING PATCH complete)
 # All exhibit pack gates PASSED
-# F1/F3 regenerated per FIGURE-PIN spec
+# X5 updated with pre-period weighting analysis
 
 # README
 25a35eb7dd05924bd9571699973dfddaf14e229a88bbd2a22ce61cfabad7b7f4  README.md
@@ -21,7 +21,7 @@ ad755c13d051c21fa9f835afc80714d7ebafcca4a7d199988ed992f65764f02d  code/T3_varian
 01473ec4099922e0d5a1b8fa26e5daacfb747fd63cca6b284a8079ee4f894e07  code/X1_corrected_LN_anchor_v2.R
 0f62e1f03ba96f0f50e482799dca1d17d57beee95ac708bb2e843ad756077282  code/X2_residual_tail_v5.R
 39f67f4f8f7077c4020bd84f856dbebc8f259b0d7f3f2bc9a269ab5a0a95b504  code/X3_peryear_ratio.R
-03d3000e336d734ed916e52ebf05062be6533e18ddff7fd19ce5ccd43eeadbdb  code/X5_size_cohort.R
+59e14a9bba9b355a4fbd14ff1fad7738462632034445775c2d02f9d0df2c7997  code/X5_size_cohort.R
 5bf8e75c4f106a13abb9ab0c40d1ef118baa6b2760ec25b8fca57e96317b0f27  code/build_exhibit_pack.R
 2b5ce63ac5fd956e6c385473aeb286b913e7d2e4d5ee3c933c1466c8b46baf14  code/gates_lib_v2.R
 
@@ -35,6 +35,7 @@ dd82ef9165e9bba669dd2c8616895e349032664b47e51fb7dfe107c31dc24f7b  data/P4_result
 25dfd53e24b5cc2f5d1cbec10d0ce8b5edad8d0ab18a5e3b60cee96780156cad  data/Q4_exhibits.rds
 27bed9d2c07b452ea5b7bdaa1873c0974f48e0e5db72760bc89aafa9111feeab  data/W1_pop_canon.rds
 6d4898372e775926d538e570a3b74f9e22749e85c4be02ee7f70682bfdd64d65  data/X1_results.rds
+5027a65530b33dc9d3e52818b8dc58a16beeb992e84ba5ef95649b29224cfc46  data/X5_results.rds
 ee8f82b27071ca087e4ad8a7166f5109a5262719705d1446794cf8f116ee3b4d  data/filtered_trade.rds
 65ca4db1537aa747fade8c13e51e9fc8b4fc8ce8ce562bad66f5fbabdc29fe8d  data/G2c_results.RData
 
