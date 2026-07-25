@@ -1,0 +1,5 @@
+seed,matching_cell,n_placebos,mean_theta_B,sd_theta_B,abs_mean,threshold,PASS_FAIL
+20260719,decile_only,6339,-0.1405,NA,0.1405,0.05,FAIL
+42,decile_only,6339,-0.1417,NA,0.1417,0.05,FAIL
+999,decile_only,6339,-0.1436,NA,0.1436,0.05,FAIL
+12345,decile_only,6339,-0.14,NA,0.14,0.05,FAIL

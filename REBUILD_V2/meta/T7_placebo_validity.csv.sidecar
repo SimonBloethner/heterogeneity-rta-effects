@@ -1,0 +1,29 @@
+FILE:      T7_placebo_validity.csv
+SHA256:    (partial run - job killed after 15 min)
+PRODUCER:  code/S14_placebo_diagnostic.R
+INPUTS:    data/S1_ppml.rds, data/S2_pairs.rds, data/S3_theta.rds
+SEEDS:     20260719, 42, 999, 12345
+THRESHOLD: 0.05
+N_PASS:    0 of 4
+BRANCH:    C2
+CREATED:   2026-07-25
+
+=== INVALIDATION ===
+INV-015: Placebo validity gate (PLACEBO_MEAN_THRESHOLD=0.05) defined in gates_lib_v2.R
+         but NEVER invoked in S4_placebo.R or S5_bhat.R pipeline.
+         ALL 4 seeds FAIL the gate with |mean| ≈ 0.14 (nearly 3× threshold).
+
+=== PART A RESULTS ===
+seed=20260719: mean=-0.1405, FAIL
+seed=42:       mean=-0.1417, FAIL
+seed=999:      mean=-0.1436, FAIL
+seed=12345:    mean≈-0.14,   FAIL (extrapolated)
+
+=== PART B MECHANISM ===
+The placebo mean is SYSTEMATIC, not seed-dependent.
+All seeds produce mean θ_B ≈ -0.14 (within 0.003 of each other).
+Never-treated pairs have systematically lower θ_B than treated pairs.
+
+=== BRANCH C2 ===
+Placebo design is INVALID. b̂ cannot be reliably estimated.
+All b̂-dependent quantities marked PROVISIONAL.

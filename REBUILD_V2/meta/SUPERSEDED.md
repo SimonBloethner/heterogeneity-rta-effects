@@ -45,3 +45,17 @@ The superseded files affected:
 3. **Matching sensitivity:** Inherited wrong quintiles (F2 fix)
 
 All corrected versions (T5b, T3b, T6b) have passed their respective gates.
+
+## Invalidation Register
+
+### INV-015: Placebo Validity Gate Never Invoked
+- **Detected by:** code/S14_placebo_diagnostic.R
+- **Description:** `PLACEBO_MEAN_THRESHOLD = 0.05` defined in gates_lib_v2.R but
+  `assert_placebo_validity()` was NEVER called in S4_placebo.R or S5_bhat.R
+- **Finding:** All 4 seeds fail the gate with |mean(θ_B)| ≈ 0.14 (nearly 3× threshold)
+- **Impact:** All b̂-dependent quantities marked PROVISIONAL:
+  - MEAN_THETA_D, SD_THETA_D, SD_THETA_TRUE
+  - Q1_Q5_SPREAD, COHORT_EARLY, COHORT_LATE
+  - All GE propagation quantities
+- **Branch taken:** C2 — Placebo design INVALID, b̂ cannot be reliably estimated
+- **Date detected:** 2026-07-25

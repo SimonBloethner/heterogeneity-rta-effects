@@ -58,5 +58,8 @@ meta/T6_matching_sensitivity.csv.sidecar,meta,code/S13_matching_sensitivity.R,ou
 code/S13b_matching_sensitivity.R,code,manual,data/S6_population.rds;data/S3_theta.rds;data/S2_pairs.rds;data/S1_ppml.rds;data/S5_bhat.rds,MULTIPLE,syntax_valid,8,BUILT
 output/T6b_matching_sensitivity.csv,output,code/S13b_matching_sensitivity.R,data/S6_population.rds;data/S3_theta.rds;data/S2_pairs.rds;data/S1_ppml.rds;data/S5_bhat.rds,MULTIPLE,T3b_reproduction,8,BUILT
 meta/T6b_matching_sensitivity.csv.sidecar,meta,code/S13b_matching_sensitivity.R,output/T6b_matching_sensitivity.csv,NONE,exists,8,BUILT
-output/canonical_facts.md,output,code/build_facts.R,all,NONE,all_ids_sourced,9,BUILT
-meta/DEPENDENCY_GRAPH.txt,meta,code/enforce.R,all,NONE,complete_trace,9,BUILT
+code/S14_placebo_diagnostic.R,code,manual,data/S1_ppml.rds;data/S2_pairs.rds;data/S3_theta.rds;data/S6_population.rds,MULTIPLE,syntax_valid,9,BUILT
+output/T7_placebo_validity.csv,output,code/S14_placebo_diagnostic.R,data/S1_ppml.rds;data/S2_pairs.rds;data/S3_theta.rds,MULTIPLE,all_seeds_tested,9,BUILT
+meta/T7_placebo_validity.csv.sidecar,meta,code/S14_placebo_diagnostic.R,output/T7_placebo_validity.csv,NONE,exists,9,BUILT
+output/canonical_facts.md,output,code/build_facts.R,all,NONE,all_ids_sourced,10,BUILT
+meta/DEPENDENCY_GRAPH.txt,meta,code/enforce.R,all,NONE,complete_trace,10,BUILT
