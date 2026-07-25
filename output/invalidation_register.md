@@ -13,6 +13,7 @@
 | INV-009 | SPLITHALF r=0.9244 | SUPERSEDED | Fresh recomputation canonical | NAIVE_GROUND_TRUTH.R | 2026-07-24 | SPLITHALF_A_FRESH = 0.9720 |
 | INV-010 | O1 theta_A (mean=-0.52) | REGISTER | Unidentified computation lineage | NAIVE_GROUND_TRUTH.R | 2026-07-24 | r=0.667 vs fresh; canonical is G2a (mean=-0.27, SD=1.66) |
 | INV-011 | O1 theta_B | REGISTER | Unidentified computation lineage | NAIVE_GROUND_TRUTH.R | 2026-07-24 | r=0.677 vs fresh; M1 theta_hat_B (r=0.976) pending CHECK |
+| INV-012 | TW_MEAN label ambiguity | RELABELED | Weight-period disambiguation | X5_size_cohort.R | 2026-07-25 | TW_MEAN = outcome-inclusive weights; TW_MEAN_PRESUM / TW_MEAN_PREMEAN = pre-adoption weights |
 
 ## Notes
 - INV-001: Table 6 verified from original code; reinterpreted via U2 decomposition (Pearson 6.25 / log-gap 0.99)
@@ -26,6 +27,9 @@
 - INV-009: G2c r=0.9244 superseded by fresh ledgered computation r=0.9720. Note: r=0.9364 reported elsewhere is decile-split reliability of theta_D, a different statistic (not superseded).
 - INV-010: O1 theta_A had mean=-0.5168 but r=0.667 vs fresh recomputation; canonical Definition A is G2a theta_hat (mean=-0.2738, SD=1.6641, r=1.0 vs fresh)
 - INV-011: O1 theta_B had r=0.677 vs fresh; M1 theta_hat_B has r=0.976 (between 0.9 and 0.99, requires CHECK)
+- INV-012: TW_MEAN (0.1412) is not superseded and remains canonical. The
+  label alone was ambiguous once pre-adoption weightings were computed;
+  all three variants are canonical for their stated weight definitions.
 
 ## Cross-Check Verification
 Verified via cross_check_register.R: No superseded value appears as canonical.

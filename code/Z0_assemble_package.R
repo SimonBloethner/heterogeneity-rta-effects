@@ -1,14 +1,14 @@
 #!/usr/bin/env Rscript
 # Z0_assemble_package.R: Generate MANIFEST from git working tree
 #
-# M1: Git tree is authoritative. gates/ is used ONLY for artefacts git cannot
-#     hold (gitignored large files like data/N0_data.rds).
+# M1: Git tree is authoritative for all distributed files.
+# FINAL: Not-distributed files (gitignored, regenerable) use pinned hashes.
 #
 # Workflow:
 #   1. Read inventory from docs/package_contents.txt
-#   2. Verify all inventory files exist in git working tree
-#   3. For gitignored files, check gates/ - REPORT and HALT on mismatch
-#   4. Generate MANIFEST.txt from git tree hashes
+#   2. Verify all distributed files exist in git working tree
+#   3. Not-distributed files: use pinned hash, do not require existence
+#   4. Generate MANIFEST.txt from git tree hashes + pinned hashes
 
 cat("========================================================================\n")
 cat("Z0: GENERATE MANIFEST FROM GIT TREE\n")
@@ -22,17 +22,20 @@ suppressPackageStartupMessages({
 # -----------------------------------------------------------------------------
 # PATH CONSTANTS
 # -----------------------------------------------------------------------------
-# When run on Festus, these point to the git working tree
-REPO_DIR <- "/groups/m-larch/bt307958/replication_package"
-GATES_DIR <- "/groups/m-larch/bt307958/gates"
+REPO_DIR <- "/Users/Simon/replication_package"
 
-# Files that are gitignored (too large for git) - sourced from gates/
-GITIGNORED_FILES <- c("data/N0_data.rds")
+# Not-distributed files: gitignored, regenerable from source
+# These use pinned hashes and are not required to exist
+NOT_DISTRIBUTED <- list(
+    "data/N0_data.rds" = list(
+        sha = "329721092fff490ab2c7825052cbf73bc0384698dd780689760aceb20325fd73",
+        note = "not distributed - regenerate via N0_setup.R"
+    )
+)
 
 cat("PATHS:\n")
-cat("  REPO_DIR: ", REPO_DIR, "\n")
-cat("  GATES_DIR:", GATES_DIR, "\n")
-cat("  Gitignored files:", paste(GITIGNORED_FILES, collapse = ", "), "\n\n")
+cat("  REPO_DIR:", REPO_DIR, "\n")
+cat("  Not-distributed files:", paste(names(NOT_DISTRIBUTED), collapse = ", "), "\n\n")
 
 # -----------------------------------------------------------------------------
 # DIRECTORY GUARDS
@@ -73,28 +76,20 @@ for (line in inventory_lines) {
 cat("  Inventory entries:", length(inventory), "\n\n")
 
 # -----------------------------------------------------------------------------
-# PHASE 2: VERIFY ALL FILES EXIST IN GIT TREE
+# PHASE 2: VERIFY DISTRIBUTED FILES EXIST
 # -----------------------------------------------------------------------------
 cat("========================================================================\n")
-cat("PHASE 2: Verify all inventory files exist in git tree\n")
+cat("PHASE 2: Verify distributed files exist in git tree\n")
 cat("========================================================================\n")
 
 missing_files <- character(0)
-gitignored_missing <- character(0)
 
 for (inv_path in inventory) {
     full_path <- file.path(REPO_DIR, inv_path)
 
-    if (inv_path %in% GITIGNORED_FILES) {
-        # Gitignored files: check gates/ instead
-        gates_path <- file.path(GATES_DIR, basename(inv_path))
-        if (!file.exists(gates_path)) {
-            gitignored_missing <- c(gitignored_missing, inv_path)
-            cat("  MISSING (gitignored, not in gates):", inv_path, "\n")
-        } else {
-            gates_info <- file.info(gates_path)
-            cat("  GITIGNORED:", inv_path, "(", gates_info$size, "bytes in gates/)\n")
-        }
+    if (inv_path %in% names(NOT_DISTRIBUTED)) {
+        # Not-distributed: do not require existence, use pinned hash
+        cat("  NOT-DISTRIBUTED:", inv_path, "(pinned hash)\n")
     } else {
         # Regular files: must exist in git tree
         if (!file.exists(full_path)) {
@@ -110,77 +105,30 @@ if (length(missing_files) > 0) {
     stop("FATAL: ", length(missing_files), " files missing from git tree:\n  ",
          paste(missing_files, collapse = "\n  "))
 }
-if (length(gitignored_missing) > 0) {
-    stop("FATAL: ", length(gitignored_missing), " gitignored files missing from gates/:\n  ",
-         paste(gitignored_missing, collapse = "\n  "))
-}
-cat("\nAll", length(inventory), "inventory files verified: PASS\n\n")
+cat("\nAll distributed files verified: PASS\n\n")
 
 # -----------------------------------------------------------------------------
-# PHASE 3: GITIGNORED FILE REPORT (M1d)
-# For files git cannot arbitrate, report both local and gates hashes
+# PHASE 3: GENERATE MANIFEST FROM GIT TREE + PINNED HASHES
 # -----------------------------------------------------------------------------
 cat("========================================================================\n")
-cat("PHASE 3: Gitignored file status (cannot be arbitrated by git)\n")
-cat("========================================================================\n")
-
-for (inv_path in GITIGNORED_FILES) {
-    cat("\n", inv_path, ":\n")
-
-    local_path <- file.path(REPO_DIR, inv_path)
-    gates_path <- file.path(GATES_DIR, basename(inv_path))
-
-    if (file.exists(local_path)) {
-        local_sha <- digest(file = local_path, algo = "sha256")
-        local_info <- file.info(local_path)
-        cat("  LOCAL:  ", local_sha, "\n")
-        cat("          size:", local_info$size, "bytes\n")
-        cat("          mtime:", format(local_info$mtime), "\n")
-    } else {
-        cat("  LOCAL:   MISSING\n")
-    }
-
-    if (file.exists(gates_path)) {
-        gates_sha <- digest(file = gates_path, algo = "sha256")
-        gates_info <- file.info(gates_path)
-        cat("  GATES:  ", gates_sha, "\n")
-        cat("          size:", gates_info$size, "bytes\n")
-        cat("          mtime:", format(gates_info$mtime), "\n")
-    } else {
-        cat("  GATES:   MISSING\n")
-    }
-
-    # Report mismatch but DO NOT choose - human decision required
-    if (file.exists(local_path) && file.exists(gates_path)) {
-        if (local_sha != gates_sha) {
-            cat("  STATUS: MISMATCH - human decision required\n")
-        } else {
-            cat("  STATUS: MATCH\n")
-        }
-    }
-}
-cat("\n")
-
-# -----------------------------------------------------------------------------
-# PHASE 4: GENERATE MANIFEST FROM GIT TREE
-# -----------------------------------------------------------------------------
-cat("========================================================================\n")
-cat("PHASE 4: Generate MANIFEST.txt from git tree\n")
+cat("PHASE 3: Generate MANIFEST.txt\n")
 cat("========================================================================\n")
 
 manifest_entries <- list()
-for (inv_path in inventory) {
-    if (inv_path %in% GITIGNORED_FILES) {
-        # Use gates/ copy for gitignored files
-        full_path <- file.path(GATES_DIR, basename(inv_path))
-    } else {
-        # Use git tree for everything else
-        full_path <- file.path(REPO_DIR, inv_path)
-    }
+manifest_notes <- list()
 
-    if (file.exists(full_path) && !dir.exists(full_path)) {
-        sha <- digest(file = full_path, algo = "sha256")
-        manifest_entries[[inv_path]] <- sha
+for (inv_path in inventory) {
+    if (inv_path %in% names(NOT_DISTRIBUTED)) {
+        # Use pinned hash for not-distributed files
+        manifest_entries[[inv_path]] <- NOT_DISTRIBUTED[[inv_path]]$sha
+        manifest_notes[[inv_path]] <- NOT_DISTRIBUTED[[inv_path]]$note
+    } else {
+        # Compute hash from git tree
+        full_path <- file.path(REPO_DIR, inv_path)
+        if (file.exists(full_path) && !dir.exists(full_path)) {
+            sha <- digest(file = full_path, algo = "sha256")
+            manifest_entries[[inv_path]] <- sha
+        }
     }
 }
 
@@ -191,7 +139,7 @@ manifest_lines <- c(
     "# MANIFEST - SHA256 checksums for replication package",
     paste0("# Generated: ", format(Sys.Date()), " (Z0_assemble_package.R)"),
     paste0("# Inventory: docs/package_contents.txt"),
-    paste0("# Source: git working tree (gitignored files from gates/)"),
+    paste0("# Source: git working tree (gitignored files noted)"),
     ""
 )
 
@@ -201,7 +149,11 @@ add_section <- function(title, pattern) {
     if (length(entries) > 0) {
         manifest_lines <<- c(manifest_lines, paste0("# ", title))
         for (e in sort(entries)) {
-            manifest_lines <<- c(manifest_lines, paste(manifest_entries[[e]], "", e))
+            line <- paste(manifest_entries[[e]], "", e)
+            if (e %in% names(manifest_notes)) {
+                line <- paste0(line, "  # ", manifest_notes[[e]])
+            }
+            manifest_lines <<- c(manifest_lines, line)
         }
         manifest_lines <<- c(manifest_lines, "")
     }
@@ -232,5 +184,5 @@ cat("========================================================================\n"
 cat("Z0 MANIFEST GENERATION COMPLETE\n")
 cat("========================================================================\n")
 cat("Files in manifest:", length(manifest_entries), "\n")
-cat("Gitignored files: ", length(GITIGNORED_FILES), "(sourced from gates/)\n")
+cat("Not-distributed files:", length(NOT_DISTRIBUTED), "(pinned hashes)\n")
 cat("End:", format(Sys.time()), "\n")

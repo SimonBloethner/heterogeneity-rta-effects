@@ -9,6 +9,9 @@ Source: build_exhibit_pack.R
 |----|----------|-------|--------|
 | MEAN_THETA | Mean theta_D (canonical) | 0.2138 [0.2098, 0.2178] | W1_pop_canon.rds |
 | TW_MEAN | Trade-weighted mean theta_D | 0.1412 | X5_results.rds |
+| TW_MEAN_PRESUM | Trade-weighted mean theta_D, pre-adoption sum weights | 0.1235 [0.1060, 0.1413] | X5_results.rds$weighting |
+| TW_MEAN_PREMEAN | Trade-weighted mean theta_D, pre-adoption mean weights | 0.1221 [0.1085, 0.1373] | X5_results.rds$weighting |
+| TW_WEIGHT_POPULATION | n for all weighting variants | 4182 | X5_results.rds$weighting; equals N_PAIRS, no pairs lost to the pre-period requirement |
 | SD_RAW | SD theta_D (raw) | 0.5950 [0.5850, 0.6050] | W1_pop_canon.rds |
 | SD_THETA_IDSET | SD theta (identified set) | [0.39, 0.46] | Prop 3 noise attribution endpoints |
 | SD_THETA_039_CI | Bootstrap CI of lower endpoint | [0.336, 0.440] | Variance decomposition |
@@ -101,3 +104,12 @@ Post-2008 adoptions show lower mean effect (0.15) with higher variance.
 See A0_anchor_table.csv for year-by-year Step-1 estimates (u, mu, sigma, H, E_S, empirical, omega).
 2019 verification: E_S=7011 (target: 7009+/-20), omega=1.058 (target: 1.058+/-0.01).
 All omega in [0.948, 1.091] subset of [0.94, 1.10].
+
+### Weighting Variants
+TW_MEAN weights by trade summed over all years, including post-adoption,
+so its weights are outcome-inclusive. TW_MEAN_PRESUM and TW_MEAN_PREMEAN
+weight by pre-adoption trade only, computed on the identical population
+(n = 4182), which isolates the effect of reweighting from any change of
+sample. All three are canonical for their stated definitions. Bootstrap CIs
+at 10 dp: presum [0.1059529309, 0.1413298582], premean [0.1085294949,
+0.1373252250].
