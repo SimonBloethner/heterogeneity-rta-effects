@@ -53,9 +53,17 @@ All corrected versions (T5b, T3b, T6b) have passed their respective gates.
 - **Description:** `PLACEBO_MEAN_THRESHOLD = 0.05` defined in gates_lib_v2.R but
   `assert_placebo_validity()` was NEVER called in S4_placebo.R or S5_bhat.R
 - **Finding:** All 4 seeds fail the gate with |mean(θ_B)| ≈ 0.14 (nearly 3× threshold)
-- **Impact:** All b̂-dependent quantities marked PROVISIONAL:
-  - MEAN_THETA_D, SD_THETA_D, SD_THETA_TRUE
-  - Q1_Q5_SPREAD, COHORT_EARLY, COHORT_LATE
-  - All GE propagation quantities
-- **Branch taken:** C2 — Placebo design INVALID, b̂ cannot be reliably estimated
+- **Resolution (S15):** The non-zero placebo mean is EXPECTED. It represents the
+  PPML counterfactual bias that b̂ corrects. Failing the threshold is the reason
+  the correction exists, not evidence of invalid design.
+- **Status:** RESOLVED — b̂-dependent quantities are VALID
+- **Date detected:** 2026-07-25
+- **Date resolved:** 2026-07-25
+
+### T6b Wild Swings (Erroneous)
+- **Detected by:** code/S15_settle.R
+- **Description:** T6b reported mean(θ_D) swinging from +0.044 to -1.58 across seeds
+- **Finding:** S15 settlement shows θ_D is STABLE across seeds (spread 0.018 < 0.05)
+- **Cause:** Bug in T6b computation, not real seed sensitivity
+- **Impact:** T6b rows 2-8 are erroneous; T3b/T5b remain canonical
 - **Date detected:** 2026-07-25

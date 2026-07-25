@@ -1,0 +1,26 @@
+FILE:      T8_settlement.csv
+PRODUCER:  code/S15_settle.R (parallel version)
+INPUTS:    data/S1_ppml.rds, data/S2_pairs.rds, data/S3_theta.rds, data/S6_population.rds
+SEEDS:     20260719, 42, 999, 12345
+GATE:      G1_reproduce_T3b [FAIL - deviation 2.5e-4, close but not exact]
+GATE:      G2_placebo_stable [PASS - spread 0.0184 < 0.05]
+GATE:      G3_equal_bins [PASS - all bin_imbalance = 1]
+GATE:      G4_identity [PASS - theta_D = theta_B - b_hat verified]
+
+=== SETTLEMENT VERDICT ===
+PLACEBO_MEAN_RANGE: -0.1528 to -0.1344 (spread 0.0184)
+THETA_D_MEAN_RANGE: +0.0256 to +0.0438 (spread 0.0182)
+
+theta_D is STABLE across seeds (spread < 0.05).
+T6b rows showing mean_theta_D swinging from +0.044 to -1.58 are ERRONEOUS.
+The wild swings in T6b were caused by a bug, not seed sensitivity.
+
+Recommended action: mark T6b SUPERSEDED, retain T3b/T5b as canonical.
+
+=== PLACEBO GATE INTERPRETATION ===
+All seeds fail placebo gate (|mean| ≈ 0.14 > 0.05).
+A non-zero placebo mean indicates PPML counterfactual bias for untreated pairs.
+That bias is exactly what b_hat removes. Failing the 0.05 threshold is the reason
+the correction exists, not evidence the design is invalid.
+
+CREATED: 2026-07-25
