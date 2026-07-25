@@ -9,27 +9,56 @@ cat("========================================================================\n\
 
 suppressPackageStartupMessages({
     library(data.table)
+    library(digest)  # E3: portable SHA256
 })
 
 # -----------------------------------------------------------------------------
-# D1: REFERENCE FILE AND PATH GUARDS
+# PATH CONSTANTS (E4: consolidated, no dead code)
 # -----------------------------------------------------------------------------
 REFERENCE_PATH <- "/scratch/bt307958/X5_rng_reference.rds"
 OUTPUT_PATH <- "/scratch/bt307958/X5_results.rds"
-LOCAL_OUTPUT_PATH <- "/scratch/bt307958/data/X5_results.rds"
+# E2: Correct repository path, determined from location of W1_pop_canon.rds and X1_results.rds
+REPO_DATA_PATH <- "/groups/m-larch/bt307958/replication_package/data/X5_results.rds"
 
-# Guard: reference and output paths must differ (structural prevention of D1 defect)
+cat("PATHS:\n")
+cat("  REFERENCE_PATH:", REFERENCE_PATH, "\n")
+cat("  OUTPUT_PATH:   ", OUTPUT_PATH, "\n")
+cat("  REPO_DATA_PATH:", REPO_DATA_PATH, "\n\n")
+
+# -----------------------------------------------------------------------------
+# E3: VERIFY DIGEST PACKAGE BEFORE EXPENSIVE WORK
+# -----------------------------------------------------------------------------
+if (!requireNamespace("digest", quietly = TRUE)) {
+    stop("FATAL: digest package not available. Required for portable SHA256.")
+}
+cat("DIGEST PACKAGE: available: PASS\n")
+
+# -----------------------------------------------------------------------------
+# PATH GUARDS
+# -----------------------------------------------------------------------------
+# Literal check (original D1(d))
 if (REFERENCE_PATH == OUTPUT_PATH) {
     stop("FATAL: REFERENCE_PATH and OUTPUT_PATH are identical. This is structurally forbidden.")
 }
-cat("PATH GUARD: REFERENCE_PATH != OUTPUT_PATH: PASS\n")
+cat("PATH GUARD (literal): REFERENCE_PATH != OUTPUT_PATH: PASS\n")
 
 # Guard: reference file must exist
 if (!file.exists(REFERENCE_PATH)) {
     stop("FATAL: Reference file does not exist: ", REFERENCE_PATH,
-         "\nThe H3 gate requires a frozen reference. Halting immediately.")
+         "\nRun X5_freeze_reference.R first to create it.")
 }
-cat("REFERENCE GUARD: ", REFERENCE_PATH, " exists: PASS\n\n")
+cat("REFERENCE GUARD: ", REFERENCE_PATH, " exists: PASS\n")
+
+# E5: normalizePath check after both files exist (catches symlinks, relative paths)
+# OUTPUT_PATH may not exist yet, so use mustWork=FALSE
+ref_norm <- normalizePath(REFERENCE_PATH, mustWork = TRUE)
+out_norm <- normalizePath(OUTPUT_PATH, mustWork = FALSE)
+if (ref_norm == out_norm) {
+    stop("FATAL: REFERENCE_PATH and OUTPUT_PATH resolve to same path after normalization.\n",
+         "  REFERENCE_PATH: ", REFERENCE_PATH, " -> ", ref_norm, "\n",
+         "  OUTPUT_PATH:    ", OUTPUT_PATH, " -> ", out_norm)
+}
+cat("PATH GUARD (normalized): paths differ: PASS\n\n")
 
 # Load reference for later comparison
 rng_reference <- readRDS(REFERENCE_PATH)
@@ -472,28 +501,45 @@ saveRDS(results, OUTPUT_PATH)
 cat("Saved:", OUTPUT_PATH, "\n")
 
 # -----------------------------------------------------------------------------
-# D2: COPY TO LOCAL DATA PATH (provenance)
+# E2: COPY TO REPOSITORY DATA PATH (provenance)
 # -----------------------------------------------------------------------------
-# Match pattern from N0_setup.R: explicit copy step so artefact path is pipeline-produced
-LOCAL_DATA_PATH <- "/scratch/bt307958/data/X5_results.rds"
+# Pattern from N0_setup.R: explicit copy so artefact path is pipeline-produced
+# REPO_DATA_PATH defined at top, points to /groups/m-larch/bt307958/replication_package/data/
 
 # Ensure directory exists
-if (!dir.exists(dirname(LOCAL_DATA_PATH))) {
-    dir.create(dirname(LOCAL_DATA_PATH), recursive = TRUE)
+if (!dir.exists(dirname(REPO_DATA_PATH))) {
+    dir.create(dirname(REPO_DATA_PATH), recursive = TRUE)
 }
 
-file.copy(OUTPUT_PATH, LOCAL_DATA_PATH, overwrite = TRUE)
-cat("Copied to:", LOCAL_DATA_PATH, "\n")
+copy_success <- file.copy(OUTPUT_PATH, REPO_DATA_PATH, overwrite = TRUE)
+if (!copy_success) {
+    stop("FATAL: Failed to copy to REPO_DATA_PATH: ", REPO_DATA_PATH)
+}
+cat("Copied to:", REPO_DATA_PATH, "\n")
 
-# Print SHA256 for verification (using system call)
-sha_output <- system(paste("shasum -a 256", OUTPUT_PATH), intern = TRUE)
-sha_local <- system(paste("shasum -a 256", LOCAL_DATA_PATH), intern = TRUE)
-cat("SHA256 (OUTPUT_PATH):    ", sha_output, "\n")
-cat("SHA256 (LOCAL_DATA_PATH):", sha_local, "\n")
-# Extract just the hash for comparison
-hash_output <- strsplit(sha_output, "  ")[[1]][1]
-hash_local <- strsplit(sha_local, "  ")[[1]][1]
-stopifnot(hash_output == hash_local)
+# E3: Print SHA256 using digest (portable, verified available at top)
+sha_output <- digest(file = OUTPUT_PATH, algo = "sha256")
+sha_repo <- digest(file = REPO_DATA_PATH, algo = "sha256")
+cat("SHA256 (OUTPUT_PATH):   ", sha_output, "\n")
+cat("SHA256 (REPO_DATA_PATH):", sha_repo, "\n")
+stopifnot(sha_output == sha_repo)
 cat("Copy integrity: PASS\n")
+
+# -----------------------------------------------------------------------------
+# R4: PRINT WEIGHTING BLOCK VALUES FOR CROSS-CHECK
+# -----------------------------------------------------------------------------
+cat("\n========================================================================\n")
+cat("R4: WEIGHTING BLOCK VALUES (for cross-check)\n")
+cat("========================================================================\n")
+cat(sprintf("unweighted_full     = %.10f\n", unweighted_full))
+cat(sprintf("unweighted_valid    = %.10f\n", unweighted_valid))
+cat(sprintf("tw_mean_total_full  = %.10f\n", tw_mean_total_full))
+cat(sprintf("tw_mean_total_valid = %.10f\n", tw_mean_total_valid))
+cat(sprintf("tw_mean_presum      = %.10f\n", tw_mean_presum))
+cat(sprintf("tw_mean_premean     = %.10f\n", tw_mean_premean))
+cat(sprintf("n_full              = %d\n", n_full))
+cat(sprintf("n_valid             = %d\n", n_valid))
+cat(sprintf("presum_ci           = [%.10f, %.10f]\n", presum_ci[1], presum_ci[2]))
+cat(sprintf("premean_ci          = [%.10f, %.10f]\n", premean_ci[1], premean_ci[2]))
 
 cat("\nX5 COMPLETE:", format(Sys.time()), "\n")
