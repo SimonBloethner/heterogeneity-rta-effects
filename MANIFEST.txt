@@ -1,97 +1,51 @@
-# MANIFEST - SHA256 checksums for replication package
-# Generated: 2026-07-25 (Z0_assemble_package.R)
-# Inventory: docs/package_contents.txt
-# Source: git working tree (gitignored files noted)
+# MANIFEST.txt - Replication Package
+# Generated: 2026-07-26
+# Repository: heterogeneity-rta-effects
 
-# README
-25a35eb7dd05924bd9571699973dfddaf14e229a88bbd2a22ce61cfabad7b7f4  README.md
+## Directory Structure
 
-# Code files
-5bf8e75c4f106a13abb9ab0c40d1ef118baa6b2760ec25b8fca57e96317b0f27  code/build_exhibit_pack.R
-4d3b98800f1225c11940d5ace3d59b8ca028904cc6ea4cabb6a3c35c1d9b95fa  code/G2c_placebo.R
-2b5ce63ac5fd956e6c385473aeb286b913e7d2e4d5ee3c933c1466c8b46baf14  code/gates_lib_v2.R
-4a334585757be0ee1bc1ab466b155ad342a4edf594bfb99cf95554002ea62c5c  code/N0_setup.R
-a5e17507ef4dcb0b8994d30a2bb5610a01126d71d96ac15feaab1558ea6ad1d5  code/N2_deconv.R
-e55fb9d3109fe86838c2576751fe4f288417ea4a390825ad987b1d413f76be14  code/O5_verdict.R
-d75d288685f292c336fca57b10ee7accffcddc05488867a296e15eb6f68c9ace  code/P4_injection.R
-d4de8c5f81edbe4e306671e6c015488fb2923559dd6ea69400a8f0d2fb7c326e  code/PROP_derivations_v4.R
-97be496b4ea26aa7824d0532c989c4e48aa5d671a6c9f43522f26a6efc4ee4a6  code/PROP_NUM_v3.R
-7907531243759fb21c4ffd6bf82febed5dde508e128844a60d4edf5bb256b2df  code/Q4_exhibit_pack.R
-cd3ab1c9049dc3411a2355236caf25f401c5b44967f5dd8fb8cc6835d73dcced  code/S1_population_reconciliation.R
-ad755c13d051c21fa9f835afc80714d7ebafcca4a7d199988ed992f65764f02d  code/T3_variance_identity.R
-50585150716083818a63e961f69927ab75258975e8b0b0e4f0b6887a0e7ef520  code/W4_ge_propagation.R
-01473ec4099922e0d5a1b8fa26e5daacfb747fd63cca6b284a8079ee4f894e07  code/X1_corrected_LN_anchor_v2.R
-0f62e1f03ba96f0f50e482799dca1d17d57beee95ac708bb2e843ad756077282  code/X2_residual_tail_v5.R
-39f67f4f8f7077c4020bd84f856dbebc8f259b0d7f3f2bc9a269ab5a0a95b504  code/X3_peryear_ratio.R
-74a445786672a898d65384a073305f13207e0b22a88ccfd7bb592d96a37c1fe5  code/X5_freeze_reference.R
-309f62026ae4d3c4c326957c86eb374e8506054aeb27f37ba662eb35d671f8c6  code/X5_size_cohort.R
-d0e738e7676e95cb19f577c816886ef585b77ad84483853d58ed72807cedd0bd  code/Z0_assemble_package.R
+code/           R scripts (S1-S23, N1-N6, validation)
+data/           RDS data files
+output/         CSV output tables (T1-T20)
+meta/           Sidecars, FILE_REGISTRY.csv, canonical_facts.md
+audit/          Scripts superseded or under review (S13b, S14, S15)
+archive/        Retired exhibit pack (INV-021)
+article/        LaTeX source
 
-# Data files
-ee8f82b27071ca087e4ad8a7166f5109a5262719705d1446794cf8f116ee3b4d  data/filtered_trade.rds
-65ca4db1537aa747fade8c13e51e9fc8b4fc8ce8ce562bad66f5fbabdc29fe8d  data/G2c_results.RData
-e488c36afdf7c9fd1d38667a18b7855eb39e4085430ef96eab946e2d89fe4c01  data/ITPDE_total.rds
-329721092fff490ab2c7825052cbf73bc0384698dd780689760aceb20325fd73  data/N0_data.rds  # not distributed - regenerate via N0_setup.R
-a07738d9eef1e44d41c4bbce4d2f805f7f3f9056056af75ed4bc5a2f0c89a627  data/N0_pair_trade.rds
-caafb0587a13881d071db40db133b8cb01c001ee878f7503c8c6117c069727b9  data/N0_rta_pairs.rds
-cc43ebd8bbb17515ab1425d063de4fdeb095f9bb494292985184b27cf916ddae  data/O5_verdict.rds
-dd82ef9165e9bba669dd2c8616895e349032664b47e51fb7dfe107c31dc24f7b  data/P4_results.rds
-25dfd53e24b5cc2f5d1cbec10d0ce8b5edad8d0ab18a5e3b60cee96780156cad  data/Q4_exhibits.rds
-27bed9d2c07b452ea5b7bdaa1873c0974f48e0e5db72760bc89aafa9111feeab  data/W1_pop_canon.rds
-6d4898372e775926d538e570a3b74f9e22749e85c4be02ee7f70682bfdd64d65  data/X1_results.rds
-5027a65530b33dc9d3e52818b8dc58a16beeb992e84ba5ef95649b29224cfc46  data/X5_results.rds
-4ce520c0d4d47c5ac7b37ca7651e551721243623d02fabf07b55ca37292c9419  data/X5_rng_reference.rds
+## Key Outputs
 
-# Documentation
-df63dd85b8d3ce0129407336153c8128f7ef7c7cef00cecb3ffc703b5b17d92e  docs/execution_order.md
-66cbdfea3eae9377e2d00b508b582e26188e4431861224520c68a6d7b4f1c63f  docs/gate_verification.md
-5e325b3323cd32a3eaf94def1ab802c335ac5b2bcdbcbb805942444a77eda6d2  docs/package_contents.txt
+| File | Description | Status |
+|------|-------------|--------|
+| output/T19_pleq0_bracket.csv | P(theta<=0) bracket [0.369, 0.421] | BUILT |
+| output/T20_ge_bracket.csv | GE propagation arm-indexed | BUILT |
+| output/TD1R_population_census.csv | Population census (n=4182) | BUILT |
+| meta/canonical_facts.md | Canonical facts ledger | BUILT |
 
-# Exhibit Pack - Output
-711de04a59358aaa2b2e84dc0d012dcdeea3bfeedb8454584ab0b57a6f0057c1  output/A0_anchor_table.csv
-9845d2cc35d348b244b26d6d39456320be86018211ce0f264dc0b9b3123bedb8  output/A1_vuong.csv
-1a83c63af58b166ff40c341ee486f7ece634ccd5ca4d194fd3952ab62ece44ea  output/A2_residual_tails.csv
-638a342e59141c1e041cb7b438f07f78794e4590a4a847d50d2115d29fd7aaed  output/A3_kappa_convergence.csv
-e24fb9981b1806cc511dd9c346de8fe1a9e8152eaa3da44d2d991199c955d511  output/A4_per_year_anchor.csv
-488dfdd783b0a70f7da462b63ff12b4438ab3efbac674579767455e1561c0fbd  output/A5_proposition_verification.csv
-4cdc834c9f83fd43328b2a95f3093c427ff1903a4f70deba4f808dd475d2be24  output/canonical_facts.md
-2827e04ea2babeef71d760c642c0fa222b52a3b704b4396b29b09bcdb7843531  output/cross_check_register.R
-34d13d040390e043b9786262d79ddc01e58a9b85909cc4bf0a7a0b16df0bcda8  output/F1_moment_convergence.pdf
-ef8165f8bc380e359322779ac8178bcb8b60900c0104ae28397ec26de3997c55  output/F1_moment_convergence.png
-c69506d9b328829efad645dc885f4d5d707a777f3edaef068b8ee186afaa3876  output/F2_effect_density.pdf
-0c836ca65051af312aa1030653dd9ce40628ffb791f527ccb94b630811aaf614  output/F2_effect_density.png
-39a322dfbfc9cbc8c4f3be5a7dbb748c8fc8fb6b786365069867766d8a418313  output/F3_tail_adequacy.pdf
-49d9ccc5076e9965cdaa45794058447847be4e0eeb356cfbca5362b2b2717929  output/F3_tail_adequacy.png
-8c3dadb19880fa13c011b101b41d51252b4628d95f90c211522478e20607db4b  output/F4_thetaD_convergence.pdf
-c9ed43c4d934e9c61b46d188ba6b7a22f862a8fb9cbf0744fe1f7daba0775188  output/F4_thetaD_convergence.png
-fd75df1b059eb62f914812668cbb498376ceeccce44fb1dc1032f22f1b1243dd  output/gate_report.csv
-7e76b4c3003c9c1f59ab709225c9607c82c79683ffbdcc901433d0defab2903d  output/gate_report.rds
-7a8bedec44875df1dd987dcfe376755b5f22784956e56bbaa60f112d0cfbf583  output/invalidation_register.md
-b90c13059a10226f99ffb622ca73e4c32a1ec55105db11cf8f52cd23a1f2ec48  output/T1_correction_path.csv
-32fdc6db12092df27f73beccd9174e0c85f3da80af9d3871507096ed91c30e99  output/T2_effect_distribution.csv
-609a02c701861baa9a586dd260691ade72e7d2f199c0741c35b42b337ea26e36  output/T3_gradient_cohorts.csv
-9bc7c53284f3ab8524c9731533a81acbe4a6257d4f0743d29117b3464c21974f  output/T3b_cohort_table.csv
-ad3e53e39ea6a49c15a1336abdd760bee34866e7012e930412d5aee22e0fd63c  output/T4_fe_reconciliation.csv
-4df58ba96aabe2c4aaa6ab636e7209ec8e7713c9eb38f4ec29b1698666785cd8  output/T5_injection.csv
-f1f60c99bd30af0e7981549c482ac813badff46c1d0a8378aebbead2e528d6f1  output/T6_ge_propagation.csv
-3bb101ea9ba5983db441f000ea0dd88a3839029774f8580a47d6765f182e45e8  output/T7_pearson_loggap_2x2.csv
+## Canonical Facts
 
-# Sidecars
-bedbb10f5969f4e9be0825bfc51a8a9e0a9b0c7fb0e44d39cf3e1e5af5a50894  output/.A0_anchor_table.csv.meta.txt
-d0b0d0a2263d328a2ac578fc83cdb3652d192f5e2991c4bce1157b38c8e7acb1  output/.A1_vuong.csv.meta.txt
-6ac2b3dac6ccbf28a456c4436f526d1e3243f42ffe1c149b5db619da96bee493  output/.A2_residual_tails.csv.meta.txt
-a253e76639a3f8af26c7c560b8d82885bbc874b3b692ddaf0f6f55d160e62fc9  output/.A3_kappa_convergence.csv.meta.txt
-a4970ec52c1f60a3c456e5de358613c5d4369dd0e7e690c6c441bd90fb422314  output/.A4_per_year_anchor.csv.meta.txt
-b2829a94b7d475f244ff55538efa75aa98146680672d31007420c6552a931245  output/.A5_proposition_verification.csv.meta.txt
-190cc32f33d2ab346fcac3170a1b0986fc8e7cb0ab38c1fb0dc400859b8f6184  output/.F2_effect_density.pdf.meta.txt
-e919212a926db114ffefcdf236be21d6c01e53dad4e327a29434f7e0623d2a3c  output/.T1_correction_path.csv.meta.txt
-f507ce885d1c026947ab0538ceeab750f01cd993066f18bfdd12141d56129316  output/.T2_effect_distribution.csv.meta.txt
-913b0ccdbfa8338688260324aff0ec87f1ca7df6f51ff6a4d4770b88125a0859  output/.T3_gradient_cohorts.csv.meta.txt
-711f591f5c952cd2a9dde36f39189cd63d044f53723834dc73b74e4cf6af48d1  output/.T3b_cohort_table.csv.meta.txt
-5e4eb59443ac01df56c969da7768c0d32f269507f13674a941f3eeca8503a3cc  output/.T4_fe_reconciliation.csv.meta.txt
-7750d71d9d12456aff2bdead5f2043f098b2ff02a69ec5d891f7661867423fd0  output/.T5_injection.csv.meta.txt
-9f6859921099d841d1317b768bc3d1205984779cf597972601ba329e8652189b  output/.T6_ge_propagation.csv.meta.txt
-0565bd447b94300bab17932f0057ff62e39522c31f43c5b0de25e9536e6e9327  output/.T7_pearson_loggap_2x2.csv.meta.txt
+- N = 4182 (from S6R_population.R)
+- MEAN_THETA_D = 0.2473 (SE 0.0241)
+- RAW_SHARE = 0.4211
+- P(theta <= 0) = [0.369, 0.421]
+- SD_THETA_TRUE = [0.74, 1.48] (INV-027)
 
-# Total files: 78
+## Investigations
 
+| INV | Status | Summary |
+|-----|--------|---------|
+| INV-021 | CLOSED | Retired W1 exhibit pack |
+| INV-027 | CLOSED | SD_true identified set |
+| INV-028 | CLOSED | Wrong-object (raw share) |
+| INV-029 | CLOSED | Shape unidentified, P_HI capped |
+| INV-030 | CLOSED | theta_D location error |
+| INV-032 | CLOSED | Wrong-object (MEAN_THETA_D) |
+| INV-033 | OPEN | Pseudo-population unreconciled |
+
+## QUARANTINED (INV-029)
+
+L1-L5 scripts and T14-T18 outputs.
+
+## Verification
+
+Run: Rscript code/enforce.R
+Expected: Only L* QUARANTINE violations (no BUILT violations)

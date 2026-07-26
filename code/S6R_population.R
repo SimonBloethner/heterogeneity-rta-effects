@@ -1,9 +1,14 @@
 #!/usr/bin/env Rscript
-# =============================================================================
-# S6R_population.R - Estimating population under the symmetric window
-# =============================================================================
+# S6R_population.R - Population census under symmetric window
+# OUTPUTS: data/S6R_population.rds, output/TD1R_population_census.csv
+# INPUTS:  data/S1R_ppml.rds, data/S3R_theta.rds
+# SEED:    NONE
+# EXPECTED_N: 4182
+# GATES:   G1 monotone census; G2 no duplicates; G3 size matches
+#
+# This script PRODUCES the canonical population (n=4182).
+# Output assertion: stopifnot(nrow(popn) == length(k))
 # NOTE: Uses dplyr (no data.table) for Festus compatibility.
-# =============================================================================
 
 .libPaths(c("/groups/m-larch/bt307958/Rlibs", .libPaths()))
 

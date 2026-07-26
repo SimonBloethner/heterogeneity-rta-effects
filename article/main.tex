@@ -3,7 +3,7 @@
 % Packages
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
-\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{amsmath,amssymb,amsfonts,amsthm}
 \usepackage{graphicx}
 \usepackage{booktabs}
 \usepackage{natbib}
@@ -19,6 +19,19 @@
 
 % Line spacing
 \onehalfspacing
+
+% Math operators
+\newcommand{\E}{\mathbb{E}}
+\DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\Cov}{Cov}
+\DeclareMathOperator{\Corr}{Corr}
+\DeclareMathOperator{\SD}{SD}
+
+% Theorem environments
+\newtheorem{assumption}{Assumption}
+\newtheorem{proposition}{Proposition}
+\newtheorem{corollary}{Corollary}
+\newtheorem*{remark}{Remark}
 
 % Title information
 \title{Heterogeneity in RTA Trade Effects}
@@ -374,6 +387,284 @@ corrected effect distribution and its variation across pair types, and (iv) in t
 composition of the treated population --- and Section~\ref{sec:conclusion}
 reports which survived.
 
+% =============================================================================
+% SECTION 3 — DATA AND THE ESTIMATING POPULATION
+% Draft DATA-2 (final). Supersedes DATA-1.
+% Hands off from sec:theory-standard (§2.4).
+%
+% Fact convention: every number carries a trailing "% [ID]".
+%   [FROZEN_FACTS$x]  -> REBUILD_V2/code/gates_lib_v2.R, FROZEN_FACTS
+%   [TD1R]            -> REBUILD_V2/output/TD1R_population_census.csv
+%   [I2] / [I3]       -> Section-3 inputs run, 2026-07-26
+% All [NEEDED] markers from DATA-1 are resolved. None remain.
+% =============================================================================
+
+\section{\label{sec:data}Data and the Estimating Population}
+
+% ¶1 — Hands off from §2.4: the predictions are obligations on data as much as
+% on method, so the construction is fixed before any estimator sees it.
+
+Section~\ref{sec:theory-standard} committed the mechanism to four predictions
+and assigned each to a later section. Those assignments are obligations on the
+data as much as on the method. A prediction about the shape of outcomes, about
+gradation in size and prior integration, and about the composition of the
+treated population can be tested only against a population whose construction
+is fixed in advance and stated in full, since a construction chosen after the
+estimates are seen can accommodate any of them. This section fixes it. We
+describe the trade panel and the two configurations in which it is used, the
+agreement indicator and how adoption is dated from it, the rules that select
+the pairs on which pair-level effects are computed, and the populations from
+which the counterfactual is built. Nothing here reports an estimate.
+
+\subsection{\label{sec:data-flows}Trade Flows}
+
+% ¶2 — Source, dimensions, units, frozen counts, and why the window is 1988-2019.
+
+Bilateral trade comes from the International Trade and Production Database for
+Estimation, Release~2 \citep{borchert2022international}, aggregated to total goods
+trade for each ordered exporter--importer pair and year, in millions of current
+United States dollars. The panel runs from 1988 to 2019
+% [FROZEN_FACTS$year_min, FROZEN_FACTS$year_max]
+, which is the window over which the release's goods sectors are jointly
+available; its services industries begin only in 2000 and are outside the panel
+by coverage rather than by choice. After the restrictions described next, the
+estimation panel contains $794{,}720$ observations % [FROZEN_FACTS$n_obs]
+across $46{,}803$ ordered pairs % [TD1R, R0]
+, of which the terminal cross-section contributes $31{,}650$
+% [FROZEN_FACTS$n_2019]
+. These counts and the year bounds are frozen: every script verifies them
+against the source file before computing anything and halts if they do not
+reproduce.
+
+% ¶3 — The two configurations, stated once, so no later re-inclusion of
+% domestic flows reads as inconsistency.
+
+Two configurations of this panel are used, and we state both here. Estimation
+of the agreement effect uses positive international flows: observations in
+which exporter and importer coincide are excluded, and observations recording
+zero trade are excluded with them. The first follows from what is being
+estimated --- an agreement acts on trade between two countries, and a country's
+trade with itself carries no agreement --- and the second from the pair-level
+construction, which takes logarithms of realized flows and their counterfactual
+counterparts. The general-equilibrium analysis of
+Section~\ref{sec:robustness} re-introduces domestic flows, because its
+accounting requires them: an expenditure system in which each economy's outlay
+must exhaust across all sources cannot be closed on international flows alone.
+The two are not competing samples but the input requirements of two different
+calculations.
+
+% ¶4 — What a zero is in this release; bears on the intensive-margin restriction.
+
+One property of the release deserves recording where the exclusions are stated
+rather than buried. Missing international flows in Release~2 are set to zero on
+the reasoning that reported trade is comprehensive and the bilateral matrix is
+genuinely sparse. A zero here is therefore an observed absence of recorded
+trade rather than a measured value of nothing, and dropping zeros drops both.
+We take no position on the imputation and note only that it makes the boundary
+between a pair that does not trade and a pair whose trade is unrecorded less
+sharp than the data's appearance suggests.
+
+% ¶5 — Why gross bilateral flows suit the estimand. No distributional commentary.
+
+The outcome is the gross value of goods shipped from one member of the pair to
+the other. This is the right object rather than merely the available one. The
+treaty is a bilateral instrument: it is signed by two governments, it alters
+the terms on which exporters in one meet buyers in the other, and the unit at
+which its provisions bind is the pair. An outcome on any other unit would
+either aggregate across pairs the treaty treats differently or decompose the
+pair into components the treaty does not address. Value-added measures
+reallocate part of a bilateral relationship's response to the third countries
+supplying its inputs, which is informative about where production sits but not
+about what the agreement did to the relationship it governs; netting flows
+within a pair discards the directional asymmetry the provisions themselves
+distinguish. Gross directed flows keep estimand and instrument on one unit.
+
+\subsection{\label{sec:data-agreements}Agreements}
+
+% ¶6 — The indicator, the classification, and the exclusions with their reasons.
+
+Agreement status is the binary indicator of Egger and Larch
+\citep{EggerLarch2008}, recording for each pair-year whether a reciprocal
+agreement is in force. Pairs are classified from the time path of this
+indicator alone. A pair is a \emph{switcher} if the indicator makes exactly one
+transition from zero to one and none from one to zero; its adoption year is the
+first year the indicator equals one. Pairs whose indicator equals one in every
+year are always-treated: they carry no within-pair variation and cannot
+contribute to a within-pair design, whatever their weight in world trade. Pairs
+recording more than one transition are excluded, because adoption is not well
+defined for them and a pair-level effect computed across their regimes would
+average over the very heterogeneity the paper measures. Together these
+exclusions are large: $6{,}339$ of $46{,}803$ pairs are single switchers
+% [TD1R, R1]
+, and the $40{,}464$ removed are overwhelmingly never-treated.
+
+% ¶7 — Back-reference to §2.3's passage on instrument depth. No new claims.
+
+The indicator is binary, and Section~\ref{sec:theory-nonsep} has already
+observed that a single indicator bundles legal instruments ranging from bare
+tariff schedules to architectures governing services, procurement, standards
+and dispute settlement; the construction described here does not separate
+variation originating in that bundling from variation originating in pair
+conditions, and we make no claim about their relative contribution.
+
+\subsection{\label{sec:data-population}The Estimating Population}
+
+% ¶8 — The design logic that generates the rules.
+
+The design is within-pair: each pair's effect is identified from the comparison
+of its own realized trade after adoption with what the fitted model implies for
+it in the absence of the agreement, so the pair is its own control and no
+cross-pair comparison enters the pair-level estimate. Every selection rule
+follows from that design, and each is stated with the reason it exists rather
+than as a threshold applied by convention. Table~\ref{tab:TD1} reports the
+pairs surviving each rule in the order applied.
+
+% ¶9 — Rules (a)-(c).
+
+The rules are: (a) \emph{switchers only}, since the within-pair comparison
+requires observation on both sides of adoption, and always-treated and
+multi-switcher pairs are excluded by
+Section~\ref{sec:data-agreements}. (b) \emph{adoption within 1991--2016}: a
+pair adopting in the panel's first or last years cannot satisfy the window
+requirements below, and the range makes the boundary explicit rather than
+implicit; it removes $753$ pairs % [TD1R, R2]
+. (c) \emph{a symmetric one-year exclusion band around adoption}. The
+pre-period ends at $\text{adoption}-2$ and the post-period begins at
+$\text{adoption}+2$; the adoption year and both flanking years are assigned to
+neither side. Agreements are announced before they enter force and implemented
+in stages after, so trade in the immediate neighbourhood of the switch belongs
+cleanly to neither regime. The band is symmetric by construction, and the same
+band governs the comparison populations of
+Section~\ref{sec:data-comparison}, so that treated and untreated pairs are
+never compared across differently drawn windows.
+
+% ¶10 — Rules (d)-(e), with the intensive-margin consequence stated honestly.
+
+Two further rules concern estimability and window length. (d) \emph{a usable
+counterfactual}: a pair enters only if the imputation model of
+Section~\ref{sec:empirical} yields a prediction for its post-adoption cells,
+which requires that its own fixed effect be identified from untreated data.
+This removes $576$ pairs % [TD1R, R3]
+; because identification binds at the pair fixed effect rather than cell by
+cell, every retained pair has a counterfactual for all of its post-adoption
+years, and no retained pair is estimated on a truncated window. (e) \emph{at
+least three pre- and three post-adoption years of positive trade}, outside the
+exclusion band, removing $353$ and $475$ pairs respectively
+% [TD1R, R4 and R5]
+. A pair-level effect estimated on one or two years is dominated by whichever
+shocks fall in them, and the minimum buys enough within-pair observations for
+the effect and its sampling error to be separately estimable. Robustness across
+the threshold grid is reported in Appendix~\ref{app:tables}~[X-REF: threshold
+grid].
+
+% ¶11 — What rule (e) implies about the margin, stated plainly.
+
+Rule (e) carries a consequence that should be stated rather than left to be
+discovered. A pair recording no positive trade in any pre-adoption year has no
+pre-period and is removed by the rule mechanically; there is no separate
+extensive-margin exclusion because none is needed. The effect this paper
+estimates is therefore an intensive-margin effect --- what an agreement does to
+trade between countries already trading --- and it is silent on the creation of
+trading relationships where none existed. That is a real restriction on the
+estimand's reach, since the excluded pairs are precisely those for which an
+agreement might matter most in proportional terms.
+
+% ¶12 — The resulting population, its weight, and its composition, honestly.
+
+Applying these rules yields the canonical population of $4{,}182$ pairs
+% [TD1R, R5]
+, with adoption years from 1992 to 2015. The population is economically
+substantial: its members account for $22.1$ percent of world international
+goods trade in 2015 % [I2]
+. Its composition, however, deserves comment. The largest members by
+pre-adoption trade are the Korea--United States agreement of 2012, the
+Australia--Japan and Australia--China agreements of 2015, the China--Hong Kong
+arrangement of 2003, and the Japanese agreements with Thailand, Indonesia and
+Singapore % [I3]
+; the ten largest directed pairs account for $34.3$ percent of the
+population's pre-adoption trade. Conspicuously absent are the North American
+and European agreements a reader might expect. They are absent by construction
+rather than by selection: Canada and the United States were already in force
+under their 1989 agreement when the panel opens, and intra-European pairs are
+in force throughout, so all are always-treated and carry no within-pair
+variation to identify from. The population is thus weighted toward the
+Asia-Pacific agreements of the 2000s and 2010s, and results should be read as
+speaking to agreements of that kind.
+
+% ¶13 — The frozen estimand sentence, verbatim.
+
+With the population fixed, the object of estimation can be stated exactly. It
+is the distribution across adopting pairs of the pair-level multiplicative
+effect of a new agreement on bilateral trade, for pairs with pre- and
+post-adoption trading histories.
+
+\subsection{\label{sec:data-comparison}The Comparison Populations}
+
+% ¶14 — Never-treated pairs and switchers' own pre-periods, introduced as data;
+% roles named, not performed. Also names the estimation sample, which is their
+% union - the fact that matters for §4 and is a data-construction fact here.
+
+Two further populations are constructed here and used later. The first is the
+never-treated pairs: those whose indicator is zero throughout, to which
+pseudo-adoption years are assigned under the same band and minimum-length rules
+that govern the switchers. Because nothing happens to these pairs at their
+assigned dates, whatever a pair-level effect returns for them is by
+construction not an agreement effect, and the population therefore serves as a
+reservoir against which the machinery can be calibrated. The second is the
+switchers' own pre-adoption periods, which record how each pair behaves in the
+absence of the treatment it later receives, and so allow the pairs to calibrate
+themselves rather than each other.
+
+% ¶15 — Their union is the estimation sample. Stated as a data fact, with the
+% estimator itself deferred to §4.
+
+These two populations have a further role that belongs here rather than later,
+because it determines which observations are used at all. Their union --- every
+year of every never-treated pair, together with every pre-band year of every
+switcher --- is the sample on which the counterfactual is fitted. No cell in
+which an agreement is in force enters that fit. The consequence is that a
+switcher's post-adoption counterfactual is a prediction for years the fitting
+sample never saw, rather than a fitted value for years it did; what that buys,
+and what it costs, is the business of Section~\ref{sec:empirical}. We record
+here only the sample definition, since it is a property of the data
+construction and not of the estimator applied to it.
+
+% =============================================================================
+\begin{table}[htbp]
+\centering
+\caption{Construction of the estimating population}
+\label{tab:TD1}
+\begin{tabular}{llrr}
+\toprule
+ & Rule & Pairs & Removed \\
+\midrule
+     & All ordered pairs, international, positive trade & $46{,}803$ & --- \\
+\addlinespace
+(a)  & Single switchers (one $0\!\to\!1$ transition)    & $6{,}339$  & $40{,}464$ \\
+(b)  & Adoption year in $[1991, 2016]$                  & $5{,}586$  & $753$ \\
+(d)  & Usable counterfactual from untreated data        & $5{,}010$  & $576$ \\
+(e1) & $\geq 3$ pre years, outside the band             & $4{,}657$  & $353$ \\
+(e2) & $\geq 3$ post years, outside the band            & $4{,}182$  & $475$ \\
+\midrule
+     & \textbf{Canonical population}                    & $\mathbf{4{,}182}$ & \\
+\bottomrule
+\end{tabular}
+
+\vspace{0.5em}
+\begin{minipage}{0.95\textwidth}
+\footnotesize
+\emph{Notes.} Rules are applied in the order shown. Rule~(c), the symmetric
+one-year exclusion band, is not a separate row: it defines the pre- and
+post-periods over which (e1) and (e2) count years, so its effect is embedded
+in those two rows. Pre years are those before $\text{adoption}-1$ and post
+years those after $\text{adoption}+1$, both requiring positive trade. Panel
+totals are frozen and verified at load
+% [FROZEN_FACTS$n_obs]
+. Source: % [TD1R]
+.
+\end{minipage}
+\end{table}
+
 
 
 \newpage
@@ -388,5 +679,180 @@ reports which survived.
 
 \section{Proofs}
 \label{app:proofs}
+
+\section{Propositions}
+
+\subsection*{Notation and assumptions}
+$y_{ijt}$ observed trade; $\hat y_{ijt}$ the PPML-imputed counterfactual;
+$\eta_{ijt}:=y_{ijt}/\hat y_{ijt}$; $g_{ijt}:=\log\eta_{ijt}$.
+Definitions: $\theta^A_{ij}:=T^{-1}\sum_{t\in\text{post}}g_{ijt}$;
+$\theta^B_{ij}:=\log\!\big(\sum_{t}y_{ijt}/\sum_t\hat y_{ijt}\big)$ over the post window.
+
+\begin{assumption}[A1] $y_{ijt}=\hat y_{ijt}\eta_{ijt}$ with $\E[\eta_{ijt}]=1$.\end{assumption}
+\begin{assumption}[A2] $\log\eta_{ijt}\sim N(-\sigma^2_{ij}/2,\sigma^2_{ij})$, i.i.d.\ over $t$ within pair.\end{assumption}
+\begin{assumption}[A3] $\sigma^2_{ij}$ varies across pairs and is a persistent pair trait.\end{assumption}
+
+%------------------------------------------------------------
+\begin{proposition}[Jensen bias and its reliability]\label{prop:jensen}
+Under (A1)--(A2) with zero treatment effect:
+\emph{(a)} $\E[\theta^A_{ij}\mid ij]=-\sigma^2_{ij}/2$ exactly.
+\emph{(b)} Write $R_{ij}=\sum_t w_t\eta_{ijt}$ with $w_t=\hat y_{ijt}/\sum_s\hat y_{ijs}$. Then
+$\E[\theta^B_{ij}]=-\tfrac12\Var(R_{ij})+r_{ij}$, where
+$\Var(R_{ij})=\Var(\eta_{ij})\sum_t w_t^2$ (equal weights: $\Var(\eta_{ij})/T$),
+$\Var(\eta_{ij})=e^{\sigma^2_{ij}}-1$, and the remainder $r_{ij}$ collects terms of
+order $\E[(R-1)^3]$ and higher; the expansion requires $\Var(R_{ij})\ll1$.
+\emph{(c)} For split-half estimates on disjoint post halves of length $T_h$,
+\[
+\mathrm{Corr}\big(\theta^{A,(1)},\theta^{A,(2)}\big)
+=\frac{\Var_{\text{pairs}}(\sigma^2_{ij})/4}
+{\Var_{\text{pairs}}(\sigma^2_{ij})/4+\E[\sigma^2_{ij}]/T_h},
+\]
+exactly under (A2).
+\end{proposition}
+
+\begin{proof}
+(a) Immediate from (A2). (b) Second-order expansion of $\log R$ about $R=1$ with
+$\E[R]=1$; the weight identity and $\Var(\eta)=e^{\sigma^2}-1$ (from $\E[\eta^2]=e^{\sigma^2}$
+under (A2)) give the display. (c) Conditional on the pair,
+$\theta^{A,(h)}=-\sigma^2_{ij}/2+\bar\varepsilon^{(h)}$ with
+$\bar\varepsilon^{(h)}\sim(0,\sigma^2_{ij}/T_h)$ independent across halves; decompose
+variance and covariance across pairs.
+\end{proof}
+
+\begin{corollary}[Reliability paradox]\label{cor:rel}
+Let $b_{ij}$ be \emph{any} persistent per-pair bias with cross-pair variance
+$\Var(b)$; then under zero effects
+$r_{\mathrm{split}}=\Var(b)/\big(\Var(b)+\E[\sigma^2]/T_h\big)$.
+High split-half reliability certifies persistence, not validity: any dispersed,
+persistent artifact (Jensen, drift) passes.
+\end{corollary}
+
+\begin{remark}[Empirical scale; validity of the expansions]
+At the ledgered dispersion ($\E[\sigma^2]\!\approx\!1.42$, i.e.\ mean placebo $-0.71$
+under $A$), $\Var(\eta)\approx3.1$: the generic Taylor form $-\Var(\eta)/2$ is
+\emph{invalid} for $\theta^A$ (the exact lognormal value applies), and for
+$\theta^B$ at $T=10$, $\Var(R)\approx0.31$, so $-\Var(R)/2=-0.156$ is a rough guide
+only. At the empirical scale ($\sigma=1.19$, $T=10$), simulation gives
+$\E[\theta^B]=-0.117$ against the second-order approximation $-0.156$:
+the expansion overstates the bias magnitude by roughly a third, the
+positive third-order (skewness) term partially offsetting the variance
+term. The approximation is thus a conservative guide at this scale. The ledgered $B$-placebo band
+$[-0.23,-0.19]$ additionally contains drift (Proposition~\ref{prop:drift}).
+Consistency check [V1c]: the ledgered $(r,\E[\sigma^2])=(0.62,1.42)$ are jointly
+consistent with the part-(c) formula for $\Var(\sigma^2)\approx1.85$
+(CV of $\sigma^2_{ij}\approx1$) --- a plausible but not independently measured
+dispersion; [V1c] scans $\Var(\sigma^2)\in[1,3]$ at the ledgered
+$\E[\sigma^2]=1.42$: the implied $r$ ranges $0.47$--$0.73$, with the
+ledgered $r=0.62$ obtained at $\Var(\sigma^2)\approx1.85$ (a coefficient
+of variation of $\sigma^2_{ij}$ near one) --- consistent with, though
+not an independent measurement of, the observed reliability.
+\end{remark}
+
+%------------------------------------------------------------
+\begin{proposition}[Within-pair drift]\label{prop:drift}
+Relax (A2) to $\log\eta_{ijt}=-\sigma^2_{ij}/2+\delta_{ij}\,(t-\bar t_{ij})+u_{ijt}$,
+$u_{ijt}\stackrel{iid}{\sim}N(0,\sigma^2_{ij})$, with $\delta_{ij}$ a persistent
+pair-specific drift and $\bar t_{ij}$ the pair's sample midpoint (the pair fixed
+effect centers the level, not the trend). For a never-treated pair with span
+$T=T_{\mathrm{pre}}+T_{\mathrm{post}}$ and post window equal to the last
+$T_{\mathrm{post}}$ years:
+\emph{(a)} $\overline{(t-\bar t)}^{\,\mathrm{post}}=T_{\mathrm{pre}}/2$, hence to
+first order
+$\E[\theta^{A}_{ij}]=-\sigma^2_{ij}/2+\delta_{ij}T_{\mathrm{pre}}/2$
+(and $\theta^B$ inherits the same drift term with $\hat y$-weighted window mean);
+the expression depends on window geometry only, never on calendar time.
+\emph{(b)} The drift term is a persistent pair trait and passes split-half
+reliability by Corollary~\ref{cor:rel}.
+\emph{(c)} Now let true effects $\theta_{ij}\sim(\mu,\tau^2)$ enter the post
+window. If $\delta_{ij}$ correlates with pair size $s$, the Definition-$D$
+correction (subtracting the size-cell placebo mean) removes
+$\E[\delta_{ij}\mid s]\,T_{\mathrm{pre}}/2$ but not the within-cell dispersion:
+\[
+\Var(\theta^D\mid s)\;=\;\tau^2+\big(T_{\mathrm{pre}}/2\big)^2\Var(\delta_{ij}\mid s)
++\frac{\E[\sigma^2_{ij}\mid s]}{T_{\mathrm{post}}},
+\]
+so any deconvolution recovers $\tau^2$ jointly with the within-cell drift
+variance unless the null design carries matching window geometry.
+\end{proposition}
+
+\begin{proof}
+(a) The post-window mean of $t$ is $T_{\mathrm{pre}}+(T_{\mathrm{post}}+1)/2$;
+subtracting $\bar t=(T+1)/2$ gives $T_{\mathrm{pre}}/2$. Calendar year enters
+nowhere. (b) Apply Corollary~\ref{cor:rel} with
+$b_{ij}=-\sigma^2_{ij}/2+\delta_{ij}T_{\mathrm{pre}}/2$. (c) Decompose
+$\theta^D=\theta_{ij}+\big(\delta_{ij}-\E[\delta\mid s]\big)T_{\mathrm{pre}}/2+
+\bar u$, take variances conditional on $s$.
+\end{proof}
+
+\begin{remark}
+Part (a) explains the ledgered calendar invariance of the placebo bias
+($R^2<1\%$ on pseudo-year dummies) and, with size-correlated $\delta$, the
+size-graded placebo means ($-1.07$ smallest decile); [V2a]--[V2b] verify the
+formula and the invariance in simulation. The ledgered M1 adjudication ---
+stationary resampling produced $b\in[0.03,0.12]$, incapable of generating the
+placebo pattern --- is the empirical counterpart of the exclusion of (A2)-only
+mechanisms.
+\end{remark}
+
+%------------------------------------------------------------
+\begin{proposition}[Identification and its boundary]\label{prop:ident}
+Let pre-window gaps be $g_{ijt}=\sigma_{ij}u_{ijt}$ (mean-adjusted) and
+post-window gaps
+$g_{ijt}=\theta_{ij}+\nu_{ijt}+\sigma_{ij}\rho\,u_{ijt}$, with
+$u_{ijt}\stackrel{iid}{\sim}N(0,1)$, transitory effect variation
+$\nu_{ijt}\stackrel{iid}{\sim}N(0,\omega^2)$ independent of $u$, persistent
+effects $\theta_{ij}\sim(\mu,\tau^2)$, and post/pre volatility ratio $\rho\ge0$.
+Define the per-pair observables: pre variance $V^{\mathrm{pre}}_{ij}$, centered
+post variance $V^{\mathrm{post}}_{ij}$, and $\hat\theta_{ij}=\bar g^{\mathrm{post}}$.
+Then:
+\emph{(a) (Identification of $\tau^2$.)}
+$\E[V^{\mathrm{post}}_{ij}]=\sigma^2_{ij}\rho^2+\omega^2$,
+$\Var(\hat\theta_{ij}\mid ij)=V^{\mathrm{post}}_{ij}/T_{\mathrm{post}}$ exactly, hence
+\[
+\tau^2=\Var_{\text{pairs}}(\hat\theta)-\E\big[V^{\mathrm{post}}\big]/T_{\mathrm{post}},
+\]
+with all right-hand quantities estimable (the within-pair sample variance is
+unbiased for $V^{\mathrm{post}}$).
+\emph{(b) (Exact non-identification of $(\omega^2,\rho)$.)} Under the stated
+normality, the post gaps are, conditionally on the pair, i.i.d.\
+$N(\theta_{ij},\,\sigma^2_{ij}\rho^2+\omega^2)$: the parameters enter the
+likelihood only through the composite $\sigma^2\rho^2+\omega^2$. Any two
+parameterizations with equal composites generate \emph{identical} data
+distributions; the split between transitory effect heterogeneity and
+treatment-coincident volatility change is a modeling label, not an estimable
+quantity. Absent normality, separation requires within-pair moments of order
+$\ge3$, whose sampling noise at $T_{\mathrm{post}}\approx10$
+($\mathrm{SD}$ of sample excess kurtosis $\approx\sqrt{24/T}\approx1.5$)
+dominates plausible population differences.
+\end{proposition}
+
+\begin{corollary}[Operational variance ratios over-subtract]\label{cor:rhoop}
+Define $\hat\rho^2_{\mathrm{op}}:=V^{\mathrm{post}}/V^{\mathrm{pre}}
+=\rho^2+\omega^2/\sigma^2$. A ``post-calibrated'' null that scales a
+\emph{pre-based} noise variance of window length $T_0<T_{\mathrm{post}}$ by
+$\hat\rho^2_{\mathrm{op}}$ subtracts
+$\kappa_w\,V^{\mathrm{post}}/T_{\mathrm{post}}$ with window factor
+$\kappa_w:=T_{\mathrm{post}}/T_0>1$, biasing the recovered variance by
+$-(\kappa_w-1)\,\E[V^{\mathrm{post}}]/T_{\mathrm{post}}$. With the ledgered
+$\kappa_w\approx2.4$, a single $\sigma$ calibrated from the ledgered injection
+scenario (ii) ($0.40\to0.35$) predicts the scenario-(iv) collapse
+($0.40\to\approx0$, reported $0.06$): [V3c] confirms: calibrating a single $\sigma\approx0.52$ to the
+scenario-(ii) recovery ($0.40\to0.35$) predicts the scenario-(iv)
+collapse to the floor ($0.40\to0$; ledgered $0.06$), by formula and by
+direct simulation of the mis-windowed estimator..
+
+\end{corollary}
+
+\begin{remark}[The empirical bracket, organized]
+Part (a) is precisely the window-matched estimator used in the ledgered V1
+computation. The ledgered bracket $[0.39,0.46]$ corresponds to the two
+admissible noise attributions: subtracting $\E[\sigma^2]/T$ (pre-calibrated,
+conservative when the measured $\hat\rho^2_{\mathrm{op}}<1$) yields $0.39$;
+subtracting $\E[V^{\mathrm{post}}]/T$ per part (a) yields $0.46$. Under the
+stated model the latter is the identified value of the \emph{persistent}
+heterogeneity $\tau$; the transitory slice $\omega^2/T$ remains, by part (b),
+inseparable from volatility change at any sample size --- the boundary of what
+these data permit anyone to learn.
+\end{remark}
 
 \end{document}
