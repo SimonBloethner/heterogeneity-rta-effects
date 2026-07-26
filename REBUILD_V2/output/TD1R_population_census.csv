@@ -1,7 +1,7 @@
 "rule","description","pairs_remaining","pairs_dropped"
-"R0","All pairs in data",78400,0
-"R1","Single switchers (one 0->1 transition)",8448,69952
-"R2","Adoption year in [1991, 2016]",7068,1380
-"R3","Usable counterfactual for >=1 post cell",5233,1835
-"R4",">= 3 pre years (year < adopt-1, trade>0)",4638,595
-"R5",">= 3 post years (year > adopt+1, trade>0)",4157,481
+"R0","All pairs in data",46803,0
+"R1","Single switchers (one 0->1 transition)",6339,40464
+"R2","Adoption year in [1991, 2016]",5586,753
+"R3","Usable counterfactual for >=1 post cell",5010,576
+"R4",">= 3 pre years (year < adopt-1, trade>0)",4657,353
+"R5",">= 3 post years (year > adopt+1, trade>0)",4182,475

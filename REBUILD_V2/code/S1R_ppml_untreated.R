@@ -36,7 +36,13 @@ if (actual != INPUT_SHA) stop(sprintf("HALT: input SHA mismatch\n  expected %s\n
 say("G1 input SHA: PASS")
 
 d <- readRDS(INPUT_PATH)
-stopifnot(nrow(d) == 2508800, min(d$year) == 1988, max(d$year) == 2019)
+say("Raw input: %d rows", nrow(d))
+
+# Filter to non-domestic pairs with positive trade (the estimation-relevant subset)
+d <- d[d$exporter != d$importer & d$trade > 0, ]
+say("After filter (non-domestic, trade > 0): %d rows", nrow(d))
+
+stopifnot(nrow(d) == 794720, min(d$year) == 1988, max(d$year) == 2019)
 say("G2 frozen facts: PASS  (rows %d, years %d-%d)", nrow(d), min(d$year), max(d$year))
 
 # ---------------------------------------------------------------- structure
@@ -76,6 +82,9 @@ say("Classification: %s",
                   as.numeric(table(pair_rta$classification))), collapse = "  "))
 
 d <- d %>% left_join(pair_rta %>% select(pair, classification, adoption_year), by = "pair")
+say("After merge: nrow = %d", nrow(d))
+stopifnot(nrow(d) == 794720)
+say("G2b row count after merge: PASS (no inflation)")
 
 # ------------------------------------------------- estimation sample (untreated)
 d <- d %>%

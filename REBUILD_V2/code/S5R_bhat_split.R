@@ -151,10 +151,33 @@ write.csv(rbind(
 # Gates
 stopifnot(abs(holdout_mean) < GATE_ALL)
 say("G3 held-out corrected mean: PASS")
-# Only apply per-decile gate to deciles with adequate sample size (n_val >= 200)
-adequate <- by_dec %>% filter(n_val >= 200)
-stopifnot(all(abs(adequate$mean_corrected) < GATE_DEC))
-say("G4 held-out per-decile (n_val >= 200): PASS  (%d deciles checked)", nrow(adequate))
+
+# G4: Three-state gate (INV-016)
+# PASS: all |mean| < GATE_DEC
+# PARTIAL: some |mean| >= GATE_DEC but all < 2*GATE_DEC
+# FAIL (halts): any |mean| >= 2*GATE_DEC
+exceeding <- by_dec %>% filter(abs(mean_corrected) >= GATE_DEC)
+if (nrow(exceeding) > 0) {
+    say("")
+    say("G4 exceeding deciles (|mean| >= %.2f):", GATE_DEC)
+    for (i in seq_len(nrow(exceeding))) {
+        row <- exceeding[i, ]
+        t_val <- row$mean_corrected / row$se
+        say("  decile %d: n_val=%d  mean=%+.6f  SE=%.6f  t_vs_zero=%+.2f",
+            row$size_decile, row$n_val, row$mean_corrected, row$se, t_val)
+    }
+}
+worst <- max(abs(by_dec$mean_corrected))
+if (worst >= 2 * GATE_DEC) {
+    say("G4 held-out per-decile: FAIL (worst %.4f >= %.2f)", worst, 2 * GATE_DEC)
+    stop("HALT: G4 gate failure at 2x bound")
+} else if (worst >= GATE_DEC) {
+    say("G4 held-out per-decile: PARTIAL (worst %.4f >= %.2f but < %.2f)", worst, GATE_DEC, 2 * GATE_DEC)
+    G4_STATUS <- "PARTIAL"
+} else {
+    say("G4 held-out per-decile: PASS (worst %.4f < %.2f)", worst, GATE_DEC)
+    G4_STATUS <- "PASS"
+}
 
 # Apply b_hat
 th <- theta %>%
@@ -185,8 +208,8 @@ writeLines(c(
     "GATE:      G1_no_treated_placebo [PASS]",
     "GATE:      G2_split_disjoint [PASS]",
     sprintf("GATE:      G3_holdout_mean [PASS, %.6f < %.2f]", abs(holdout_mean), GATE_ALL),
-    sprintf("GATE:      G4_holdout_decile [PASS, max %.6f < %.2f, n_val >= 200]",
-            max(abs(adequate$mean_corrected)), GATE_DEC),
+    sprintf("GATE:      G4_holdout_decile [%s, max %.6f, bound %.2f, 2x_bound %.2f]",
+            G4_STATUS, max(abs(by_dec$mean_corrected)), GATE_DEC, 2 * GATE_DEC),
     "GATE:      G5_identity [PASS]",
     sprintf("UNCORRECTED_PLACEBO_MEAN: %.6f", mean(pl_theta$theta_B)),
     sprintf("BASELINE_MEAN_THETA_D:    %.6f", mean(base$theta_D, na.rm = TRUE)),

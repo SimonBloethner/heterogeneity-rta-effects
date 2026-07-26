@@ -1,16 +1,16 @@
 FILE:      S5R_bhat.rds
-SHA256:    9e059248d7acf6910392ab78b87533cd2fa080ba3253861294f060b8fb3402dc
-PRODUCER:  code/S5R_bhat_split.R (SHA256: f34eeb28971621b69801db67f647cb037e0c75a2a94e72cf40a73a9f5255b445)
+SHA256:    d46910ef55f0a22018baf8bd218dac5548bde98150d798ad85aa1914af8d12d8
+PRODUCER:  code/S5R_bhat_split.R (SHA256: a1b1e0e108b7302a26edcd580a2f51c88e3cdc308b40fa8d8c95be4169e80dde)
 INPUTS:    data/S1R_ppml.rds, data/S3R_theta.rds, data/S6R_population.rds
 SEED:      20260719
 MATCHING CELL: size_decile  (SELECTED)
 VALIDATION: 50/50 placebo split by pair; b_hat from CAL; gate on VAL
 GATE:      G1_no_treated_placebo [PASS]
 GATE:      G2_split_disjoint [PASS]
-GATE:      G3_holdout_mean [PASS, 0.009685 < 0.05]
-GATE:      G4_holdout_decile [PASS, max 0.053453 < 0.10, n_val >= 200]
+GATE:      G3_holdout_mean [PASS, 0.018789 < 0.05]
+GATE:      G4_holdout_decile [PARTIAL, max 0.101312, bound 0.10, 2x_bound 0.20]
 GATE:      G5_identity [PASS]
-UNCORRECTED_PLACEBO_MEAN: -0.123997
-BASELINE_MEAN_THETA_D:    0.005166
+UNCORRECTED_PLACEBO_MEAN: -0.207205
+BASELINE_MEAN_THETA_D:    0.247265
 R_VERSION: 4.4.1
-CREATED:   2026-07-26 06:11:17
+CREATED:   2026-07-26 06:30:40

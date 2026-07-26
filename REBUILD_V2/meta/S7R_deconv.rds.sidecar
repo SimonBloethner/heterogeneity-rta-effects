@@ -1,0 +1,16 @@
+FILE:      S7R_deconv.rds
+SHA256:    c1d55117cb7ec4efef3efe4bc952a2eddc6184f1474c19d932c01582612622ce
+PRODUCER:  code/S7R_deconv.R (SHA256: d07b8385470a3691318925f837b6c8efc9469b16f0e29a6733e9c81c385b5712)
+INPUTS:    data/S5R_bhat.rds, data/S3R_theta.rds, data/S6R_population.rds, data/S1R_ppml.rds
+SEED:      20260719
+N_BOOT:    500
+CONFIG:    estimator=S1R untreated-only; window=symmetric +/-1; matching=size_decile
+GATE:      identified_set_valid [PASS]
+BASELINE_N:      4182
+MEAN_THETA_D:    0.247265 (SE 0.023495)
+SD_THETA_D:      1.561394 (SE 0.027076)
+SD_THETA_TRUE:   1.524586 (SE 0.027910)
+TW_MEAN:         0.304332 (SE 0.092029)
+Q1_Q5_SPREAD:    0.913735 (SE 0.080859)
+R_VERSION: 4.5.3
+CREATED:   2026-07-26 06:45:11

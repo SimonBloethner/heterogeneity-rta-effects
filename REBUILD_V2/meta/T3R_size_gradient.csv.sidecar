@@ -1,0 +1,5 @@
+FILE:      T3R_size_gradient.csv
+SHA256:    f4754164ed0e80019fa354836a7b0883e406839822e550f7f0d39d2a4aba81df
+PRODUCER:  code/S10R_exhibits.R (SHA256: 8cbc22f6817800b7062b08dc52439240843807e648fca7c675083993c8ef14be)
+DESCRIPTION: Mean theta_D by pre-adoption trade quintile (BASELINE)
+CREATED:   2026-07-26 06:50:28

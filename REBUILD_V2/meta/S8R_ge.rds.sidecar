@@ -1,0 +1,18 @@
+FILE:      S8R_ge.rds
+SHA256:    155d6a0376a474e1cc288cdd2d41b99974ab495e29efeeec1c0a77ce7bc3e885
+PRODUCER:  code/S8R_ge_propagation.R (SHA256: ea40b3023cadca68d92da55a696a159608ade90bee98c0e17486053288101fbc)
+INPUTS:    data/S5R_bhat.rds, gravity_functions.R, ITPDE_total.rds
+SEED:      20260719
+N_DRAWS:   500
+SIGMA:     5
+DYAD:      CUW-SUR
+GATE:      A_plumbing [PASS]
+GATE:      B_market_clearing [PASS]
+GATE:      C_convergence [PASS]
+Q10:       -0.7333
+Q50:       +0.2449
+Q90:       +6.2692
+RANGE_1090: 27.2512
+RANGE_NORMAL: 49.5883
+R_VERSION: 4.4.1
+CREATED:   2026-07-26 06:50:18

@@ -1,0 +1,14 @@
+FILE:      S9R_spec.rds
+SHA256:    d7c6c98a551bda0ca174f62307e1a8b3de53dd65b8ec2960a78ee1a11c706610
+PRODUCER:  code/S9R_spec_spread.R (SHA256: 472e3480ab93283b6795ed4dd49aa4df670c6dd8387e64d3e2a0f6d3f6531118)
+INPUTS:    ITPDE_total.rds (full panel)
+SEED:      NONE
+CONFIG:    pooled RTA estimator (NOT untreated-only)
+GATE:      A_monotonic [PASS]
+B_BILATERAL:   1.4020
+C_COUNTRY:     0.9222
+CY_COUNTRY_YR: 0.4108
+FULL:          0.0947
+SPREAD:        1.3073 (pack 1.307, dev +0.0003)
+R_VERSION: 4.4.1
+CREATED:   2026-07-26 06:48:55

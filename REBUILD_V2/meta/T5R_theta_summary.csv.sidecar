@@ -1,0 +1,5 @@
+FILE:      T5R_theta_summary.csv
+SHA256:    aed2be043386613b31f1848e4861ea3d9ea4afb687eec2247faf5feddfb92f8f
+PRODUCER:  code/S10R_exhibits.R (SHA256: 8cbc22f6817800b7062b08dc52439240843807e648fca7c675083993c8ef14be)
+DESCRIPTION: Theta distribution summary statistics (BASELINE)
+CREATED:   2026-07-26 06:50:28

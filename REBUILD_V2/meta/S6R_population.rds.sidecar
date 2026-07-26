@@ -1,5 +1,5 @@
 FILE:      S6R_population.rds
-SHA256:    d0f294161ce73b638705315838c693c50b1180bd3d22f88248f1ba0902b092ee
+SHA256:    eda7571e24d16058a9d13e7f0d8a08cdcebf8dd4d31ccb619bb6b95df6ed2d09
 PRODUCER:  code/S6R_population.R (SHA256: b2862eaa3425788786f549e537cca3faaf226c66a04568bb5ff3fb59ce0cb0d9)
 INPUTS:    data/S1R_ppml.rds, data/S3R_theta.rds
 SEED:      NONE
@@ -8,6 +8,6 @@ RULES:     R1 single switchers; R2 adoption in [1991,2016];
 GATE:      G1_monotone_census [PASS]
 GATE:      G2_no_duplicates [PASS]
 GATE:      G3_size_matches [PASS]
-N:         4157  (ledgered pack 4182, residual -25)
+N:         4182  (ledgered pack 4182, residual +0)
 R_VERSION: 4.4.1
-CREATED:   2026-07-26 06:07:01
+CREATED:   2026-07-26 06:24:14

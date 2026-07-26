@@ -1,0 +1,5 @@
+FILE:      T10R_reconciliation.csv
+SHA256:    c960c4a74bfc72e308b669b307b0e91a87064c72abad6a6ae73f2f68cb009e93
+PRODUCER:  code/S10R_exhibits.R (SHA256: 8cbc22f6817800b7062b08dc52439240843807e648fca7c675083993c8ef14be)
+DESCRIPTION: Reconciliation of fixed-chain vs pack (with bootstrap SEs)
+CREATED:   2026-07-26 06:50:28

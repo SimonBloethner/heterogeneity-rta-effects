@@ -1,8 +1,8 @@
 FILE:      T10_reconciliation.csv
-SHA256:    7560483e1895a5f06c289744b03948da1f9f3d362b97523786c5495b540cf2e6
+SHA256:    3586d268102b85b3aed8c8bc4886e80604d5c413bad331167465cf89f171b7a1
 PRODUCER:  code/S16_reconcile.R (SHA256: 9c3170949c7b9592a388da44f42a70e5d3d342e61db62e79967fb65d7926dfe5)
 INPUTS:    data/S3R_theta.rds, data/S5R_bhat.rds, data/S6R_population.rds
 SEED:      NONE
 GATE:      none halting; deviations flagged at 2*SE
-RECONCILE_FAIL_COUNT: 4
-CREATED:   2026-07-26 06:09:42
+RECONCILE_FAIL_COUNT: 3
+CREATED:   2026-07-26 06:30:52

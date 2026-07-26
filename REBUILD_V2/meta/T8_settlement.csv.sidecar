@@ -1,4 +1,5 @@
 FILE:      T8_settlement.csv
+SHA256:    ccc207cc1733641061d98765a9754216aad4b569ac57fac382d83f511fccb775
 PRODUCER:  code/S15_settle.R (parallel version)
 INPUTS:    data/S1_ppml.rds, data/S2_pairs.rds, data/S3_theta.rds, data/S6_population.rds
 SEEDS:     20260719, 42, 999, 12345
@@ -23,4 +24,4 @@ A non-zero placebo mean indicates PPML counterfactual bias for untreated pairs.
 That bias is exactly what b_hat removes. Failing the 0.05 threshold is the reason
 the correction exists, not evidence the design is invalid.
 
-CREATED: 2026-07-25
+CREATED: Sat Jul 25 22:56:59 CEST 2026

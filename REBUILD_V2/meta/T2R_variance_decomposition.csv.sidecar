@@ -1,0 +1,5 @@
+FILE:      T2R_variance_decomposition.csv
+SHA256:    00e4ece086f1d513c3f622228ea453d13cb83c8a91b4b19c696468c9131cfe2b
+PRODUCER:  code/S10R_exhibits.R (SHA256: 8cbc22f6817800b7062b08dc52439240843807e648fca7c675083993c8ef14be)
+DESCRIPTION: Variance decomposition with bootstrap SEs (FIXED CHAIN)
+CREATED:   2026-07-26 06:50:28

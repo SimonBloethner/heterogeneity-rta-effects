@@ -1,6 +1,6 @@
 file: T4_ge_propagation.csv
-sha256: 329a309abb46449f2b680735a4f22937b500b7d135e7ea0bc0e53ca906362432
+sha256: 3724a6b41d041bb2748af9346c76d0d3f888437f3b9669da4629531c555abfb2
 created: 2026-07-25 20:57:03
-script: S10_exhibits.R
+script: S10_exhibits.R (manually corrected)
 description: GE trade cost change quantiles (sigma=5)
-
+note: SHA updated after manual fix to quantile extraction

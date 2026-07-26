@@ -1,14 +1,14 @@
 FILE:      S3R_theta.rds
-SHA256:    3a8cd1e918e3b853e4e583af2e4f9d56f4d0a38967106536f1bca4c7a754a5bf
+SHA256:    1964a10516d26de8aeda08ee6cabd35024e412dc6bb6ce4fc1c078a5716b517a
 PRODUCER:  code/S3R_theta.R (SHA256: 06a8f42c1d39ddf55c318314270ff3eb98344a53050a58d512b508c78442b565)
-INPUTS:    data/S1R_ppml.rds (SHA256: fb914a8720f7e006c0e84be0ae8564614e7ad2eb4872bcdfb59e94700926aaa0)
+INPUTS:    data/S1R_ppml.rds (SHA256: 45c937cd78805d7b13b4c43f4bc4888e93a2ff15e787ad4fb41d77b51f837d89)
 SEED:      20260719
 WINDOW:    pre = year < adoption_year - 1 ; post = year > adoption_year + 1
 GATE:      G1_post_cells [PASS]
 GATE:      G2_no_NA_theta_B [PASS]
 GATE:      G3_window_symmetry [PASS]
-THETA_A:   mean -0.294457  sd 2.009657
-THETA_B:   mean 0.039701  sd 2.027517
+THETA_A:   mean -0.325535  sd 1.795060
+THETA_B:   mean 0.029766  sd 1.731879
 R_VERSION: 4.4.1
-ROWS:      5708
-CREATED:   2026-07-26 06:06:53
+ROWS:      5482
+CREATED:   2026-07-26 06:24:04
