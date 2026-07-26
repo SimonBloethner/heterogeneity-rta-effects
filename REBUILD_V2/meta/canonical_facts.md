@@ -35,8 +35,11 @@ Pipeline: S1R → S3R → S4R → S5R → S6R → S7R → S8R → S9R → S10R
 |----------|----------|-----|------|--------------|
 | mean(θ_D) | 0.2473 | 0.0235 | 0.214 | +1.42 |
 | SD(θ_D) | 1.5614 | 0.0271 | — | — |
-| SD(θ_true) | 1.5246 | 0.0279 | — | — |
+| SD(θ_true) | **[1.4754, 1.5054]** | — | — | — |
 | TW_mean | 0.3043 | 0.0920 | — | — |
+
+**SD(θ_true) identified set:** Lower=1.4754 (se_total: includes counterfactual
+uncertainty), Upper=1.5054 (se_B only). See INV-019, S17_se_cf.R.
 | Q1-Q5 spread | 0.9137 | 0.0809 | 0.465 | +5.55 |
 | Spec spread (B-FULL) | 1.3073 | — | 1.307 | +0.0003 |
 
@@ -128,10 +131,30 @@ a larger size gradient (0.914 vs 0.465), with 75% attributable to the
 | S8R_ge.rds | 155d6a0376a4... |
 | S9R_spec.rds | d7c6c98a551b... |
 
+## SE-CF Analysis (Counterfactual Uncertainty)
+
+| Component | Value | Share |
+|-----------|-------|-------|
+| mean(se_B²) | 0.1717 | 65.8% |
+| mean(sd_cf²) | 0.0894 | 34.2% |
+| mean(se_total²) | 0.2612 | 100% |
+
+**Decision:** mean(sd_cf²) = 0.0894 < 0.10 × Var(θ_D) = 0.2438
+→ Counterfactual uncertainty is **IMMATERIAL**
+
+Producer: code/S17_se_cf.R (B=180 draws, seed 20260719)
+
 ## Invalidation Register
 
 - INV-016: G4 gate changed to three-state (SPECIFICATION CHANGE)
 - INV-017: S1 pooled estimator superseded by S1R untreated-only
 - INV-018: 42-pair discrepancy closed (pack matches at 4,182)
+- INV-019: SE-CF counterfactual uncertainty documented (IMMATERIAL)
+- INV-020: README T1 window-mixing defect closed
+
+## Caveats Register
+
+- CAV-001: SE-CF B=180/200 (chunks 06, 11 failed)
+- CAV-002: B1 test used S5R_bhat.rds (W1_pop_canon.rds lacks theta_B)
 
 See meta/SUPERSEDED.md for full register.

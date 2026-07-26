@@ -100,8 +100,8 @@ code/S15_seed_20260719.R,code,manual,data/S5_bhat.rds,20260719,syntax_valid,8,BU
 code/S15_seed_42.R,code,manual,data/S5_bhat.rds,42,syntax_valid,8,BUILT
 code/S15_seed_999.R,code,manual,data/S5_bhat.rds,999,syntax_valid,8,BUILT
 code/S16_reconcile.R,code,manual,data/S3R_theta.rds;data/S5R_bhat.rds;data/S6R_population.rds,NONE,syntax_valid,8,BUILT
-output/T6b_matching_sensitivity.csv,output,code/S13b_matching_sensitivity.R,data/S6R_population.rds,MULTIPLE,exists,8,BUILT
-meta/T6b_matching_sensitivity.csv.sidecar,meta,code/S13b_matching_sensitivity.R,output/T6b_matching_sensitivity.csv,NONE,exists,8,BUILT
+output/T6b_matching_sensitivity.csv,output,code/S13b_matching_sensitivity.R,data/S6R_population.rds,MULTIPLE,exists,8,SUPERSEDED
+meta/T6b_matching_sensitivity.csv.sidecar,meta,code/S13b_matching_sensitivity.R,output/T6b_matching_sensitivity.csv,NONE,exists,8,SUPERSEDED
 output/T8_seed_12345.csv,output,code/S15_seed_12345.R,data/S5_bhat.rds,12345,exists,8,BUILT
 output/T8_seed_20260719.csv,output,code/S15_seed_20260719.R,data/S5_bhat.rds,20260719,exists,8,BUILT
 output/T8_seed_42.csv,output,code/S15_seed_42.R,data/S5_bhat.rds,42,exists,8,BUILT
@@ -122,3 +122,8 @@ log_S15_42.txt,log,code/S15_seed_42.R,NONE,42,exists,8,BUILT
 log_S15_999.txt,log,code/S15_seed_999.R,NONE,999,exists,8,BUILT
 meta/SUPERSEDED.md,meta,manual,NONE,NONE,exists,0,BUILT
 meta/canonical_facts.md,meta,manual,NONE,NONE,exists,0,BUILT
+code/S17_se_cf.R,code,manual,data/S1R_ppml.rds;data/S5R_bhat.rds,20260719,syntax_valid,9,BUILT
+data/S17_se_cf.rds,data,code/S17_se_cf.R,data/S1R_ppml.rds;data/S5R_bhat.rds,20260719,cf_immaterial,9,BUILT
+meta/S17_se_cf.rds.sidecar,meta,code/S17_se_cf.R,data/S17_se_cf.rds,NONE,exists,9,BUILT
+output/T11_se_decomposition.csv,output,code/S17_se_cf.R,data/S1R_ppml.rds;data/S5R_bhat.rds,20260719,cf_immaterial,9,BUILT
+meta/T11_se_decomposition.csv.sidecar,meta,code/S17_se_cf.R,output/T11_se_decomposition.csv,NONE,exists,9,BUILT
