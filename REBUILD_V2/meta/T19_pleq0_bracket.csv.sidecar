@@ -1,0 +1,13 @@
+PRODUCER: S22_ladder_closed_form.R
+INPUTS: meta/canonical_facts.md (MEAN_THETA_D, SD_THETA_TRUE bracket)
+SEED: NONE
+EXPECTED_N: 4182
+CONFIG: MEAN_THETA_D=0.2473 (hardcoded per INV-032); SD_TRUE_LO=0.740; SD_TRUE_HI=1.475
+GATES:
+  G1: inputs match canonical_facts ledger - PASS
+  G2: P monotone decreasing in SD_true (0.369 < 0.433) - PASS
+  G3: both P in (0,1) - PASS
+STATUS: BUILT
+DATE: 2026-07-26
+INV: INV-032 (wrong-object: stray W1 copy read as S6R; reverted to R-chain value 0.2473)
+SHA256: 54adebff589c99a9deae176dd2d5149c71f6b9397c58b586c6a8edd9a5179bad

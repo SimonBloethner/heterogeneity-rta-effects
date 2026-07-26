@@ -1,0 +1,12 @@
+PRODUCER: S23_ge_bracket.R
+INPUTS: meta/canonical_facts.md (MEAN_THETA_D, SD_THETA_TRUE bracket)
+SEED: 20260726
+EXPECTED_N: 4182
+CONFIG: MEAN_THETA_D=0.2473 (hardcoded per INV-032); SD_TRUE_LO=0.740; SD_TRUE_HI=1.475; N_DRAWS=10000
+GATES:
+  G1: inputs match canonical_facts ledger - PASS
+  G2: output has 4 rows (2 arms x 2 shapes) - PASS
+STATUS: BUILT
+DATE: 2026-07-26
+INV: INV-032 (wrong-object: stray W1 copy read as S6R; reverted to R-chain value 0.2473)
+SHA256: 21af48145ca10a72a186c26bac8de798ae44e1bfa30c528ee2b5655dbd7f58cc

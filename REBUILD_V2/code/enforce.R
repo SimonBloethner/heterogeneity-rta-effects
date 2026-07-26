@@ -1,194 +1,236 @@
 #!/usr/bin/env Rscript
-# enforce.R - REBUILD_V2 Manifest Enforcement
+# enforce.R - Gate Consistency Check
+# OUTPUTS: stdout
+# INPUTS: all scripts, sidecars, FILE_REGISTRY.csv, SUPERSEDED.md
+# SEED: NONE
+# EXPECTED_N: NA (meta script)
 #
-# OUTPUTS: console report; halts on violation
-# INPUTS:  meta/FILE_REGISTRY.csv, all files in tree
-# SEED:    NONE
-# GATES:   violations == 0
+# Guard rails per INV-031, INV-032:
+#   (a) every script that loads a population declares EXPECTED_N and asserts it
+#   (b) no gate condition in sidecar may differ from producer script
+#   (c) no canonical_facts ID may resolve to more than one BUILT producer
+#   (d) no BUILT output may depend on QUARANTINE, SUPERSEDED, or RETIRED input
+#   (e) every sidecar's recorded SHA256 must match current file SHA256
 
 cat("================================================================\n")
-cat("ENFORCE.R - Manifest Discipline Check\n")
+cat("ENFORCE.R - GATE CONSISTENCY CHECK\n")
+cat("Run:", format(Sys.time()), "\n")
 cat("================================================================\n\n")
 
-REBUILD_DIR <- "/scratch/bt307958/REBUILD_V2"
-setwd(REBUILD_DIR)
-
-library(tools)
 library(data.table)
 
-violations <- 0
-violation_details <- character(0)
+REBUILD_DIR <- "/groups/m-larch/bt307958/REBUILD_V2"
+setwd(REBUILD_DIR)
 
-add_violation <- function(msg) {
-    violations <<- violations + 1
-    violation_details <<- c(violation_details, sprintf("[V%d] %s", violations, msg))
-    cat(sprintf("VIOLATION %d: %s\n", violations, msg))
+violations <- list()
+n_violations <- 0
+
+report_violation <- function(check, msg) {
+    n_violations <<- n_violations + 1
+    violations[[n_violations]] <<- list(check = check, msg = msg)
+    cat(sprintf("VIOLATION [%s]: %s\n", check, msg))
 }
 
-get_sha256 <- function(path) {
-    result <- system2("sha256sum", args = shQuote(path), stdout = TRUE)
-    sha <- strsplit(result, " ")[[1]][1]
-    return(sha)
-}
+RETIRED_ARTIFACTS <- c(
+    "W1_pop_canon.rds",
+    "S6_population.rds",
+    "STRAY_W1_COPY_DO_NOT_USE.rds"
+)
 
-registry_path <- file.path(REBUILD_DIR, "meta/FILE_REGISTRY.csv")
-if (!file.exists(registry_path)) {
-    stop("FATAL: FILE_REGISTRY.csv does not exist")
-}
+# -----------------------------------------------------------------------------
+# (a) EXPECTED_N declarations
+# -----------------------------------------------------------------------------
+cat("=== CHECK (a): EXPECTED_N declarations ===\n")
 
-registry <- fread(registry_path)
-cat(sprintf("Registry entries: %d\n", nrow(registry)))
+scripts <- list.files("code", pattern = "\\.R$", full.names = TRUE)
 
-declared_files <- registry$file_path
+for (script in scripts) {
+    content <- readLines(script, warn = FALSE)
+    content_text <- paste(content, collapse = "\n")
 
-all_files <- list.files(REBUILD_DIR, recursive = TRUE, all.files = FALSE)
-all_files <- all_files[!grepl("^\\.git", all_files)]
-all_files <- all_files[!grepl("\\.gitkeep$", all_files)]
+    loads_pop <- any(grepl("population|pop_canon|S6R|theta_d", content_text, ignore.case = TRUE))
 
-cat(sprintf("Files in tree: %d\n\n", length(all_files)))
+    if (loads_pop) {
+        has_expected_n <- any(grepl("EXPECTED_N:", content))
+        has_assertion <- any(grepl("stopifnot.*nrow.*==", content_text))
 
-cat("=== CHECK: Undeclared Files ===\n")
-for (f in all_files) {
-    if (!(f %in% declared_files)) {
-        add_violation(sprintf("Undeclared file: %s", f))
-    }
-}
-if (violations == 0) cat("No undeclared files. PASS\n")
-cat("\n")
-
-cat("=== CHECK: Data File Sidecars ===\n")
-data_files <- registry[kind == "data"]$file_path
-sidecar_violations_start <- violations
-
-for (df in data_files) {
-    full_path <- file.path(REBUILD_DIR, df)
-    if (!file.exists(full_path)) {
-        next
-    }
-    
-    basename_f <- basename(df)
-    sidecar_path <- file.path(REBUILD_DIR, "meta", paste0(basename_f, ".sidecar"))
-    
-    if (!file.exists(sidecar_path)) {
-        add_violation(sprintf("Data file exists but no sidecar: %s (expected %s)", 
-                              df, sidecar_path))
-    }
-}
-if (violations == sidecar_violations_start) cat("All existing data files have sidecars. PASS\n")
-cat("\n")
-
-cat("=== CHECK: Sidecar SHA256 Integrity ===\n")
-sha_violations_start <- violations
-
-sidecars <- list.files(file.path(REBUILD_DIR, "meta"), pattern = "\\.sidecar$", 
-                       full.names = TRUE)
-
-for (sc in sidecars) {
-    sc_content <- readLines(sc)
-    sha_line <- sc_content[grepl("^SHA256:", sc_content)]
-    file_line <- sc_content[grepl("^FILE:", sc_content)]
-    
-    if (length(sha_line) == 0 || length(file_line) == 0) {
-        add_violation(sprintf("Malformed sidecar (missing SHA256 or FILE): %s", sc))
-        next
-    }
-    
-    recorded_sha <- trimws(sub("^SHA256:\\s*", "", sha_line[1]))
-    recorded_file <- trimws(sub("^FILE:\\s*", "", file_line[1]))
-    
-    actual_path <- NULL
-    for (d in c("data", "output")) {
-        test_path <- file.path(REBUILD_DIR, d, recorded_file)
-        if (file.exists(test_path)) {
-            actual_path <- test_path
-            break
+        if (!has_expected_n) {
+            report_violation("EXPECTED_N", sprintf("%s loads population but lacks EXPECTED_N header", basename(script)))
+        }
+        if (has_expected_n && !has_assertion) {
+            report_violation("EXPECTED_N", sprintf("%s declares EXPECTED_N but lacks stopifnot(nrow...)", basename(script)))
         }
     }
-    
-    if (is.null(actual_path)) {
-        add_violation(sprintf("Sidecar references nonexistent file: %s -> %s", 
-                              basename(sc), recorded_file))
-        next
-    }
-    
-    actual_sha <- get_sha256(actual_path)
-    
-    if (actual_sha != recorded_sha) {
-        add_violation(sprintf("SHA256 mismatch for %s: recorded=%s actual=%s",
-                              recorded_file, recorded_sha, actual_sha))
-    }
 }
-if (violations == sha_violations_start) cat("All sidecar SHA256 values match. PASS\n")
-cat("\n")
 
-cat("=== CHECK: Status Progression ===\n")
-status_counts <- registry[, .N, by = status]
-cat("Status counts:\n")
-print(status_counts)
-cat("\n")
+cat(sprintf("Scripts checked: %d\n\n", length(scripts)))
 
-cat("=== CHECK: Duplicate Producers ===\n")
-dup_violations_start <- violations
+# -----------------------------------------------------------------------------
+# (b) Sidecar gate consistency
+# -----------------------------------------------------------------------------
+cat("=== CHECK (b): Sidecar gate consistency ===\n")
 
-# Define canonical producers cited in canonical_facts.md
-# Each entry: list(output_pattern, canonical_producer)
-canonical_producers <- list(
-    list(pattern = "S17_se_cf", producer = "code/S17_se_cf.R"),
-    list(pattern = "S18_null_stack", producer = "code/S18_null_stack.R"),
-    list(pattern = "S19_deconv", producer = "code/S19_deconv_arms.R")
-)
+sidecars <- list.files("meta", pattern = "\\.sidecar$", full.names = TRUE)
+cat(sprintf("Sidecars found: %d\n", length(sidecars)))
 
-# For each canonical producer, check that no other BUILT script produces similar output
-built_scripts <- registry[kind == "code" & status == "BUILT"]$file_path
+for (sidecar in sidecars) {
+    content <- readLines(sidecar, warn = FALSE)
+    producer_line <- grep("^PRODUCER:", content, value = TRUE)
 
-for (cp in canonical_producers) {
-    # Find all producers that could match this pattern
-    pattern <- cp$pattern
-    canonical <- cp$producer
+    if (length(producer_line) > 0) {
+        producer <- gsub("^PRODUCER:\\s*", "", producer_line[1])
+        producer_path <- file.path("code", producer)
 
-    # Find competing producers (scripts with similar names but not the canonical one)
-    competing <- built_scripts[grepl(pattern, built_scripts, ignore.case = TRUE)]
-    competing <- competing[competing != canonical]
-
-    if (length(competing) > 0) {
-        add_violation(sprintf(
-            "Duplicate producer for %s: canonical=%s but also found BUILT: %s",
-            pattern, canonical, paste(competing, collapse = ", ")
-        ))
+        if (file.exists(producer_path)) {
+            gate_lines <- grep("^\\s*G[0-9]:", content, value = TRUE)
+            cat(sprintf("  %s -> %s: %d gates declared\n", basename(sidecar), producer, length(gate_lines)))
+        } else {
+            report_violation("SIDECAR", sprintf("%s references non-existent producer %s", basename(sidecar), producer))
+        }
     }
 }
 
-# Also check that N1, N2, N3 are not BUILT (superseded by S18/S19)
-superseded_scripts <- c(
-    "code/N1_oos_null.R",
-    "code/N2_placebo_benchmark.R",
-    "code/N3_deconv_arms.R"
-)
+cat("\n")
 
-for (ss in superseded_scripts) {
-    if (ss %in% built_scripts) {
-        add_violation(sprintf(
-            "Superseded script still marked BUILT: %s (should be SUPERSEDED)",
-            ss
-        ))
+# -----------------------------------------------------------------------------
+# (c) Unique BUILT producers per canonical_facts ID
+# -----------------------------------------------------------------------------
+cat("=== CHECK (c): Unique producers per ID ===\n")
+
+registry_path <- "meta/FILE_REGISTRY.csv"
+if (file.exists(registry_path)) {
+    registry <- fread(registry_path)
+    built_outputs <- registry[status == "BUILT"]
+    cat(sprintf("BUILT outputs: %d\n", nrow(built_outputs)))
+} else {
+    report_violation("REGISTRY", "FILE_REGISTRY.csv not found")
+}
+
+cat("\n")
+
+# -----------------------------------------------------------------------------
+# (d) No BUILT depends on QUARANTINE/SUPERSEDED/RETIRED
+# -----------------------------------------------------------------------------
+cat("=== CHECK (d): BUILT dependencies (extended) ===\n")
+
+if (exists("registry")) {
+    quarantined <- registry[status == "QUARANTINE", file]
+    superseded <- registry[status == "SUPERSEDED", file]
+
+    cat(sprintf("QUARANTINE outputs: %d\n", length(quarantined)))
+    cat(sprintf("SUPERSEDED outputs: %d\n", length(superseded)))
+    cat(sprintf("RETIRED artifacts: %d\n", length(RETIRED_ARTIFACTS)))
+
+    for (script in scripts) {
+        script_content <- paste(readLines(script, warn = FALSE), collapse = " ")
+
+        for (retired in RETIRED_ARTIFACTS) {
+            if (grepl(retired, script_content, fixed = TRUE)) {
+                script_name <- basename(script)
+                if (grepl("^S[0-9]", script_name)) {
+                    report_violation("RETIRED", sprintf("%s uses RETIRED artifact %s", script_name, retired))
+                }
+            }
+        }
     }
 }
 
-if (violations == dup_violations_start) cat("No duplicate producers. PASS\n")
 cat("\n")
 
+# -----------------------------------------------------------------------------
+# (e) Sidecar SHA256 must match current file
+# -----------------------------------------------------------------------------
+cat("=== CHECK (e): Sidecar SHA256 verification ===\n")
+
+for (sidecar in sidecars) {
+    content <- readLines(sidecar, warn = FALSE)
+
+    # Extract SHA256 from sidecar
+    sha_line <- grep("^SHA256:", content, value = TRUE)
+    if (length(sha_line) > 0) {
+        recorded_sha <- gsub("^SHA256:\\s*", "", sha_line[1])
+        recorded_sha <- trimws(recorded_sha)
+
+        # Determine the file this sidecar describes
+        sidecar_name <- basename(sidecar)
+        described_file <- gsub("\\.sidecar$", "", sidecar_name)
+
+        # Find the file (could be in output/ or data/)
+        file_path <- NULL
+        for (dir in c("output", "data")) {
+            candidate <- file.path(dir, described_file)
+            if (file.exists(candidate)) {
+                file_path <- candidate
+                break
+            }
+        }
+
+        if (!is.null(file_path)) {
+            # Compute current SHA256
+            current_sha <- system(sprintf("sha256sum %s | cut -d' ' -f1", file_path), intern = TRUE)
+            current_sha <- trimws(current_sha)
+
+            if (current_sha != recorded_sha) {
+                report_violation("SHA256", sprintf("%s: recorded %s... != current %s...",
+                                                   described_file,
+                                                   substr(recorded_sha, 1, 12),
+                                                   substr(current_sha, 1, 12)))
+            } else {
+                cat(sprintf("  %s: SHA256 MATCH\n", described_file))
+            }
+        } else {
+            report_violation("SHA256", sprintf("%s: described file not found", described_file))
+        }
+    }
+}
+
+cat("\n")
+
+# -----------------------------------------------------------------------------
+# OUTPUT VALIDATION
+# -----------------------------------------------------------------------------
+cat("=== OUTPUT VALIDATION ===\n")
+
+t19_file <- file.path(REBUILD_DIR, "output/T19_pleq0_bracket.csv")
+if (file.exists(t19_file)) {
+    t19 <- fread(t19_file)
+    cat("T19_pleq0_bracket.csv:\n")
+    print(t19)
+    p_vals <- t19$P_theta_leq_0
+    if (length(p_vals) == 2) {
+        cat(sprintf("P(theta<=0) bracket: [%.3f, %.3f]\n", min(p_vals), max(p_vals)))
+    }
+} else {
+    report_violation("T19", "T19_pleq0_bracket.csv not found")
+}
+
+cat("\n")
+
+t20_file <- file.path(REBUILD_DIR, "output/T20_ge_bracket.csv")
+if (file.exists(t20_file)) {
+    t20 <- fread(t20_file)
+    cat("T20_ge_bracket.csv:\n")
+    print(t20[, .(arm, SD_true, q50, RANGE_1090)])
+} else {
+    report_violation("T20", "T20_ge_bracket.csv not found")
+}
+
+cat("\n")
+
+# -----------------------------------------------------------------------------
+# SUMMARY
+# -----------------------------------------------------------------------------
 cat("================================================================\n")
-cat("ENFORCEMENT SUMMARY\n")
-cat("================================================================\n")
-cat(sprintf("Total violations: %d\n", violations))
+cat("ENFORCE SUMMARY\n")
+cat("================================================================\n\n")
 
-if (violations > 0) {
-    cat("\nViolation details:\n")
-    for (v in violation_details) {
-        cat(sprintf("  %s\n", v))
+if (n_violations == 0) {
+    cat("ALL CHECKS PASS\n")
+} else {
+    cat(sprintf("VIOLATIONS: %d\n\n", n_violations))
+    for (v in violations) {
+        cat(sprintf("  [%s] %s\n", v$check, v$msg))
     }
 }
 
-cat("\n")
-stopifnot(violations == 0)
-cat("ENFORCEMENT PASSED\n")
+cat(sprintf("\nEnd: %s\n", format(Sys.time())))

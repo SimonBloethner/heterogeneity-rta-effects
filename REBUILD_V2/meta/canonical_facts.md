@@ -1,184 +1,62 @@
-# Canonical Facts: REBUILD_V2 Fixed Chain
+# Canonical Facts Ledger
 
 Generated: 2026-07-26
-Pipeline: S1R → S3R → S4R → S5R → S6R → S7R → S8R → S9R → S10R
-
-## Configuration
-
-| Parameter | Value | Source |
-|-----------|-------|--------|
-| Estimator | Untreated-only PPML | S1R_ppml_untreated.R |
-| Anticipation window | Symmetric ±1 year | adopt-1 to adopt+1 excluded |
-| Placebo split | 50/50 train/validate | S5R_bhat_split.R |
-| Matching | Size decile | pre_trade deciles |
-| Bootstrap draws | 500 | Seed 20260719 |
-| GE sigma | 5 | Standard elasticity |
+Status: CLOSED
 
 ## Population
 
-| Quantity | Value | Notes |
-|----------|-------|-------|
-| N_pairs (BASELINE) | 4,182 | Matches exhibit pack exactly |
-| Total observations | 794,720 | Non-domestic, trade > 0 |
-| Unique pairs | 46,803 | All years 1988-2019 |
+| ID | Quantity | Value | Producer |
+|----|----------|-------|----------|
+| N | Sample size | 4182 | code/S6R_population.R -> data/S6R_population.rds (census: output/TD1R_population_census.csv) |
 
-### Population Rules Applied
-- R1: Single switchers (one 0→1 RTA transition)
-- R2: Adoption year in [1991, 2016]
-- R3: Usable counterfactual for ≥1 post cell
-- R4: ≥3 pre years (year < adopt-1, trade > 0)
-- R5: ≥3 post years (year > adopt+1, trade > 0)
+## Effect Distribution
 
-## Key Quantities with Bootstrap SEs
+| ID | Quantity | Value | SE | Producer |
+|----|----------|-------|-----|----------|
+| MEAN_THETA_D | Mean theta_D | 0.2473 | 0.0235 | code/S6R_population.R -> data/S6R_population.rds; cross-referenced output/T10_reconciliation.csv and meta/S5R_bhat.rds.sidecar |
+| SD_THETA_TRUE | SD(theta_true) | [0.74, 1.48] | - | INV-027 |
 
-| Quantity | Estimate | SE | Pack | Deviation/SE |
-|----------|----------|-----|------|--------------|
-| mean(θ_D) | 0.2473 | 0.0235 | 0.214 | +1.42 |
-| SD(θ_D) | 1.5614 | 0.0271 | — | — |
-| SD(θ_true) | **[1.43, 1.48]** | — | — | — |
-| TW_mean | 0.3043 | 0.0920 | — | — |
+## P(theta <= 0) Bracket
 
-**SD(θ_true) partial identification:** Three-arm deconvolution (S19_deconv_arms.R)
-- Arm A (noise only): SD = 1.475 [1.42, 1.53] — subtracts mean(se_total²) = 0.261
-- Arm B (placebo): SD = 1.326 [1.26, 1.38] — subtracts Var(placebo) = 0.680
-- Arm C (OOS drift): SD = 1.431 [1.37, 1.48] — subtracts Var_null_matched = 0.389
-- **Canonical bracket: [1.43, 1.48]** — Arm C (lower) to Arm A (upper)
+| ID | Quantity | Value | Producer |
+|----|----------|-------|----------|
+| P_THETA_LEQ_0 | P(theta_true <= 0) | [0.369, 0.433] | code/S22_ladder_closed_form.R -> output/T19_pleq0_bracket.csv |
+| P_LO | C_hardened | 0.369 | Phi(-0.2473/0.74) |
+| P_HI | A_noise_only | 0.433 | Phi(-0.2473/1.48) |
 
-See INV-023, INV-025, INV-026, INV-027. Producers: S18_null_stack.R, S19_deconv_arms.R.
-| Q1-Q5 spread | 0.9137 | 0.0809 | 0.465 | +5.55 |
-| Spec spread (B-FULL) | 1.3073 | — | 1.307 | +0.0003 |
+## GE Propagation (Arm-Indexed)
 
-## Variance Decomposition
+| Arm | SD_true | q50 | RANGE_1090 | Producer |
+|-----|---------|-----|------------|----------|
+| C_hardened | 0.740 | 28.2% | 6.64 | code/S23_ge_bracket.R -> output/T20_ge_bracket.csv |
+| A_noise_only | 1.475 | 23.5% | 44.44 | code/S23_ge_bracket.R -> output/T20_ge_bracket.csv |
 
-```
-Var(θ̂_B)  = 2.4961
-E[SE²_B]  = 0.1717
-─────────────────────
-Var(θ)    = 2.3244  (deconvolved)
-SD(θ)     = 1.5246  (SE: 0.0279)
-```
+## Gradient
 
-## Size Gradient (Pre-Trade Quintiles)
+| ID | Quantity | Value | SE | Producer |
+|----|----------|-------|-----|----------|
+| GRADIENT | Cohort gradient | 0.9137 | 0.0809 | gates/X5_size_cohort.R -> gates/T3_gradient_cohorts.csv |
 
-| Quintile | N | mean(θ_D) | SE |
-|----------|---|-----------|-----|
-| Q1 (smallest) | 837 | +0.855 | 0.076 |
-| Q2 | 836 | +0.374 | 0.060 |
-| Q3 | 836 | +0.131 | 0.049 |
-| Q4 | 836 | -0.066 | 0.037 |
-| Q5 (largest) | 837 | -0.058 | 0.028 |
+## Superseded Entries
 
-**Gradient decomposition:**
-- Q1-Q5 spread: 0.914
-- From θ_B: 0.683 (75%)
-- From b̂: 0.231 (25%)
+| Old Entry | Old Value | Cause | INV |
+|-----------|-----------|-------|-----|
+| "41% share theta_D <= 0" | 0.41 | wrong-object | INV-028 |
+| "12.5x GE range" | 12.5 | un-indexed by arm | INV-028 |
+| "27.25x GE range" | 27.25 | un-indexed by arm | INV-028 |
 
-## Specification Spread
+## QUARANTINED (INV-029)
 
-| Spec | Published | REBUILD | Diff |
-|------|-----------|---------|------|
-| (B) Bilateral | 1.402 | 1.4020 | -0.0000 |
-| (C) Country | 0.922 | 0.9222 | +0.0002 |
-| (CY) Country-Year | 0.411 | 0.4108 | -0.0002 |
-| (FULL) Full | 0.095 | 0.0947 | -0.0003 |
+T14, T15, T16, T17, T18 outputs.
 
-Spread (B - FULL): 1.3073 (pack: 1.307)
+## RETIRED (INV-021)
 
-## GE Propagation (σ=5)
+- W1_pop_canon.rds
+- S6_population.rds (use S6R_population.rds)
 
-| Quantile | Trade Change |
-|----------|--------------|
-| q10 | -73.3% |
-| q25 | -37.1% |
-| q50 | +24.5% |
-| q75 | +164.9% |
-| q90 | +626.9% |
+## Investigation Log
 
-Range (1+q90)/(1+q10): 27.25
-Normal baseline range: 49.59
+### INV-032: Wrong-object class instance 7
+During a provenance fix, the retired pack value 0.2138 was written over the R-chain value 0.2473. Cause: a stray W1 copy carrying the S6R filename was read in place of the committed artifact. The SE moved 0.0235 -> 0.0092, a factor of 2.6, which no re-sourcing of the same 4,182 pairs can produce.
 
-## Gate Status
-
-| Gate | Script | Status |
-|------|--------|--------|
-| G1 monotone census | S6R | PASS |
-| G2 no duplicates | S6R | PASS |
-| G3 size matches | S6R | PASS |
-| G4 per-decile | S5R | PARTIAL (decile 3: 0.101) |
-| A plumbing | S8R | PASS |
-| B market clearing | S8R | PASS |
-| C convergence | S8R | PASS |
-| A monotonic | S9R | PASS |
-
-## Reconciliation Assessment
-
-**Matching pack:**
-- N_pairs: 4,182 = 4,182 ✓
-- Spec spread: 1.3073 ≈ 1.307 ✓
-
-**Deviating from pack:**
-- mean(θ_D): 0.247 vs 0.214 (+1.4 SE, not significant at 2 SE)
-- Q1-Q5 spread: 0.914 vs 0.465 (+5.5 SE, significant)
-
-The Q1-Q5 spread deviation is the primary finding: the fixed chain shows
-a larger size gradient (0.914 vs 0.465), with 75% attributable to the
-θ_B component and 25% to the b̂ correction.
-
-## File Provenance
-
-| File | SHA256 |
-|------|--------|
-| S1R_ppml.rds | (see sidecar) |
-| S3R_theta.rds | (see sidecar) |
-| S5R_bhat.rds | (see sidecar) |
-| S6R_population.rds | eda7571e24d1... |
-| S7R_deconv.rds | c1d55117cb7e... |
-| S8R_ge.rds | 155d6a0376a4... |
-| S9R_spec.rds | d7c6c98a551b... |
-
-## SE-CF Analysis (Counterfactual Uncertainty)
-
-| Component | Value | Share |
-|-----------|-------|-------|
-| mean(se_B²) | 0.1717 | 65.8% |
-| mean(sd_cf²) | 0.0894 | 34.2% |
-| mean(se_total²) | 0.2612 | 100% |
-
-**Decision:** mean(sd_cf²) = 0.0894 < 0.10 × Var(θ_D) = 0.2438
-→ Counterfactual uncertainty is **IMMATERIAL**
-
-Producer: code/S17_se_cf.R (B=180 draws, seed 20260719)
-
-## Three-Arm Deconvolution (N3)
-
-| Arm | Description | Var_null | SD_true | 95% CI |
-|-----|-------------|----------|---------|--------|
-| A | Noise only (se_total²) | 0.261 | 1.475 | [1.42, 1.53] |
-| B | Placebo benchmark | 0.680 | 1.326 | [1.26, 1.38] |
-| C | OOS drift (matched) | 0.389 | 1.431 | [1.37, 1.48] |
-
-**Canonical SD_true bracket: [1.43, 1.48]**
-
-Producers: S18_null_stack.R (N1/N2), S19_deconv_arms.R (N3)
-
-## Invalidation Register
-
-- INV-016: G4 gate changed to three-state (SPECIFICATION CHANGE)
-- INV-017: S1 pooled estimator superseded by S1R untreated-only
-- INV-018: 42-pair discrepancy closed (pack matches at 4,182)
-- INV-019: SE-CF counterfactual uncertainty documented (IMMATERIAL)
-- INV-020: README T1 window-mixing defect closed
-- INV-021: Pack theta_D lineage retired (pooled estimator + W0 window)
-- INV-022: se_B omitted counterfactual uncertainty (se_total canonical)
-- INV-023: Drift heterogeneity omitted from deconvolution (three-arm fix)
-- INV-024: OOS null gate applied to uncorrected object (CORRECTED)
-- INV-025: Horizon-cohort disjunction in 11+ bin (DOCUMENTED)
-- INV-026: Horizon binning used W0 window instead of symmetric (CORRECTED)
-- INV-027: Variance discrepancy V4 vs S18 (sample definitions differ)
-
-## Caveats Register
-
-- CAV-001: SE-CF B=180/200 (chunks 06, 11 failed)
-- CAV-002: B1 test used S5R_bhat.rds (W1_pop_canon.rds lacks theta_B)
-
-See meta/SUPERSEDED.md for full register.
+Stray file renamed: data/STRAY_W1_COPY_DO_NOT_USE.rds
