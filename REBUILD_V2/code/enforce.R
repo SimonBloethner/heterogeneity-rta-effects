@@ -127,6 +127,56 @@ cat("Status counts:\n")
 print(status_counts)
 cat("\n")
 
+cat("=== CHECK: Duplicate Producers ===\n")
+dup_violations_start <- violations
+
+# Define canonical producers cited in canonical_facts.md
+# Each entry: list(output_pattern, canonical_producer)
+canonical_producers <- list(
+    list(pattern = "S17_se_cf", producer = "code/S17_se_cf.R"),
+    list(pattern = "S18_null_stack", producer = "code/S18_null_stack.R"),
+    list(pattern = "S19_deconv", producer = "code/S19_deconv_arms.R")
+)
+
+# For each canonical producer, check that no other BUILT script produces similar output
+built_scripts <- registry[kind == "code" & status == "BUILT"]$file_path
+
+for (cp in canonical_producers) {
+    # Find all producers that could match this pattern
+    pattern <- cp$pattern
+    canonical <- cp$producer
+
+    # Find competing producers (scripts with similar names but not the canonical one)
+    competing <- built_scripts[grepl(pattern, built_scripts, ignore.case = TRUE)]
+    competing <- competing[competing != canonical]
+
+    if (length(competing) > 0) {
+        add_violation(sprintf(
+            "Duplicate producer for %s: canonical=%s but also found BUILT: %s",
+            pattern, canonical, paste(competing, collapse = ", ")
+        ))
+    }
+}
+
+# Also check that N1, N2, N3 are not BUILT (superseded by S18/S19)
+superseded_scripts <- c(
+    "code/N1_oos_null.R",
+    "code/N2_placebo_benchmark.R",
+    "code/N3_deconv_arms.R"
+)
+
+for (ss in superseded_scripts) {
+    if (ss %in% built_scripts) {
+        add_violation(sprintf(
+            "Superseded script still marked BUILT: %s (should be SUPERSEDED)",
+            ss
+        ))
+    }
+}
+
+if (violations == dup_violations_start) cat("No duplicate producers. PASS\n")
+cat("\n")
+
 cat("================================================================\n")
 cat("ENFORCEMENT SUMMARY\n")
 cat("================================================================\n")

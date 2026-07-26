@@ -235,6 +235,26 @@ for analysis. Each entry documents what was wrong and what supersedes it.
 - **Status:** DOCUMENTED — result valid, different source object
 - **Date:** 2026-07-26
 
+## Disambiguated Producers
+
+| Superseded | Canonical | Reason |
+|------------|-----------|--------|
+| N1_oos_null.R | S18_null_stack.R | S18 combines N1+N2; cited in canonical_facts.md |
+| N2_placebo_benchmark.R | S18_null_stack.R | S18 combines N1+N2; cited in canonical_facts.md |
+| N3_deconv_arms.R | S19_deconv_arms.R | S19 is canonical producer; cited in canonical_facts.md |
+| S17_secf_bootstrap.R | S17_se_cf.R | S17_se_cf.R cited in canonical_facts.md |
+| S13b_matching_sensitivity.R | (none) | Bug produced spurious seed swings; analysis not replicated |
+
+## Audit Trail (Tier C)
+
+Scripts moved to audit/ for forensic record. Not part of main chain.
+
+| Script | Purpose | Status |
+|--------|---------|--------|
+| S14_placebo_diagnostic.R | Diagnosed INV-015 placebo gate | AUDIT |
+| S15_settle.R | Seed sensitivity (superseded by S5R) | AUDIT |
+| S15_seed_*.R | Per-seed runs for settlement | AUDIT |
+
 ## Retired Scripts (Old Chain)
 
 | Old Script | Superseded By | Reason |
