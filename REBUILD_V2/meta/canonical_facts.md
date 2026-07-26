@@ -35,11 +35,16 @@ Pipeline: S1R → S3R → S4R → S5R → S6R → S7R → S8R → S9R → S10R
 |----------|----------|-----|------|--------------|
 | mean(θ_D) | 0.2473 | 0.0235 | 0.214 | +1.42 |
 | SD(θ_D) | 1.5614 | 0.0271 | — | — |
-| SD(θ_true) | **[1.4754, 1.5054]** | — | — | — |
+| SD(θ_true) | **[1.43, 1.48]** | — | — | — |
 | TW_mean | 0.3043 | 0.0920 | — | — |
 
-**SD(θ_true) identified set:** Lower=1.4754 (se_total: includes counterfactual
-uncertainty), Upper=1.5054 (se_B only). See INV-019, S17_se_cf.R.
+**SD(θ_true) partial identification:** Three-arm deconvolution (S19_deconv_arms.R)
+- Arm A (noise only): SD = 1.475 [1.42, 1.53] — subtracts mean(se_total²) = 0.261
+- Arm B (placebo): SD = 1.326 [1.26, 1.38] — subtracts Var(placebo) = 0.680
+- Arm C (OOS drift): SD = 1.431 [1.37, 1.48] — subtracts Var_null_matched = 0.389
+- **Canonical bracket: [1.43, 1.48]** — Arm C (lower) to Arm A (upper)
+
+See INV-023, INV-025, INV-026, INV-027. Producers: S18_null_stack.R, S19_deconv_arms.R.
 | Q1-Q5 spread | 0.9137 | 0.0809 | 0.465 | +5.55 |
 | Spec spread (B-FULL) | 1.3073 | — | 1.307 | +0.0003 |
 
@@ -144,6 +149,18 @@ a larger size gradient (0.914 vs 0.465), with 75% attributable to the
 
 Producer: code/S17_se_cf.R (B=180 draws, seed 20260719)
 
+## Three-Arm Deconvolution (N3)
+
+| Arm | Description | Var_null | SD_true | 95% CI |
+|-----|-------------|----------|---------|--------|
+| A | Noise only (se_total²) | 0.261 | 1.475 | [1.42, 1.53] |
+| B | Placebo benchmark | 0.680 | 1.326 | [1.26, 1.38] |
+| C | OOS drift (matched) | 0.389 | 1.431 | [1.37, 1.48] |
+
+**Canonical SD_true bracket: [1.43, 1.48]**
+
+Producers: S18_null_stack.R (N1/N2), S19_deconv_arms.R (N3)
+
 ## Invalidation Register
 
 - INV-016: G4 gate changed to three-state (SPECIFICATION CHANGE)
@@ -151,6 +168,13 @@ Producer: code/S17_se_cf.R (B=180 draws, seed 20260719)
 - INV-018: 42-pair discrepancy closed (pack matches at 4,182)
 - INV-019: SE-CF counterfactual uncertainty documented (IMMATERIAL)
 - INV-020: README T1 window-mixing defect closed
+- INV-021: Pack theta_D lineage retired (pooled estimator + W0 window)
+- INV-022: se_B omitted counterfactual uncertainty (se_total canonical)
+- INV-023: Drift heterogeneity omitted from deconvolution (three-arm fix)
+- INV-024: OOS null gate applied to uncorrected object (CORRECTED)
+- INV-025: Horizon-cohort disjunction in 11+ bin (DOCUMENTED)
+- INV-026: Horizon binning used W0 window instead of symmetric (CORRECTED)
+- INV-027: Variance discrepancy V4 vs S18 (sample definitions differ)
 
 ## Caveats Register
 

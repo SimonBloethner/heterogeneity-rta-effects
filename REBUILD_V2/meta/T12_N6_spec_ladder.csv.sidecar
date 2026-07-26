@@ -1,0 +1,22 @@
+FILE:      T12_N6_spec_ladder.csv
+SHA256:    a5edd406627fddf63262b5fa8dbe8dadad487c8c09c2f3aa31793f652c25345f
+PRODUCER:  code/N6_T1_rebuild.R (SHA256: bfb768011b446d6263900bc82477d201edb58bd40afda8fa125d6840e72753eb)
+INPUTS:    data/S9R_spec.rds, data/N2_placebo.rds, data/S5R_bhat.rds
+SEED:      20260719
+
+CHAIN:     S*R (single chain, one window convention)
+WINDOW:    Symmetric ±1 year (adopt-1 to adopt+1 excluded)
+
+SPECIFICATION SPREAD (RTA coefficient):
+  B (bilateral): 1.4020
+  FULL:          0.0947
+  B - FULL:      1.3073
+
+THETA DISTRIBUTION (SD):
+  A (naive):     1.6090
+  B (bilateral): 1.5799
+  D (corrected): 1.5614
+
+INV-020: T1 splice defect documented
+  Original mixed rows from different chains/windows
+CREATED:   2026-07-26 10:04:07

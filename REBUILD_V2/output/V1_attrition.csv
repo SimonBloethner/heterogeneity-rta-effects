@@ -1,0 +1,16 @@
+"item","value"
+"Q1_n",837
+"Q2_n",836
+"Q3_n",836
+"Q4_n",836
+"Q5_n",837
+"Q1_mean_theta_D",0.855441640476092
+"Q2_mean_theta_D",0.374436386815467
+"Q3_mean_theta_D",0.130798792905637
+"Q4_mean_theta_D",-0.0664197406967008
+"Q5_mean_theta_D",-0.0582935792746363
+"n_dropped",2415
+"worst_low",-0.575403572191902
+"worst_high",0.888898383242386
+"n_restricted",3263
+"Q1_Q5_restricted",1.08623433147569

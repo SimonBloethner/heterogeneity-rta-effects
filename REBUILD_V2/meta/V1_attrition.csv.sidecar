@@ -1,0 +1,10 @@
+FILE:      V1_attrition.csv
+SHA256:    54d27b834dab2e07e71ed25500c570bec1c7abd48a567ec2bcbde361f8c02e9f
+PRODUCER:  code/validation/V1_attrition.R (SHA256: bcca4a7e563c42ef8d7f1946e8ee5c8f51a270eff52eccb62a4790fbc32446bb)
+INPUTS:    data/S1R_ppml.rds, data/S5R_bhat.rds
+
+DROPPED: 2415 pairs (36.6%)
+WORST-CASE BOUNDS: [-0.5754, 0.8889]
+RESTRICTED (n_post >= 6): 3263 pairs
+Q1-Q5 SPREAD (restricted): 1.0862
+CREATED:   2026-07-26 11:34:13

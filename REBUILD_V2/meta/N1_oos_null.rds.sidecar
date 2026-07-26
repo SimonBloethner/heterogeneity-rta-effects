@@ -1,0 +1,8 @@
+FILE:      N1_oos_null.rds
+SHA256:    424b504447dd5920f0721b18558960fa4479d66b16ff2393475068ca7d613a6c
+PRODUCER:  code/N1_oos_null.R (SHA256: eb6b4040cb2c71c9a633bd4619f99b6936298a8973f0bced50b99a3285c0d6e3)
+INPUTS:    data/S1R_ppml.rds, data/S5R_bhat.rds
+SEED:      20260719
+METHOD:    Split pre-period at midpoint, refit on EARLY, predict LATE
+G3_STATUS: FAIL (|mean| = 0.137 > 0.10)
+CREATED:   2026-07-26 10:06:20

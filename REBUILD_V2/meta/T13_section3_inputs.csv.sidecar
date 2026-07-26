@@ -1,0 +1,20 @@
+FILE:      T13_section3_inputs.csv
+SHA256:    002a1707cf56b8c69e4291531582f9ad7a106e76610cefa3407f4d6d983dbfd5
+PRODUCER:  code/S21_section3_inputs.R (SHA256: 6005c0c810006c1a4fdaf1cce6fe8eabac3d117a453fde4d29779a597bf8a6ff)
+INPUTS:    data/S1R_ppml.rds, data/S5R_bhat.rds, ITPDE_total.rds
+SEED:      20260719
+
+STATUS:    BLOCKING - these numbers appear in Section 3
+
+CENSUS:
+  R0 (all pairs):    46803
+  R1 (switchers):    10340
+  R6 (canonical):    4182
+
+WORLD TRADE (2015):
+  Total international: 19.13 T USD
+  Canonical pairs:     4.22 T USD
+  Share:               22.1%
+
+TOP 10 SHARE: 34.3%
+CREATED:   2026-07-26 11:30:58

@@ -1,0 +1,9 @@
+FILE:      V2_coverage.csv
+SHA256:    58cd13130ef4abd5c74d57f40d44ce2d0679185ffc03e7438d67841b8c866c18
+PRODUCER:  code/validation/V2_coverage.R (SHA256: 2f3aedb7ae77b6b80577360251f9aee57e26775b87d0d1ba0fdc2e9bfb539d05)
+INPUTS:    data/S1R_ppml.rds, data/S5R_bhat.rds
+
+MEAN COVERAGE: 1.000
+FULL COVERAGE: 100.0%
+G5 GATE: PASS
+CREATED:   2026-07-26 11:36:59

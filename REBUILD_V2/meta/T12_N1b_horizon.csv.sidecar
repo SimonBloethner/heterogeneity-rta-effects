@@ -1,0 +1,7 @@
+FILE:      T12_N1b_horizon.csv
+SHA256:    5fa2f874c1b376eed69eaeb7e22046b7179cce20b3e40dfca29bddef7997e6e6
+PRODUCER:  code/N1_oos_null.R (SHA256: eb6b4040cb2c71c9a633bd4619f99b6936298a8973f0bced50b99a3285c0d6e3)
+INPUTS:    data/S1R_ppml.rds, data/S5R_bhat.rds
+SEED:      20260719
+VAR_NULL_MATCHED: 1.539349
+CREATED:   2026-07-26 09:50:33

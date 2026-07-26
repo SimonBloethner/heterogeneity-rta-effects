@@ -1,0 +1,16 @@
+FILE:      T12_N3_deconv.csv
+SHA256:    22afe77844ed6e0db748b2b4be3d1d58502160d97c1fcbf367b6c01d66a4a6cb
+PRODUCER:  code/S19_deconv_arms.R (SHA256: ea39ee7b49a796c95b5f1e1d1c8140f0dc106d5f6da7ff659cc9c877154cffe7)
+INPUTS:    data/S5R_bhat.rds, data/S18_null_stack.rds
+SEED:      20260719
+B:         500 bootstrap iterations
+
+THREE-ARM DECONVOLUTION:
+  Arm A (noise):   SD = 1.4754 [1.4191, 1.5266]
+  Arm B (placebo): SD = 1.3260 [1.2598, 1.3834]
+  Arm C (OOS):     SD = 1.4314 [1.3702, 1.4846]
+
+SD_THETA_TRUE BRACKET: [1.4314, 1.4754]
+
+ACCOUNTING IDENTITY: Var(theta_D) = Var_true + Var_noise
+CREATED:   2026-07-26 11:32:03

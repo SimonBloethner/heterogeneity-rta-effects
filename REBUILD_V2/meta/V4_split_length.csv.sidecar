@@ -1,0 +1,17 @@
+FILE:      V4_split_length.csv
+SHA256:    4f1f1da388ef76fb161fa04d6d1646f2ee69dec1ae0942d849e54ed27abbc2a4
+PRODUCER:  code/validation/V4_split_length.R (SHA256: f330c1691214c55ee598909f85843e811506d7bcd3bb3600ea15290e4510646a)
+INPUTS:    data/S1R_ppml.rds, data/S5R_bhat.rds
+SEED:      20260719
+
+S2: REGRESSION
+  beta_early: -0.1421 (SE: 0.0475)
+
+S4: COHORT EXTRAPOLATION
+  Extrapolated 11+ ratio: 0.2990
+
+INV-027: VARIANCE DISCREPANCY
+  V4 (11+ bin):  0.1593
+  S18 (11+ bin): 1.2300
+  STATUS: OPEN
+CREATED:   2026-07-26 11:37:00

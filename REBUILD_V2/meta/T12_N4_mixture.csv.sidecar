@@ -1,0 +1,7 @@
+FILE:      T12_N4_mixture.csv
+SHA256:    c2f2dd180a9f055327f6e08082ec1b489252f30f86c8cf1d7eb8bd7dfb3ff9bf
+PRODUCER:  code/N4_distribution.R (SHA256: 406d734df04202b937227eb5b47c8579d87449ffde22fb38327be41df4ce2f48)
+METHOD:    EM with per-pair se_total
+K2_mu:     0.220, 0.390
+K3_mu:     -0.053, 0.220, 0.818
+CREATED:   2026-07-26 09:55:56

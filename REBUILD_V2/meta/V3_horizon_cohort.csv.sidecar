@@ -1,0 +1,18 @@
+FILE:      V3_horizon_cohort.csv
+SHA256:    77b3d267d6b59a964f32eab57dc5b4469dcafe1cc8c85255aa0796c5fd9a75ef
+PRODUCER:  code/validation/V3_horizon_cohort.R (SHA256: c1ed0c1e7287a7bf1670458acfb89b8970f64d7d00d27890db048a2f6d6b3f27)
+INPUTS:    data/S18_null_stack.rds, data/S5R_bhat.rds, data/S1R_ppml.rds
+
+H1: 11+ BIN DISJUNCTION
+  Pseudo 11+:  1233 pairs, adoption 2010-2019
+  Treated 11+: 1834 pairs, adoption 1992-2007
+  Overlap:     0 years
+  DISJOINT:    YES
+
+H2: COHORT VARIANCE RATIOS (pre/post)
+  2-3:  0.928
+  4-5:  0.329
+  6-10: 0.396
+
+INV-025: Horizon-cohort disjunction documented
+CREATED:   2026-07-26 11:37:03

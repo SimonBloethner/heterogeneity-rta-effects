@@ -1,0 +1,8 @@
+FILE:      T13_top10_pairs.csv
+SHA256:    a89e4288255c3e4eaba51ec3b07a576e79e2dfeb26a01fb01f4512396c111eea
+PRODUCER:  code/S21_section3_inputs.R (SHA256: 6005c0c810006c1a4fdaf1cce6fe8eabac3d117a453fde4d29779a597bf8a6ff)
+INPUTS:    data/S5R_bhat.rds
+
+Top 10 canonical pairs by pre-adoption trade
+Combined share: 34.3%
+CREATED:   2026-07-26 11:30:58

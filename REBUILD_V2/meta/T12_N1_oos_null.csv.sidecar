@@ -1,0 +1,19 @@
+FILE:      T12_N1_oos_null.csv
+SHA256:    d2a15ed2b22ff418b4e1232b646cb2ae689c113523d075505f4bf7f3cb30d03f
+PRODUCER:  code/S18_null_stack.R (SHA256: 877ef526222884861a37ec372bae3d1bd83674bc93ff3d77b0de960f81e4bb86)
+INPUTS:    data/S1R_ppml.rds, data/S5R_bhat.rds
+SEED:      20260719
+
+METHOD:    Split switcher pre-periods at midpoint (50/50)
+WINDOW:    SYMMETRIC (year > adoption + 1)
+
+N_PSEUDO:  5169
+VAR_NULL_MATCHED: 0.3892
+G3:        PASS (mean=0.0007, SE=0.0130)
+
+SYMMETRIC WEIGHTS:
+  2-3:  0.0148
+  4-5:  0.2049
+  6-10: 0.3417
+  11+:  0.4385
+CREATED:   2026-07-26 11:29:49

@@ -1,0 +1,17 @@
+FILE:      T12_C_corrections.csv
+SHA256:    3d16749641c81f96e002ee6225839f9f13b67baed3bdcc0f354f505ef1c23fa3
+PRODUCER:  code/S20_corrections.R (SHA256: 710873a3c8a8e0210157435254f9349b04296a751951732f91cf2ec023f39220)
+INPUTS:    data/S18_null_stack.rds, data/S5R_bhat.rds
+
+C1: G3 GATE CORRECTION (INV-024)
+  Uncorrected: mean=-0.1707 -> FAIL
+  Corrected:   mean=0.0007 -> PASS
+
+C2: ARM C VARIANCE
+  Var_null_matched = 0.3892
+
+C3: THIN BINS: 1
+
+C4: TRADE-WEIGHTED MEAN
+  pre_trade weighted: 0.0898
+CREATED:   2026-07-26 11:37:01

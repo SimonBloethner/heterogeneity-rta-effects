@@ -128,6 +128,92 @@ for analysis. Each entry documents what was wrong and what supersedes it.
 - **Status:** CLOSED
 - **Date:** 2026-07-26
 
+### INV-021: Pack theta_D Lineage Retired
+- **Issue:** Pack theta_D used pooled counterfactual (S1) + W0 window convention
+- **Impact:** All downstream quantities (SD_true, GE range) were computed on
+  a different theta_D than the S*R chain produces
+- **Resolution:** S*R chain with untreated-only counterfactual (S1R) + symmetric
+  ±1 window is now canonical; pack lineage retired
+- **Status:** Pack theta_D lineage RETIRED; N3/N4/N5 results are authoritative
+- **Date:** 2026-07-26
+
+### INV-022: se_B Omitted Counterfactual Uncertainty
+- **Issue:** se_B (sampling noise from finite post-windows) omitted counterfactual
+  uncertainty (sd_cf from y_hat_0 estimation variability)
+- **Finding:** sd_cf accounts for 34% of total noise (S17 analysis)
+- **Resolution:** se_total = sqrt(se_B² + sd_cf²) is the correct noise measure
+  for deconvolution (Arm A)
+- **Status:** se_B SUPERSEDED by se_total for deconvolution purposes
+- **Date:** 2026-07-26
+
+### INV-023: Drift Heterogeneity Omitted from Deconvolution
+- **Issue:** Original deconvolution subtracted only noise variance, ignoring
+  systematic drift heterogeneity across pairs
+- **Finding:** N1 OOS pseudo-effect null shows Var_null_matched = 1.54
+  (far exceeds mean(se_total²) = 0.26)
+- **Impact:** SD_true_A = 1.48 (noise-only) vs SD_true_C = 0.95 (OOS drift null)
+- **Resolution:** Identified set [0.95, 1.48] replaces point estimate;
+  Arm C (OOS drift) is preferred
+- **Status:** DOCUMENTED — three-arm deconvolution in N3
+- **Date:** 2026-07-26
+
+### INV-024: OOS Null Gate Applied to Uncorrected Object
+- **Issue:** G3 gate in N1 was applied to pseudo_theta_B (uncorrected) rather
+  than pseudo_theta_D (corrected by b_hat[decile])
+- **Original:** mean(pseudo_theta_B) = -0.137 → G3 FAIL
+- **Corrected:** mean(pseudo_theta_D) = +0.098 (SE: 0.022) → G3 PARTIAL
+- **Cross-check:** mean(pseudo_theta_B) - mean(b_hat) = -0.137 - (-0.235) = 0.098 ✓
+- **Impact on Arm C:**
+  - Old Var_null_matched (pseudo_theta_B): 1.539
+  - New Var_null_matched (pseudo_theta_D): 1.509
+  - Old SD_true_C: 0.948
+  - New SD_true_C: 0.964 [0.870, 1.041]
+- **Status:** CORRECTED — C1/C2 analysis
+- **Date:** 2026-07-26
+
+### INV-025: Horizon-Cohort Disjunction in 11+ Bin
+- **Issue:** OOS null for 11+ horizon bin uses different adoption cohorts than treated
+- **Pseudo pairs (11+ bin):** n = 1,131, 100% post-2008 adoption
+- **Treated pairs (11+ bin, SYMMETRIC):** n = 1,834, 100% pre-2008 adoption (≤2007)
+- **Overlap:** DISJOINT — no shared adoption cohorts
+- **Variance instability:** Cannot test directly (only post-2008 in pseudo)
+- **Cohort variance ratios (pre/post) in other bins:**
+  - 2-3: 0.67, 4-5: 0.53, 6-10: 0.47, mean: 0.56
+- **R4 Sensitivity (SYMMETRIC weights, cohort-scaled 11+ null):**
+  - (a) As measured: Var_null = 1.887, SD_true_C = 0.742
+  - (b) Scaled by mean (0.56): Var_null = 1.648, SD_true_C = 0.889
+  - (c) Scaled by min (0.47): Var_null = 1.601, SD_true_C = 0.915
+  - (c) Scaled by max (0.67): Var_null = 1.711, SD_true_C = 0.853
+- **SD_TRUE_C BRACKET:** [0.74, 0.91] under cohort sensitivity
+- **Root cause:** By construction, pairs with 11+ post years adopted early (≤2007);
+  pseudo pairs with 11+ late years come from recent adopters (post-2008).
+- **H3 note:** 2-3 bin has 62 treated pairs under symmetric (min n_post = 3)
+- **Status:** DOCUMENTED — fundamental design limitation
+- **Date:** 2026-07-26
+
+### INV-026: Horizon Binning Used W0 Window Instead of Symmetric
+- **Issue:** N1 treated_dist computed horizon bins using W0 (year >= adoption),
+  not symmetric window (year > adoption + 1)
+- **R1 Finding (pseudo sample):**
+  - C3 used N1 (4,244 pairs) — CORRECT
+  - H1/H2 incorrectly filtered to baseline-only (3,387 pairs)
+- **R2 Finding (treated weights):**
+  - W0 weights: 2-3 (0%), 4-5 (1.7%), 6-10 (34.3%), 11+ (64.0%)
+  - SYMMETRIC weights: 2-3 (1.5%), 4-5 (20.5%), 6-10 (34.2%), 11+ (43.9%)
+  - 2008/2009 adopters moved from 11+ to 6-10/4-5 under symmetric
+- **R3 Finding (Var_null_matched):**
+  - N1 stored (W0): 1.539
+  - INV-024 stated (W0): 1.509 — now superseded
+  - CORRECT (SYMMETRIC): 1.887
+- **Impact on SD_true_C:**
+  - W0: 0.948
+  - SYMMETRIC: 0.742 (before cohort scaling)
+- **Canonical values (SYMMETRIC weights):**
+  - Var_null_matched = 1.887
+  - SD_true_C bracket = [0.74, 0.91] (cohort sensitivity)
+- **Status:** CORRECTED — symmetric window is canonical
+- **Date:** 2026-07-26
+
 ## Caveats Register
 
 ### CAV-001: SE-CF Bootstrap Sample Size

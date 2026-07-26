@@ -1,0 +1,16 @@
+"source","quantity","value","n_valid","sigma"
+"raw_theta_D","q10",-0.733252479483527,500,5
+"raw_theta_D","q25",-0.371260641019302,500,5
+"raw_theta_D","q50",0.244853341102266,500,5
+"raw_theta_D","q75",1.64935697809097,500,5
+"raw_theta_D","q90",6.26919267976301,500,5
+"deconv_C","q10",-0.639048853776853,500,5
+"deconv_C","q25",-0.279601002469783,500,5
+"deconv_C","q50",0.248636987195392,500,5
+"deconv_C","q75",1.24915752906073,500,5
+"deconv_C","q90",3.49495958542052,500,5
+"range_ratio","retired_pack",1.36,NA,5
+"range_ratio","S8R_raw",27.25,NA,5
+"range_ratio","N5_raw",27.2512099294812,NA,5
+"range_ratio","N5_deconv_C",12.4530968593784,NA,5
+"range_ratio","normal_A",39.9931001311374,NA,5

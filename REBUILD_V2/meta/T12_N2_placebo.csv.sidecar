@@ -1,0 +1,11 @@
+FILE:      T12_N2_placebo.csv
+SHA256:    0a685a12a47addfec30a8e8b0954574456032d50ccab837a9373d4906cf70a86
+PRODUCER:  code/S18_null_stack.R (SHA256: 877ef526222884861a37ec372bae3d1bd83674bc93ff3d77b0de960f81e4bb86)
+INPUTS:    data/S5R_bhat.rds
+
+METHOD:    In-sample placebo (never-treated pairs)
+NOTE:      IN-SAMPLE is lower bound; use N1 for deconvolution
+
+N_PLACEBO: 17200
+VAR_PLACEBO: 0.6796
+CREATED:   2026-07-26 11:29:49

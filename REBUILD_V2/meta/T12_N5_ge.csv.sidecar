@@ -1,0 +1,18 @@
+FILE:      T12_N5_ge.csv
+SHA256:    faf0ecbb1b916d7780b12ecd2df51ec12dfe24f6d7fb196ae5a83cf3a76a0a89
+PRODUCER:  code/N5_ge_propagation.R (SHA256: b342ceda2c9f69b978dbb0c67d94fae484625d142eaf9395a2929b879ae3b9bb)
+INPUTS:    data/N4_distribution.rds, data/N3_deconv.rds, gravity_functions.R
+SEED:      20260719
+N_DRAWS:   500
+SIGMA:     5
+DYAD:      CUW-SUR
+
+THREE-POINT HISTORY:
+  1. Retired pack:        1.36x
+  2. S8R raw theta_D:     27.25x
+  3. N5 raw theta_D:      27.25x
+  4. N5 deconvolved (C):  12.45x
+
+RAW:      q10=-0.7333, q90=6.2692
+DECONV_C: q10=-0.6390, q90=3.4950
+CREATED:  2026-07-26 10:01:26

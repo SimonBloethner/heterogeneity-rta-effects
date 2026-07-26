@@ -1,0 +1,6 @@
+FILE:      N4_distribution.rds
+SHA256:    9e333b17800c2486bfdf348e8486f5911a2ee7a4802f6aa92e7d36769b42d4f3
+PRODUCER:  code/N4_distribution.R (SHA256: 406d734df04202b937227eb5b47c8579d87449ffde22fb38327be41df4ce2f48)
+INPUTS:    data/S5R_bhat.rds, data/N3_deconv.rds
+SEED:      20260719
+CREATED:   2026-07-26 10:06:20

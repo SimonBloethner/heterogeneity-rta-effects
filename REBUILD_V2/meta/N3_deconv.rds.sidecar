@@ -1,0 +1,10 @@
+FILE:      N3_deconv.rds
+SHA256:    ef389f3560ec581f1ea73d700542dfe6c3e6bbf8317a341d09e071dbca53e22c
+PRODUCER:  code/N3_deconv_arms.R (SHA256: c0775be1cdeb1061b70055434f6d389a17468774871f3a8930f63fc603257f9f)
+INPUTS:    data/S5R_bhat.rds, data/N1_oos_null.rds, data/N2_placebo.rds
+SEED:      20260719
+B:         500
+SD_TRUE_A: 1.4754
+SD_TRUE_C: 0.9479
+IDENTIFIED_SET: [0.9479, 1.4754]
+CREATED:   2026-07-26 10:06:20

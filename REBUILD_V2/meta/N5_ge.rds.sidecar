@@ -1,0 +1,10 @@
+FILE:      N5_ge.rds
+SHA256:    1dd66077e53fa2eaf8fc125e147cf3aedc18f496506ccab031c1059928f1bc3f
+PRODUCER:  code/N5_ge_propagation.R (SHA256: b342ceda2c9f69b978dbb0c67d94fae484625d142eaf9395a2929b879ae3b9bb)
+INPUTS:    data/N4_distribution.rds, data/N3_deconv.rds, gravity_functions.R
+SEED:      20260719
+N_DRAWS:   500
+SIGMA:     5
+RANGE_RAW: 27.25
+RANGE_DECONV_C: 12.45
+CREATED:   2026-07-26 10:06:20

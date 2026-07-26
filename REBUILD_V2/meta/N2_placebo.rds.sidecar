@@ -1,0 +1,7 @@
+FILE:      N2_placebo.rds
+SHA256:    9adf5d47b7c37cec85570b648237fcf1b3ec52f7d83dd67521ed1beca9c249ca
+PRODUCER:  code/N2_placebo_benchmark.R (SHA256: 6af7abd5f2efd2b88359bc0ce4c6501d0c446e8f502b5edeca271e21e6eb0622)
+INPUTS:    data/S5R_bhat.rds
+SEED:      20260719
+NOTE:      IN-SAMPLE benchmark (lower bound on null)
+CREATED:   2026-07-26 10:06:20
