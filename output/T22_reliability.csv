@@ -1,0 +1,6 @@
+"ID","quantity","value","retired_value","deviation","note"
+"SPLITHALF_A_R","Split-half correlation (odd/even post-years)",0.911274496868736,0.972,-0.0607255031312637,"Definition A, baseline n=4182"
+"SPLITHALF_A_RELIABILITY","Spearman-Brown full reliability",0.953577833389906,NA,NA,"2r/(1+r)"
+"PLACEBO_A_MEAN_R","Placebo mean theta_D",-0.207204589838223,-0.7121,0.504895410161777,"Never-treated pairs"
+"PLACEBO_A_SD_R","Placebo SD theta_D",0.824354559230742,1.1165,-0.292145440769258,"Never-treated pairs"
+"PLACEBO_A_R_R","Placebo split-half r",NA,0.62,NA,"Never-treated pairs"

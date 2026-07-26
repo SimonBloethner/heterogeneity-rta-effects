@@ -1,0 +1,18 @@
+PRODUCER: S24_arms_canonical.R
+INPUTS: data/S5R_bhat.rds (verification only)
+SEED: NONE
+EXPECTED_N: 4182
+VAR_THETA_D: 2.4380
+GATES:
+  G1: Var(theta_D) = 2.4380 (canonical 2.4380) - PASS
+  G2: shares = Var_null / Var_theta_D - PASS
+  G2b: SD_true values match register - PASS
+  G3: TW_MEAN = 0.0898 (canonical 0.0897) - PASS
+STATUS: BUILT
+DATE: 2026-07-26
+NOTE: Arm C uses the symmetric-window Var_null_matched of 1.887 per INV-027
+   (CORRECTED). The value 0.389 in T12 is the pre-correction W0-window generation.
+INV-034: TW_MEAN = 0.0897 (pre_trade weights). T10R used total_trade (0.304),
+   retired pack used unknown weights (0.141). C4 adjudicated pre_trade as canonical
+   since total_trade is endogenous to the effect.
+SHA256: f1722fafc9fd80560e4c088cd087d8c4f21f1b2e547f3ff02bc02494fc293d1c

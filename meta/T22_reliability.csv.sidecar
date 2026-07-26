@@ -1,0 +1,18 @@
+PRODUCER: S24_reliability.R
+INPUTS: data/S5R_bhat.rds, data/S1R_ppml.rds
+SEED: 20260719
+EXPECTED_N: 4182
+METHOD: Split-half by odd/even post-years, ledgered convention
+GATES:
+  G1: n = 4182 - PASS
+  G2: split-half r = 0.9113 - COMPUTED
+  G3: placebo stats computed - PASS
+STATUS: BUILT
+DATE: 2026-07-26
+COMPARISON (REPORT-ONLY, not gates):
+  Split-half r: R-chain 0.9113 vs retired 0.9720 (dev -0.0607)
+  Placebo mean: R-chain -0.2072 vs retired -0.7121 (dev +0.5049)
+  Placebo SD: R-chain 0.8244 vs retired 1.1165 (dev -0.2921)
+  Placebo r: R-chain NA (retired 0.6200) - placebo pairs not in PPML
+NOTE: Deviations are findings, not errors. Section 4 uses R-chain values.
+SHA256: c7b69516448c4eba86d1057e19ee4c3f922fe363e322afdf26c7e31814d35e24

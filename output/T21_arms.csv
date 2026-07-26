@@ -1,0 +1,5 @@
+"arm","window","Var_null_subtracted","share_of_Var_theta_D","SD_true","CI_low","CI_high","source_INV","value"
+"A_noise_only","horizon-matched",0.261145,0.1071,1.4754,1.4191,1.5266,"INV-022",NA
+"B_placebo","in-sample",0.67956,0.2787,1.3261,1.2598,1.3834,"in-sample",NA
+"C_OOS","symmetric",1.887,0.774,0.7423,NA,NA,"INV-027 corrected",NA
+"TW_MEAN","pre_trade weights",NA,NA,NA,NA,NA,"INV-034",0.0897566731583432

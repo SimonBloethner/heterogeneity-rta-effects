@@ -16,6 +16,7 @@ Status: CLOSED
 | MEAN_THETA_D | Mean theta_D | 0.2473 | 0.0241 | data/S5R_bhat.rds$baseline (n=4182) |
 | SD_THETA_TRUE | SD(theta_true) | [0.74, 1.48] | - | INV-027 |
 | RAW_SHARE | Share theta_D <= 0 | 0.4211 | - | data/S5R_bhat.rds$baseline (n=4182) |
+| TW_MEAN | Trade-weighted mean theta_D | 0.0897 | - | code/S24_arms_canonical.R, INV-034 |
 
 ## P(theta <= 0) Bracket
 
@@ -81,3 +82,13 @@ Status: CLOSED.
 Three pseudo-population counts exist: 5,169 / 4,244 / 3,387. Arm C null variance depends on which definition is used. Non-blocking: SD_true is reported as an interval [0.74, 1.48].
 
 Status: OPEN.
+
+### INV-034: Trade-weighted mean reconciliation (CLOSED)
+TW_MEAN values diverge by weighting scheme:
+- pre_trade weights: 0.0897 (canonical, C4 adjudication)
+- total_trade weights: 0.304 (T10R)
+- retired pack: 0.141 (unknown weights)
+
+Resolution: pre_trade is canonical because total_trade is endogenous to the effect (larger effects mechanically produce larger post-trade). C4 adjudication confirms pre_trade weighting for all trade-weighted quantities.
+
+Status: CLOSED.
