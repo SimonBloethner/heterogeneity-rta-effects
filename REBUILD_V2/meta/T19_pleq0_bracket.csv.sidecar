@@ -1,13 +1,22 @@
 PRODUCER: S22_ladder_closed_form.R
-INPUTS: meta/canonical_facts.md (MEAN_THETA_D, SD_THETA_TRUE bracket)
+INPUTS: data/S5R_bhat.rds
 SEED: NONE
 EXPECTED_N: 4182
-CONFIG: MEAN_THETA_D=0.2473 (hardcoded per INV-032); SD_TRUE_LO=0.740; SD_TRUE_HI=1.475
+CONFIG: MEAN_LEDGER=0.2473; SD_TRUE_LO=0.740; SD_TRUE_HI=1.475
 GATES:
-  G1: inputs match canonical_facts ledger - PASS
-  G2: P monotone decreasing in SD_true (0.369 < 0.433) - PASS
-  G3: both P in (0,1) - PASS
+  G1: n == 4182 - PASS
+  G2: theta_D present - PASS
+  G3: mean matches ledger (0.2473) - PASS
+  G4: normal form at noise-only arm (0.4334) vs raw share (0.4211) - EXCEEDS
+  G5: reported bracket strictly ordered (0.369 < 0.421) - PASS
 STATUS: BUILT
 DATE: 2026-07-26
-INV: INV-032 (wrong-object: stray W1 copy read as S6R; reverted to R-chain value 0.2473)
-SHA256: 54adebff589c99a9deae176dd2d5149c71f6b9397c58b586c6a8edd9a5179bad
+RAW_SHARE: 0.4211 (n=4182, from S5R_bhat.rds$baseline)
+P_BRACKET: [0.369, 0.421]
+NOTE: Shape unidentified (INV-029). Lower endpoint is the normal form at the
+   cohort-hardened arm. Upper endpoint is the empirical share of
+   non-positive estimates, which requires no distributional assumption.
+   The normal form at the noise-only arm exceeds that share, indicating
+   that normality overstates the left tail; it is reported in the
+   P_normal_form column but is not used as an endpoint.
+SHA256: 8924f7b54d69ea36a59fef5deae25d4bf8ae869b157fce3423b14a12699f594b

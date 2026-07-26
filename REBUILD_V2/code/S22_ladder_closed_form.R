@@ -1,49 +1,87 @@
 #!/usr/bin/env Rscript
-# S22_ladder_closed_form.R
+# S22_ladder_closed_form.R  (v2, capped)
 # OUTPUTS: output/T19_pleq0_bracket.csv, meta/T19_pleq0_bracket.csv.sidecar
-# INPUTS:  meta/canonical_facts.md (MEAN_THETA_D, SD_THETA_TRUE bracket)
+# INPUTS:  data/S5R_bhat.rds
 # SEED:    NONE
 # EXPECTED_N: 4182
-# GATES:   G1 inputs match ledger; G2 P monotone decreasing in SD_true;
-#          G3 both P in (0,1)
+# GATES:   G1 n == 4182; G2 theta_D present; G3 mean matches ledger;
+#          G4 normal form at the noise-only arm vs the raw share
+#             (documents the normality violation, does not halt);
+#          G5 reported bracket strictly ordered
 #
-# The K=3 mixture failed to identify shape (duplicate components at the
-# SD floor). With shape under-identified, P(theta <= 0) is reported
-# under a symmetric shape, which is the defensible object:
-#     P = Phi(-mean / SD_true)
-# Reported as a bracket over the SD_true identified set, NOT a point.
-# Right skew would lower P, but no skew was identified, so none is claimed.
+# WHY THE CAP.  P(theta_true <= 0) needs a SHAPE, not just a mean and an
+# SD. Shape is unidentified (INV-029: K=3 returned duplicate components
+# at the SD floor, k=2 mean 0.190 sd 0.100, k=3 mean 0.213 sd 0.100).
+# The normal form fills the gap by assumption, and the assumption is
+# wrong in a known direction: the distribution is right-skewed, so a
+# normal of the same SD must place the mass it cannot put in the right
+# tail on the LEFT, fabricating downside.
+# The observed share of non-positive ESTIMATES is an assumption-free
+# upper bound: observed = true + noise, and noise moves mass into both
+# tails, so deconvolution can only reduce the share. A normal-form value
+# above that share is therefore inadmissible as an endpoint.
 #
-# INV-032: MEAN_THETA_D = 0.2473, not 0.2138. The value 0.2138 was from
-# a stray W1 copy mistakenly named S6R_population.rds.
+# INV-030 NOTE. theta_D does NOT exist in data/S6R_population.rds, which
+# holds (pair, adoption_year, theta_A, theta_B, se_B, n_pre, n_post,
+# pre_trade). theta_D = theta_B - b_hat is created in S5R and lives in
+# data/S5R_bhat.rds$baseline. Earlier raw-share figures computed from a
+# file named S6R_population.rds were reading a stray W1 copy, since
+# renamed STRAY_W1_COPY_DO_NOT_USE.rds. This script reads S5R.
 
-MEAN_THETA_D <- 0.2473; SE_MEAN <- 0.0235
-SD_TRUE_LO   <- 0.740   # Arm C, cohort-hardened
-SD_TRUE_HI   <- 1.475   # Arm A, noise-only
+suppressPackageStartupMessages(library(data.table))
+setwd("/scratch/bt307958/REBUILD_V2")
 
-cat(sprintf("MEAN_THETA_D: %.4f (SE %.4f)\n", MEAN_THETA_D, SE_MEAN))
-cat(sprintf("SD_TRUE bracket: [%.3f, %.3f] (INV-027)\n", SD_TRUE_LO, SD_TRUE_HI))
+EXPECTED_N  <- 4182
+MEAN_LEDGER <- 0.2473
+SD_TRUE_LO  <- 0.740    # arm C, cohort-hardened
+SD_TRUE_HI  <- 1.475    # arm A, noise-only
 
-stopifnot(abs(MEAN_THETA_D - 0.2473) < 1e-4)
-stopifnot(SD_TRUE_LO < SD_TRUE_HI)
+S5R  <- readRDS("data/S5R_bhat.rds")
+base <- as.data.table(S5R$baseline)
 
-p_lo <- pnorm(-MEAN_THETA_D / SD_TRUE_HI)   # larger SD -> larger P
-p_hi <- pnorm(-MEAN_THETA_D / SD_TRUE_LO)
+stopifnot(nrow(base) == EXPECTED_N)
+stopifnot("theta_D" %in% names(base))
 
-cat(sprintf("\nP(theta <= 0) computation:\n"))
-cat(sprintf("  C_hardened:   Phi(-%.4f / %.3f) = %.6f\n", MEAN_THETA_D, SD_TRUE_LO, p_hi))
-cat(sprintf("  A_noise_only: Phi(-%.4f / %.3f) = %.6f\n", MEAN_THETA_D, SD_TRUE_HI, p_lo))
+MEAN_THETA_D <- mean(base$theta_D, na.rm = TRUE)
+SD_THETA_D   <- sd(base$theta_D,   na.rm = TRUE)
+SE_MEAN      <- SD_THETA_D / sqrt(EXPECTED_N)
+stopifnot(abs(MEAN_THETA_D - MEAN_LEDGER) < 5e-4)
 
-stopifnot(p_hi < p_lo, p_lo > 0, p_hi > 0, p_lo < 1, p_hi < 1)
+n_ok      <- sum(!is.na(base$theta_D))
+RAW_SHARE <- sum(base$theta_D <= 0, na.rm = TRUE) / n_ok
+
+p_norm_lo <- pnorm(-MEAN_THETA_D / SD_TRUE_LO)
+p_norm_hi <- pnorm(-MEAN_THETA_D / SD_TRUE_HI)
+
+violation <- p_norm_hi > RAW_SHARE
+cat(sprintf("G4 normal form at noise-only arm %.4f vs raw share %.4f : %s\n",
+            p_norm_hi, RAW_SHARE,
+            ifelse(violation, "EXCEEDS (normality overstates left tail)",
+                              "within bound")))
+
+P_LO <- p_norm_lo
+P_HI <- min(p_norm_hi, RAW_SHARE)
+
+# If this halts, the bracket is incoherent: the raw share sits below the
+# hardened-arm normal form, meaning normality overstates the left tail at
+# BOTH arms. Report the halt; do not adjust SD_TRUE_LO to rescue it.
+stopifnot(P_LO < P_HI, P_LO > 0, P_HI < 1)
 
 out <- data.frame(
-  arm      = c("C_hardened", "A_noise_only"),
-  SD_true  = c(SD_TRUE_LO, SD_TRUE_HI),
-  mean     = MEAN_THETA_D,
-  P_theta_leq_0 = c(p_hi, p_lo),
-  shape    = "symmetric (skew under-identified)"
+  arm            = c("C_hardened", "A_noise_only"),
+  SD_true        = c(SD_TRUE_LO, SD_TRUE_HI),
+  mean           = MEAN_THETA_D,
+  P_normal_form  = c(p_norm_lo, p_norm_hi),
+  P_reported     = c(P_LO, P_HI),
+  basis          = c("normal form (shape unidentified)",
+                     ifelse(violation,
+                            "capped at empirical share of non-positive estimates",
+                            "normal form (shape unidentified)")),
+  raw_share      = RAW_SHARE
 )
 print(out)
-cat(sprintf("\nP(theta <= 0) bracket: [%.3f, %.3f]\n", p_hi, p_lo))
+cat(sprintf("\nRAW_SHARE = %.4f (n = %d, from S5R_bhat.rds$baseline)\n",
+            RAW_SHARE, n_ok))
+cat(sprintf("P(theta <= 0) reported bracket: [%.3f, %.3f]\n", P_LO, P_HI))
+
 write.csv(out, "output/T19_pleq0_bracket.csv", row.names = FALSE)
-cat("Saved: output/T19_pleq0_bracket.csv\n")
