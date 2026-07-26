@@ -66,4 +66,16 @@ meta/DEPENDENCY_GRAPH.txt,meta,code/enforce.R,all,NONE,complete_trace,10,BUILT
 code/S15_settle.R,code,manual,data/S1_ppml.rds;data/S2_pairs.rds;data/S3_theta.rds;data/S6_population.rds,20260719;42;999;12345,syntax_valid,9,BUILT
 output/T8_settlement.csv,output,code/S15_settle.R,data/S1_ppml.rds;data/S2_pairs.rds;data/S3_theta.rds;data/S6_population.rds,20260719;42;999;12345,G2_placebo_stable;G3_equal_bins;G4_identity,9,BUILT
 output/T8b_bhat_by_decile.csv,output,code/S15_settle.R,data/S1_ppml.rds;data/S2_pairs.rds;data/S3_theta.rds;data/S6_population.rds,20260719;42;999;12345,none,9,BUILT
-meta/T8_settlement.csv.sidecar,meta,code/S15_settle.R,output/T8_settlement.csv,NONE,exists,9,BUILT
+meta/T8_settlement.csv.sidecar,meta,code/S15_settle.R,output/T8_settlement.csv,NONE,exists,9,SUPERSEDED
+code/S1R_ppml_untreated.R,code,manual,ITPDE_total.rds,NONE,G1_input_sha;G3_no_treated_in_est;G4_converged;G5_post_predictable,10,BUILT
+data/S1R_ppml.rds,data,code/S1R_ppml_untreated.R,ITPDE_total.rds,NONE,G3;G4;G5,10,BUILT
+code/S3R_theta.R,code,manual,data/S1R_ppml.rds,20260719,G3_window_symmetry,10,BUILT
+data/S3R_theta.rds,data,code/S3R_theta.R,data/S1R_ppml.rds,20260719,G1;G2;G3,10,BUILT
+code/S6R_population.R,code,manual,data/S1R_ppml.rds;data/S3R_theta.rds,NONE,G1_monotone;G2_no_dupes,10,BUILT
+data/S6R_population.rds,data,code/S6R_population.R,data/S1R_ppml.rds;data/S3R_theta.rds,NONE,G3_size_matches,10,BUILT
+output/TD1R_population_census.csv,output,code/S6R_population.R,data/S1R_ppml.rds;data/S3R_theta.rds,NONE,G1_monotone,10,BUILT
+code/S5R_bhat_split.R,code,manual,data/S1R_ppml.rds;data/S3R_theta.rds;data/S6R_population.rds,20260719,G3_holdout_mean;G4_holdout_decile,10,BUILT
+data/S5R_bhat.rds,data,code/S5R_bhat_split.R,data/S1R_ppml.rds;data/S3R_theta.rds;data/S6R_population.rds,20260719,G1;G2;G3;G4;G5,10,BUILT
+output/T9_placebo_holdout.csv,output,code/S5R_bhat_split.R,data/S5R_bhat.rds,20260719,G3;G4,10,BUILT
+code/S16_reconcile.R,code,manual,data/S3R_theta.rds;data/S5R_bhat.rds;data/S6R_population.rds,NONE,none,10,BUILT
+output/T10_reconciliation.csv,output,code/S16_reconcile.R,data/S3R_theta.rds;data/S5R_bhat.rds;data/S6R_population.rds,NONE,none,10,BUILT

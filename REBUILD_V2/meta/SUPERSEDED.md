@@ -67,3 +67,11 @@ All corrected versions (T5b, T3b, T6b) have passed their respective gates.
 - **Cause:** Bug in T6b computation, not real seed sensitivity
 - **Impact:** T6b rows 2-8 are erroneous; T3b/T5b remain canonical
 - **Date detected:** 2026-07-25
+
+### S15_settle.R / T8_settlement.csv
+- **Superseded by:** S5R_bhat_split.R / T9_placebo_holdout.csv
+- **Issue:** Applied the 0.05 validity threshold to UNCORRECTED placebo theta_B,
+  then argued the failure away in prose. The ledgered object is the CORRECTED
+  placebo effect on a held-out split. S5R computes it and gates on it with
+  stopifnot(). Retained for audit.
+- **Date superseded:** 2026-07-25

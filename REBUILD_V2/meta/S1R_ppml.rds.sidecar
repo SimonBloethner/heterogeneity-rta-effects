@@ -1,0 +1,18 @@
+FILE:      S1R_ppml.rds
+SHA256:    fb914a8720f7e006c0e84be0ae8564614e7ad2eb4872bcdfb59e94700926aaa0
+PRODUCER:  code/S1R_ppml_untreated.R (SHA256: ae6ff294e235670581994c77278f183a132fd5971d308af5658c1860c866e01e)
+INPUTS:    /groups/m-larch/bt307958/tails/data/ITPDE_total.rds (SHA256: e488c36afdf7c9fd1d38667a18b7855eb39e4085430ef96eab946e2d89fe4c01)
+SEED:      NONE
+ESTIMATION SAMPLE:
+  never_treated pairs: all years
+  single_switcher pairs: years < adoption_year - 1
+  no treated cell included; verified by gate G3
+MODEL:     trade ~ 1 | pair_fe + exp_year + imp_year (fixest fepois)
+GATE:      G1_input_sha [PASS]
+GATE:      G2_frozen_facts [PASS]
+GATE:      G3_no_treated_in_est [PASS, n_est=2276854]
+GATE:      G4_converged [PASS, nobs=1118468]
+GATE:      G5_post_predictable [PARTIAL, 43244 of 102759 unusable]
+R_VERSION: 4.4.1
+ROWS:      2508800
+CREATED:   2026-07-26 06:06:09
