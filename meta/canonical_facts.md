@@ -16,7 +16,9 @@ Status: CLOSED
 | MEAN_THETA_D | Mean theta_D | 0.2473 | 0.0241 | data/S5R_bhat.rds$baseline (n=4182) |
 | SD_THETA_TRUE | SD(theta_true) | [0.74, 1.48] | - | INV-027 |
 | RAW_SHARE | Share theta_D <= 0 | 0.4211 | - | data/S5R_bhat.rds$baseline (n=4182) |
-| TW_MEAN | Trade-weighted mean theta_D | 0.0897 | - | code/S24_arms_canonical.R, INV-034 |
+| TW_MEAN | Trade-weighted mean theta_D | 0.0897 | - | code/S24_arms_canonical.R |
+
+Note: TW_MEAN uses pre_trade weights (INV-034). total_trade weights yield 0.304; retired pack yielded 0.141. pre_trade is canonical because total_trade is endogenous to the effect.
 
 ## P(theta <= 0) Bracket
 
@@ -39,6 +41,21 @@ Status: CLOSED
 |----|----------|-------|-----|----------|
 | GRADIENT | Cohort gradient | 0.9137 | 0.0809 | gates/X5_size_cohort.R -> gates/T3_gradient_cohorts.csv |
 
+## Reliability
+
+| ID | Quantity | Value | Definition | Producer |
+|----|----------|-------|------------|----------|
+| SPLITHALF_A_R | Split-half Pearson r (treated) | 0.9243 | A (mean of log gaps) | code/S24_reliability.R -> output/T22_reliability.csv |
+| SPLITHALF_A_RELIABILITY | Spearman-Brown reliability (treated) | 0.9607 | A (mean of log gaps) | code/S24_reliability.R -> output/T22_reliability.csv |
+| THETA_A_MEAN | Mean theta_A (treated) | -0.2548 | A (mean of log gaps) | code/S24_reliability.R -> output/T22_reliability.csv |
+| THETA_A_SD | SD theta_A (treated) | 1.6318 | A (mean of log gaps) | code/S24_reliability.R -> output/T22_reliability.csv |
+| PLACEBO_A_MEAN | Mean theta_A (placebo) | -0.6821 | A (mean of log gaps) | code/S24_reliability.R -> output/T22_reliability.csv |
+| PLACEBO_A_SD | SD theta_A (placebo) | 1.0814 | A (mean of log gaps) | code/S24_reliability.R -> output/T22_reliability.csv |
+| PLACEBO_A_R | Split-half Pearson r (placebo) | 0.7463 | A (mean of log gaps) | code/S24_reliability.R -> output/T22_reliability.csv |
+| PLACEBO_A_RELIABILITY | Spearman-Brown reliability (placebo) | 0.8547 | A (mean of log gaps) | code/S24_reliability.R -> output/T22_reliability.csv |
+
+Note: Split rule is odd/even post-years (1st,3rd,5th->H1; 2nd,4th,6th->H2), >=2 cells per half required.
+
 ## Superseded Entries
 
 | Old Entry | Old Value | Cause | INV |
@@ -58,6 +75,13 @@ T14, T15, T16, T17, T18 outputs.
 - S6_population.rds (use S6R_population.rds)
 
 ## Investigation Log
+
+### INV-009: Split-half convention identified (CLOSED)
+The superseded value 0.9244 (G2c) is reproduced by the R-chain at 0.924345 under Definition A with an odd/even post-year split. This identifies the split convention: G2c used odd/even; SPLITHALF_A_FRESH = 0.9720 used a different rule.
+
+Both values are high; the reliability paradox rests on the within-run contrast between treated 0.9243 and placebo 0.7463, computed identically under the same split rule, not on either value's comparison to the retired chain.
+
+Status: CLOSED.
 
 ### INV-029: Shape unidentified (CLOSED)
 K=3 mixture returned duplicate components at the SD floor (k=2 mean 0.190 sd 0.100; k=3 mean 0.213 sd 0.100). Shape is not identified at the canonical signal share of 0.37. No mixture-based P(theta<=0) is reported.
