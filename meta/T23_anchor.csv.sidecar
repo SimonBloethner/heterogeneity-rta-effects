@@ -1,0 +1,29 @@
+PRODUCER: S24b_anchor_table.R
+INPUTS: data/S5R_bhat.rds, data/S1R_ppml.rds
+SEED: NONE
+EXPECTED_N: 4182 (treated), 17200 (placebo)
+
+PLACEBO POPULATION: S5R$placebo (n=17200)
+WHY THIS POPULATION:
+  S5R$placebo is the canonical R-chain placebo set from S5R_bhat.R.
+  Other counts arise from filtering:
+  - 6339: T7 decile-matching (partial run, demoted to audit/)
+  - 15683: T22 split-half >=2 per half filter
+  - Various N* scripts: same source, different filters
+  S5R$placebo contains theta_B directly; theta_A recomputed from PPML.
+
+DEFINITIONS:
+  A: theta_A = mean over post cells of [log(trade) - log(y_hat_0)]
+  B: theta_B = log(sum(trade_post) / sum(y_hat_0_post))
+  D: theta_D = theta_B - b_hat (bias-corrected; NA for placebo)
+
+GATES:
+  G1: treated n = 4182 - PASS
+  G2: placebo n = 17200 - PASS
+STATUS: BUILT
+DATE: 2026-07-26
+
+INV-036: Placebo census reconciled. Six counts explained by filtering rules.
+  Supersedes INV-033 partial (pseudo-population now resolved for placebo).
+
+SHA256: 1377515bbf7d42bbf933b0ef4a54ff976763b62b0946136df693f99dc29491db

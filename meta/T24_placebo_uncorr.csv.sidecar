@@ -1,0 +1,16 @@
+PRODUCER: S25_placebo_uncorrected.R
+INPUTS: data/S5R_bhat.rds
+SEEDS: 20260719, 42, 999, 12345
+EXPECTED_N: 17200
+DEFINITION: B (uncorrected) - theta_B = log(sum(trade_post)/sum(y_hat_0_post))
+GATES:
+  G1: n = 17200 - PASS
+  G2: |mean|=0.2072 > 0.05 - FAIL (documents bias in uncorrected placebo)
+STATUS: BUILT
+DATE: 2026-07-26
+NOTE: Gate G2 FAIL is expected - uncorrected placebo has Jensen/drift bias.
+  This table documents the bias magnitude, not a validity check.
+  T7_placebo_validity.csv demoted to audit/ (partial run, retired inputs).
+OVERALL: mean=-0.2072, SD=0.8244 (n=17200)
+DECILE_1: mean=-0.2063 (n=37)
+SHA256: 28d04a474c3a9f91f5b393c51fcab544e74d98d08025ebf87153ed2541b6bc1f

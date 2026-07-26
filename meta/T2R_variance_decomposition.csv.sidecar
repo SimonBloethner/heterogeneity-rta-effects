@@ -3,3 +3,9 @@ SHA256:    00e4ece086f1d513c3f622228ea453d13cb83c8a91b4b19c696468c9131cfe2b
 PRODUCER:  code/S10R_exhibits.R (SHA256: 8cbc22f6817800b7062b08dc52439240843807e648fca7c675083993c8ef14be)
 DESCRIPTION: Variance decomposition with bootstrap SEs (FIXED CHAIN)
 CREATED:   2026-07-26 06:50:28
+WARNING: Column naming may be misleading:
+  - "Var_theta_hat" is Var(theta_D), the observed variance of bias-corrected estimates
+  - "Var_theta" is Var_true after subtracting mean SE^2 (noise-only arm assumption)
+  - "SD_theta_true" is sqrt(Var_theta), i.e., SD_true under noise-only arm
+  - "SD_theta_D" is sqrt(Var_theta_hat), i.e., SD of the estimates (not true effects)
+  See INV-027 for arm-indexed values; this table uses noise-only assumption.

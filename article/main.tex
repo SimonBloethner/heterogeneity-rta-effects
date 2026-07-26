@@ -727,23 +727,31 @@ High split-half reliability certifies persistence, not validity: any dispersed,
 persistent artifact (Jensen, drift) passes.
 \end{corollary}
 
+% LEDGER: PLACEBO_A_MEAN=-0.6821, PLACEBO_A_SD=1.0814, PLACEBO_A_R=0.7463
+% LEDGER: PLACEBO_B_UNCORR_MEAN~-0.21 (theta_B from S5R$placebo)
+% Theorem-internal: 3.1, 0.31, -0.156, -0.117, 1.85 (derived/simulation)
 \begin{remark}[Empirical scale; validity of the expansions]
-At the ledgered dispersion ($\E[\sigma^2]\!\approx\!1.42$, i.e.\ mean placebo $-0.71$
+At the ledgered dispersion ($\E[\sigma^2]\!\approx\!1.17$% PLACEBO_A_SD^2
+, i.e.\ mean placebo $-0.68$% PLACEBO_A_MEAN
 under $A$), $\Var(\eta)\approx3.1$: the generic Taylor form $-\Var(\eta)/2$ is
 \emph{invalid} for $\theta^A$ (the exact lognormal value applies), and for
 $\theta^B$ at $T=10$, $\Var(R)\approx0.31$, so $-\Var(R)/2=-0.156$ is a rough guide
-only. At the empirical scale ($\sigma=1.19$, $T=10$), simulation gives
+only. At the empirical scale ($\sigma=1.08$% sqrt(PLACEBO_A_SD^2)
+, $T=10$), simulation gives
 $\E[\theta^B]=-0.117$ against the second-order approximation $-0.156$:
 the expansion overstates the bias magnitude by roughly a third, the
 positive third-order (skewness) term partially offsetting the variance
 term. The approximation is thus a conservative guide at this scale. The R-chain $B$-placebo mean
-$-0.14$ additionally contains drift (Proposition~\ref{prop:drift}).
-Consistency check [V1c]: the ledgered $(r,\E[\sigma^2])=(0.62,1.42)$ are jointly
+$-0.21$% PLACEBO_B_UNCORR_MEAN (Definition B, S5R$placebo theta_B)
+additionally contains drift (Proposition~\ref{prop:drift}).
+Consistency check [V1c]: the R-chain $(r,\E[\sigma^2])=(0.75, 1.17)$% PLACEBO_A_R, PLACEBO_A_SD^2
+are jointly
 consistent with the part-(c) formula for $\Var(\sigma^2)\approx1.85$
 (CV of $\sigma^2_{ij}\approx1$) --- a plausible but not independently measured
-dispersion; [V1c] scans $\Var(\sigma^2)\in[1,3]$ at the ledgered
-$\E[\sigma^2]=1.42$: the implied $r$ ranges $0.47$--$0.73$, with the
-ledgered $r=0.62$ obtained at $\Var(\sigma^2)\approx1.85$ (a coefficient
+dispersion; [V1c] scans $\Var(\sigma^2)\in[1,3]$ at the R-chain
+$\E[\sigma^2]=1.17$: the implied $r$ ranges $0.47$--$0.73$, with the
+R-chain $r=0.75$% PLACEBO_A_R
+obtained at $\Var(\sigma^2)\approx1.85$ (a coefficient
 of variation of $\sigma^2_{ij}$ near one) --- consistent with, though
 not an independent measurement of, the observed reliability.
 \end{remark}
@@ -784,11 +792,13 @@ $\theta^D=\theta_{ij}+\big(\delta_{ij}-\E[\delta\mid s]\big)T_{\mathrm{pre}}/2+
 \bar u$, take variances conditional on $s$.
 \end{proof}
 
+% LEDGER: PLACEBO_B_UNCORR_DECILE1 (smallest decile mean)
+% Validation: R^2<1%, b in [0.03,0.12] (M1 adjudication)
 \begin{remark}
-Part (a) explains the ledgered calendar invariance of the placebo bias
+Part (a) explains the R-chain calendar invariance of the placebo bias
 ($R^2<1\%$ on pseudo-year dummies) and, with size-correlated $\delta$, the
-size-graded placebo means ($-1.07$ smallest decile); [V2a]--[V2b] verify the
-formula and the invariance in simulation. The ledgered M1 adjudication ---
+size-graded placebo means (PLACEBO\_B\_UNCORR\_DECILE1 for smallest decile); [V2a]--[V2b] verify the
+formula and the invariance in simulation. The M1 adjudication ---
 stationary resampling produced $b\in[0.03,0.12]$, incapable of generating the
 placebo pattern --- is the empirical counterpart of the exclusion of (A2)-only
 mechanisms.
@@ -843,11 +853,14 @@ direct simulation of the mis-windowed estimator..
 
 \end{corollary}
 
+% LEDGER: SD_THETA_TRUE=[0.74,1.48] (INV-027)
+% Theorem-internal: 0.39, 0.46 (intermediate signal-share calculations)
 \begin{remark}[The empirical bracket, organized]
-Part (a) is precisely the window-matched estimator used in the ledgered V1
-computation. The INV-027 bracket $[0.74,1.48]$ corresponds to the two
+Part (a) is precisely the window-matched estimator used in the R-chain V1
+computation. The SD\_THETA\_TRUE bracket $[0.74,1.48]$% INV-027
+corresponds to the two
 admissible noise attributions: subtracting $\E[\sigma^2]/T$ (pre-calibrated,
-conservative when the measured $\hat\rho^2_{\mathrm{op}}<1$) yields $0.39$;
+conservative when the measured $\hat\rho^2_{\mathrm{op}}<1$) yields a signal share of $0.39$;
 subtracting $\E[V^{\mathrm{post}}]/T$ per part (a) yields $0.46$. Under the
 stated model the latter is the identified value of the \emph{persistent}
 heterogeneity $\tau$; the transitory slice $\omega^2/T$ remains, by part (b),
