@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 # S22_ladder_closed_form.R  (v2, capped)
 # OUTPUTS: output/T19_pleq0_bracket.csv, meta/T19_pleq0_bracket.csv.sidecar
-# INPUTS:  data/S5R_bhat.rds
+# INPUTS:  data/S5R_bhat.rds, output/T21_arms.csv
 # SEED:    NONE
 # EXPECTED_N: 4182
 # GATES:   G1 n == 4182; G2 theta_D present; G3 mean matches ledger;
@@ -33,8 +33,17 @@ setwd("/scratch/bt307958/REBUILD_V2")
 
 EXPECTED_N  <- 4182
 MEAN_LEDGER <- 0.2473
-SD_TRUE_LO  <- 0.740    # arm C, cohort-hardened
-SD_TRUE_HI  <- 1.475    # arm A, noise-only
+
+# Read SD_true values from T21_arms.csv (not hardcoded)
+arms <- fread("output/T21_arms.csv")
+SD_TRUE_LO <- arms[arm == "C_OOS", SD_true]
+SD_TRUE_HI <- arms[arm == "A_noise_only", SD_true]
+
+# Assert values match T21 to 1e-6
+stopifnot(abs(SD_TRUE_LO - 0.7423) < 1e-3)  # canonical from T21
+stopifnot(abs(SD_TRUE_HI - 1.4754) < 1e-3)  # canonical from T21
+cat(sprintf("SD_TRUE_LO = %.4f (from T21_arms.csv, arm C_OOS)\n", SD_TRUE_LO))
+cat(sprintf("SD_TRUE_HI = %.4f (from T21_arms.csv, arm A_noise_only)\n", SD_TRUE_HI))
 
 S5R  <- readRDS("data/S5R_bhat.rds")
 base <- as.data.table(S5R$baseline)

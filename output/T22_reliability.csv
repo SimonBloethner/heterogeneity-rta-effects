@@ -1,6 +1,9 @@
-"ID","quantity","value","retired_value","deviation","note"
-"SPLITHALF_A_R","Split-half correlation (odd/even post-years)",0.911274496868736,0.972,-0.0607255031312637,"Definition A, baseline n=4182"
-"SPLITHALF_A_RELIABILITY","Spearman-Brown full reliability",0.953577833389906,NA,NA,"2r/(1+r)"
-"PLACEBO_A_MEAN_R","Placebo mean theta_D",-0.207204589838223,-0.7121,0.504895410161777,"Never-treated pairs"
-"PLACEBO_A_SD_R","Placebo SD theta_D",0.824354559230742,1.1165,-0.292145440769258,"Never-treated pairs"
-"PLACEBO_A_R_R","Placebo split-half r",NA,0.62,NA,"Never-treated pairs"
+"ID","quantity","value","retired_value","definition","deviation"
+"SPLITHALF_A_R","Split-half Pearson r (treated)",0.924344682321206,0.972,"A (mean of log gaps)",-0.0476553176787943
+"SPLITHALF_A_RELIABILITY","Spearman-Brown reliability (treated)",0.960685152522917,NA,"A (mean of log gaps)",NA
+"THETA_A_MEAN","Mean theta_A (treated)",-0.254767840590491,NA,"A (mean of log gaps)",NA
+"THETA_A_SD","SD theta_A (treated)",1.63179321184444,NA,"A (mean of log gaps)",NA
+"PLACEBO_A_MEAN","Mean theta_A (placebo)",-0.68210567525916,-0.7121,"A (mean of log gaps)",0.0299943247408399
+"PLACEBO_A_SD","SD theta_A (placebo)",1.08137161999524,1.1165,"A (mean of log gaps)",-0.0351283800047557
+"PLACEBO_A_R","Split-half Pearson r (placebo)",0.74630841671878,0.62,"A (mean of log gaps)",0.12630841671878
+"PLACEBO_A_RELIABILITY","Spearman-Brown reliability (placebo)",0.854726930906115,NA,"A (mean of log gaps)",NA

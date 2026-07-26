@@ -1,22 +1,23 @@
 PRODUCER: S22_ladder_closed_form.R
-INPUTS: data/S5R_bhat.rds
+INPUTS: data/S5R_bhat.rds, output/T21_arms.csv
 SEED: NONE
 EXPECTED_N: 4182
-CONFIG: MEAN_LEDGER=0.2473; SD_TRUE_LO=0.740; SD_TRUE_HI=1.475
+CONFIG: MEAN_LEDGER=0.2473; SD_TRUE_LO=0.7423 (from T21); SD_TRUE_HI=1.4754 (from T21)
 GATES:
   G1: n == 4182 - PASS
   G2: theta_D present - PASS
   G3: mean matches ledger (0.2473) - PASS
-  G4: normal form at noise-only arm (0.4334) vs raw share (0.4211) - EXCEEDS
-  G5: reported bracket strictly ordered (0.369 < 0.421) - PASS
+  G4: normal form at noise-only arm (0.4335) vs raw share (0.4211) - EXCEEDS
+  G5: reported bracket strictly ordered (0.370 < 0.421) - PASS
 STATUS: BUILT
 DATE: 2026-07-26
 RAW_SHARE: 0.4211 (n=4182, from S5R_bhat.rds$baseline)
-P_BRACKET: [0.369, 0.421]
+P_BRACKET: [0.370, 0.421]
 NOTE: Shape unidentified (INV-029). Lower endpoint is the normal form at the
    cohort-hardened arm. Upper endpoint is the empirical share of
    non-positive estimates, which requires no distributional assumption.
    The normal form at the noise-only arm exceeds that share, indicating
    that normality overstates the left tail; it is reported in the
    P_normal_form column but is not used as an endpoint.
-SHA256: 8924f7b54d69ea36a59fef5deae25d4bf8ae869b157fce3423b14a12699f594b
+   SD values now read from T21_arms.csv (not hardcoded).
+SHA256: 37bcbe6900359aeee5e0b0189705b4c7d8ee1d4c808dfcedae2f77440c4a4766

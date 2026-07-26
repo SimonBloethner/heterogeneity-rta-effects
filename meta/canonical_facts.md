@@ -22,8 +22,8 @@ Status: CLOSED
 
 | ID | Quantity | Value | Producer |
 |----|----------|-------|----------|
-| P_THETA_LEQ_0 | P(theta_true <= 0) | [0.369, 0.421] | code/S22_ladder_closed_form.R -> output/T19_pleq0_bracket.csv |
-| P_LO | C_hardened | 0.369 | Phi(-0.2473/0.74), normal form |
+| P_THETA_LEQ_0 | P(theta_true <= 0) | [0.370, 0.421] | code/S22_ladder_closed_form.R -> output/T19_pleq0_bracket.csv |
+| P_LO | C_hardened | 0.370 | Phi(-0.2473/0.7423), normal form |
 | P_HI | A_noise_only | 0.421 | Capped at RAW_SHARE (normal form 0.433 exceeds empirical share) |
 
 ## GE Propagation (Arm-Indexed)
@@ -90,5 +90,19 @@ TW_MEAN values diverge by weighting scheme:
 - retired pack: 0.141 (unknown weights)
 
 Resolution: pre_trade is canonical because total_trade is endogenous to the effect (larger effects mechanically produce larger post-trade). C4 adjudication confirms pre_trade weighting for all trade-weighted quantities.
+
+Status: CLOSED.
+
+### INV-035: Placebo reliability reported under wrong definition (CLOSED)
+S24_reliability.R v1 reported placebo mean -0.2072, SD 0.8244, which match T12_N2 exactly. These are Definition D values (theta_B from S5R$placebo), not Definition A as specified.
+
+Definition A: theta_A(pair) = mean over post cells of [log(trade) - log(y_hat_0)]
+Definition D: theta_D = theta_B - b_hat (bias-corrected)
+
+Corrected values under Definition A (S24_reliability.R v2):
+- Treated: mean=-0.2548, SD=1.6318, r=0.9243 (n=4120 qualifying)
+- Placebo: mean=-0.6821, SD=1.0814, r=0.7463 (n=15683 qualifying)
+
+Wrong-object class, instance 8.
 
 Status: CLOSED.
