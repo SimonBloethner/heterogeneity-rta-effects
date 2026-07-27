@@ -287,15 +287,14 @@ chk("PLACEBO_A_R",             0.74630841671878)
 chk("PLACEBO_A_RELIABILITY",   0.854726930906115)
 stopifnot(out$n[out$ID == "SPLITHALF_A_R"] == 4120L)
 stopifnot(out$n[out$ID == "PLACEBO_A_R"]  == 15683L)
+
+# T_h >= 2 gate: meaningful split-half requires at least 2 cells per half
+# (C1.3: replaces vacuous |TPOST - 2*TH| < 1 which is algebraically true)
 stopifnot(all(out$value[out$ID %in% c("TREATED_TH","PLACEBO_TH")] >= 2))
 
-# B3 gate: halves partition the window (|TPOST - 2*TH| < 1.0)
-stopifnot(abs(treated_T_post - 2*treated_T_h) < 1.0)
-stopifnot(abs(placebo_T_post - 2*placebo_T_h) < 1.0)
-
 cat("Reproduction gates: PASS\n")
-cat(sprintf("B3 gate |TPOST - 2*TH|: treated=%.2f, placebo=%.2f (both < 1.0)\n",
-            abs(treated_T_post - 2*treated_T_h), abs(placebo_T_post - 2*placebo_T_h)))
+cat(sprintf("T_h >= 2 gate: treated=%.2f, placebo=%.2f (both >= 2)\n",
+            treated_T_h, placebo_T_h))
 
 print(out)
 
@@ -319,8 +318,7 @@ writeLines(c(
   sprintf("  G2: treated split-half r = %.15f - PASS", splithalf_r),
   sprintf("  G3: placebo split-half r = %.15f - PASS", placebo_r),
   "  REPRODUCTION: all 8 pre-existing values match to 1e-12 - PASS",
-  sprintf("  B3: |TPOST - 2*TH| < 1.0: treated=%.2f, placebo=%.2f - PASS",
-          abs(treated_T_post - 2*treated_T_h), abs(placebo_T_post - 2*placebo_T_h)),
+  sprintf("  T_h >= 2: treated=%.2f, placebo=%.2f - PASS (C1.3)", treated_T_h, placebo_T_h),
   "STATUS: BUILT",
   sprintf("DATE: %s", Sys.Date()),
   sprintf("TREATED_QUALIFYING: %d of %d", treated_result$n_qualifying, treated_result$n_total),

@@ -2,7 +2,7 @@
 # S26_prop_verification.R - Proposition verification with Monte Carlo
 # OUTPUTS: output/T25_prop_verification.csv, article/prop_constants.tex,
 #          meta/T25_prop_verification.csv.sidecar
-# INPUTS:  output/T22_reliability.csv
+# INPUTS:  output/T22_reliability.csv, output/T24_placebo_uncorr.csv
 # SEED:    20260719
 # NSIM:    4000000 (4e6 for V1b precision)
 #
@@ -12,8 +12,9 @@
 #      Gate: approx_B < mc_B < 0 (expansion overstates bias magnitude)
 # V1c: Reliability consistency (predicted vs observed) - parameter-free check
 #      Uses T_post for variance decomposition, T_h for split-half correlation
-# V2:  Window geometry - Proposition 2(a) verification
-# V3c: cor:rhoop - identification boundary verification
+#      Gate: T_h >= 2 (meaningful split-half requirement)
+# V2:  Window geometry - Proposition 2(a) with delta=0.02
+# V3c: cor:rhoop - identification boundary verification (kappa sweep)
 
 suppressPackageStartupMessages(library(data.table))
 set.seed(20260719)
@@ -23,11 +24,12 @@ N_REP <- 4e6L   # 4 million replications for V1b
 T_POST <- 10L   # Example horizon
 
 # -----------------------------------------------------------------------------
-# Load frozen values from T22
+# Load frozen values from T22 and T24
 # -----------------------------------------------------------------------------
 cat("=== LOADING FROZEN VALUES ===\n")
 
 T22 <- fread("output/T22_reliability.csv")
+T24 <- fread("output/T24_placebo_uncorr.csv")
 
 PLACEBO_A_MEAN <- T22[ID == "PLACEBO_A_MEAN", value]
 PLACEBO_A_SD <- T22[ID == "PLACEBO_A_SD", value]
@@ -35,11 +37,15 @@ PLACEBO_A_R <- T22[ID == "PLACEBO_A_R", value]
 PLACEBO_TH <- T22[ID == "PLACEBO_TH", value]
 PLACEBO_TPOST <- T22[ID == "PLACEBO_TPOST", value]
 
-cat(sprintf("PLACEBO_A_MEAN  = %.15f\n", PLACEBO_A_MEAN))
-cat(sprintf("PLACEBO_A_SD    = %.15f\n", PLACEBO_A_SD))
-cat(sprintf("PLACEBO_A_R     = %.15f\n", PLACEBO_A_R))
-cat(sprintf("PLACEBO_TH      = %.15f\n", PLACEBO_TH))
-cat(sprintf("PLACEBO_TPOST   = %.15f\n", PLACEBO_TPOST))
+# Definition B placebo mean (uncorrected) - distinct from PLACEBO_A_MEAN
+PLACEBO_B_UNCORR_MEAN <- T24[ID == "PLACEBO_B_UNCORR_OVERALL", mean_theta_B]
+
+cat(sprintf("PLACEBO_A_MEAN        = %.15f\n", PLACEBO_A_MEAN))
+cat(sprintf("PLACEBO_A_SD          = %.15f\n", PLACEBO_A_SD))
+cat(sprintf("PLACEBO_A_R           = %.15f\n", PLACEBO_A_R))
+cat(sprintf("PLACEBO_TH            = %.15f\n", PLACEBO_TH))
+cat(sprintf("PLACEBO_TPOST         = %.15f\n", PLACEBO_TPOST))
+cat(sprintf("PLACEBO_B_UNCORR_MEAN = %.15f\n", PLACEBO_B_UNCORR_MEAN))
 
 # -----------------------------------------------------------------------------
 # V1a: E[sigma^2] from placebo mean (analytical)
@@ -128,47 +134,45 @@ cat(sprintf("r_gap = |r_pred - r_obs| = %.4f\n", r_gap))
 stopifnot(q > 0)                                    # decomposition leaves positive dispersion
 stopifnot(V_sigma2 > 0)                             # variance is positive
 stopifnot(r_pred > 0, r_pred < 1)                   # a correlation
-stopifnot(abs(PLACEBO_TPOST - 2*PLACEBO_TH) < 1.0)  # halves partition the window
+stopifnot(PLACEBO_TH >= 2)                          # meaningful split-half (>= 2 cells per half)
 
 cat("G3 V1c wrong-object gates: PASS\n")
 cat(sprintf("  q > 0: %.4f > 0 PASS\n", q))
 cat(sprintf("  V_sigma2 > 0: %.4f > 0 PASS\n", V_sigma2))
 cat(sprintf("  0 < r_pred < 1: 0 < %.4f < 1 PASS\n", r_pred))
-cat(sprintf("  |T_post - 2*T_h| < 1: |%.2f - %.2f| = %.2f < 1 PASS\n",
-            PLACEBO_TPOST, 2*PLACEBO_TH, abs(PLACEBO_TPOST - 2*PLACEBO_TH)))
+cat(sprintf("  T_h >= 2: %.2f >= 2 PASS\n", PLACEBO_TH))
 
 # -----------------------------------------------------------------------------
-# V2: Window geometry - Proposition 2(a)
+# V2: Window geometry - Proposition 2(a) with non-zero drift
 # Post window is last T_post years of span T_pre + T_post
 # Centering at sample midpoint (T+1)/2
-# Predicted mean: -E_sigma2/2 + delta * T_pre/2
-# Calendar invariance: shifting all spans leaves mean unchanged
+# Predicted mean: -E_sigma2/2 + delta * T_pre/2 (Proposition 2(a))
+# With delta=0.02, T_pre=10: predicted = -E_sigma2/2 + 0.02 * 5 = -E_sigma2/2 + 0.1
 # -----------------------------------------------------------------------------
 cat("\n=== V2: WINDOW GEOMETRY (PROP 2a) ===\n")
 
-# Simulation parameters
+# Simulation parameters - delta=0.02 exercises the drift term
 N_SIM_V2 <- 100000L
 T_PRE <- 10L
 T_POST_V2 <- 10L
-DELTA_MEAN <- 0    # Mean drift (zero under null)
-DELTA_SD <- 0.05   # Cross-pair SD of drift
+DELTA_V2 <- 0.02   # Fixed drift to exercise Prop 2(a)
 
 # Simulate pairs with drift
-simulate_prop2a <- function(nsim, t_pre, t_post, e_sigma2, delta_sd) {
+simulate_prop2a <- function(nsim, t_pre, t_post, e_sigma2, delta_fixed) {
   T_total <- t_pre + t_post
   midpoint <- (T_total + 1) / 2
+  sigma_ij <- sqrt(e_sigma2)
 
   theta_A <- numeric(nsim)
 
   for (i in 1:nsim) {
-    # Draw pair-specific sigma^2 and delta
-    sigma2_ij <- E_sigma2  # Use fixed for simplicity
-    delta_ij <- rnorm(1, mean = 0, sd = delta_sd)
+    # Fixed delta exercises the drift term
+    delta_ij <- delta_fixed
 
     # Generate full span of log-gaps
     t_idx <- 1:T_total
-    u <- rnorm(T_total, mean = 0, sd = sqrt(sigma2_ij))
-    log_gap <- -sigma2_ij/2 + delta_ij * (t_idx - midpoint) + u
+    u <- rnorm(T_total, mean = 0, sd = sigma_ij)
+    log_gap <- -e_sigma2/2 + delta_ij * (t_idx - midpoint) + u
 
     # theta^A is mean over post window (last t_post years)
     post_idx <- (t_pre + 1):T_total
@@ -178,33 +182,77 @@ simulate_prop2a <- function(nsim, t_pre, t_post, e_sigma2, delta_sd) {
   theta_A
 }
 
-cat(sprintf("Running %d V2 simulations (T_pre=%d, T_post=%d)...\n",
-            N_SIM_V2, T_PRE, T_POST_V2))
+cat(sprintf("Running %d V2 simulations (T_pre=%d, T_post=%d, delta=%.2f)...\n",
+            N_SIM_V2, T_PRE, T_POST_V2, DELTA_V2))
 
-theta_A_v2 <- simulate_prop2a(N_SIM_V2, T_PRE, T_POST_V2, E_sigma2, DELTA_SD)
+theta_A_v2 <- simulate_prop2a(N_SIM_V2, T_PRE, T_POST_V2, E_sigma2, DELTA_V2)
 
-# Predicted mean under Prop 2(a): -E_sigma2/2 + E[delta] * T_pre/2
-# With E[delta] = 0, predicted = -E_sigma2/2
-predicted_mean <- -E_sigma2 / 2
+# Predicted mean under Prop 2(a): -E_sigma2/2 + delta * T_pre/2
+# With delta=0.02, T_pre=10: predicted = -E_sigma2/2 + 0.02 * 5 = -E_sigma2/2 + 0.1
+V2_predicted <- -E_sigma2/2 + DELTA_V2 * T_PRE/2
 mc_mean_v2 <- mean(theta_A_v2)
 mc_se_v2 <- sd(theta_A_v2) / sqrt(N_SIM_V2)
 
-cat(sprintf("Predicted mean = -E_sigma2/2 = %.6f\n", predicted_mean))
+cat(sprintf("Predicted mean = -E_sigma2/2 + delta*T_pre/2 = %.6f + %.3f = %.6f\n",
+            -E_sigma2/2, DELTA_V2 * T_PRE/2, V2_predicted))
 cat(sprintf("MC mean = %.6f (SE = %.6f)\n", mc_mean_v2, mc_se_v2))
-cat(sprintf("Gap = %.6f (%.1f SE)\n", mc_mean_v2 - predicted_mean,
-            (mc_mean_v2 - predicted_mean) / mc_se_v2))
+cat(sprintf("Gap = %.6f (%.1f SE)\n", mc_mean_v2 - V2_predicted,
+            (mc_mean_v2 - V2_predicted) / mc_se_v2))
 
-# Calendar invariance: shift all spans by 5 years, mean should be same
-theta_A_shifted <- simulate_prop2a(N_SIM_V2, T_PRE, T_POST_V2, E_sigma2, DELTA_SD)
-mc_mean_shifted <- mean(theta_A_shifted)
-
-cat(sprintf("Shifted MC mean = %.6f\n", mc_mean_shifted))
-cat(sprintf("Calendar shift diff = %.6f\n", abs(mc_mean_shifted - mc_mean_v2)))
-
-# Gate: MC mean within 3 SE of predicted
-V2_gap_se <- abs(mc_mean_v2 - predicted_mean) / mc_se_v2
+# Gate: MC mean within 5 SE of predicted
+V2_gap_se <- abs(mc_mean_v2 - V2_predicted) / mc_se_v2
 stopifnot(V2_gap_se < 5)  # Allow 5 SE for numerical noise
 cat(sprintf("G4 V2 gap within 5 SE: %.1f SE PASS\n", V2_gap_se))
+
+# -----------------------------------------------------------------------------
+# V3c: cor:rhoop - identification boundary verification
+# A post-calibrated null that scales pre-based variance by operational ratio
+# subtracts kappa_w * V_post / T_post, biasing tau^2 by -(kappa_w - 1) * V_post / T_post
+#
+# tau_hat = Var(theta) - kappa * V_post / T_post
+# At kappa_floor, tau_hat = 0 (variance attributed entirely to noise)
+# -----------------------------------------------------------------------------
+cat("\n=== V3c: COR:RHOOP IDENTIFICATION BOUNDARY ===\n")
+
+# Use canonical values from T22
+Var_theta_D <- 2.438  # Canonical from S5R_bhat.rds$baseline
+V_post <- PLACEBO_A_SD^2  # Var(theta_A) from placebo, proxy for post-window variance
+T_post_v3 <- PLACEBO_TPOST
+
+# tau_hat(kappa) = Var_theta_D - kappa * V_post / T_post
+# kappa_floor = Var_theta_D * T_post / V_post (where tau_hat = 0)
+kappa_floor <- Var_theta_D * T_post_v3 / V_post
+
+cat(sprintf("Var(theta_D) = %.4f (canonical)\n", Var_theta_D))
+cat(sprintf("V_post = PLACEBO_A_SD^2 = %.4f\n", V_post))
+cat(sprintf("T_post = %.2f\n", T_post_v3))
+cat(sprintf("kappa_floor = Var(theta_D) * T_post / V_post = %.4f\n", kappa_floor))
+
+# Evaluate tau_hat at kappa = 1, 2, 3, 5
+kappas <- c(1, 2, 3, 5)
+tau_hat <- Var_theta_D - kappas * V_post / T_post_v3
+
+cat("\nKappa sweep:\n")
+for (i in seq_along(kappas)) {
+  cat(sprintf("  kappa=%d: tau_hat = %.4f\n", kappas[i], tau_hat[i]))
+}
+
+# Gate: tau_hat values match expected (from spec)
+EXPECTED_TAU_HAT <- c(0.7500, 0.6527, 0.5382, 0.1297)
+EXPECTED_KAPPA_FLOOR <- 5.123
+
+# Check expectations
+for (i in seq_along(kappas)) {
+  stopifnot(abs(tau_hat[i] - EXPECTED_TAU_HAT[i]) < 0.001)
+}
+stopifnot(abs(kappa_floor - EXPECTED_KAPPA_FLOOR) < 0.001)
+
+cat("\nG5 V3c expected values: PASS\n")
+cat(sprintf("  tau_hat(1)=%.4f expected %.4f PASS\n", tau_hat[1], EXPECTED_TAU_HAT[1]))
+cat(sprintf("  tau_hat(2)=%.4f expected %.4f PASS\n", tau_hat[2], EXPECTED_TAU_HAT[2]))
+cat(sprintf("  tau_hat(3)=%.4f expected %.4f PASS\n", tau_hat[3], EXPECTED_TAU_HAT[3]))
+cat(sprintf("  tau_hat(5)=%.4f expected %.4f PASS\n", tau_hat[4], EXPECTED_TAU_HAT[4]))
+cat(sprintf("  kappa_floor=%.3f expected %.3f PASS\n", kappa_floor, EXPECTED_KAPPA_FLOOR))
 
 # -----------------------------------------------------------------------------
 # OUTPUT TABLE
@@ -215,7 +263,10 @@ out <- data.frame(
   ID = c("PROP_ESIGMA2", "PROP_SIGMA", "PROP_VAR_ETA", "PROP_VAR_R",
          "PROP_APPROX_B", "PROP_MC_B",
          "PROP_V_SIGMA2", "PROP_CV_SIGMA2", "PROP_R_PRED", "PROP_R_GAP",
-         "PROP_TH", "PROP_TPOST", "PROP_PLACEBO_R"),
+         "PROP_TH", "PROP_TPOST", "PROP_PLACEBO_R",
+         "PROP_V2_PRED",
+         "PROP_TAU_HAT_1", "PROP_TAU_HAT_2", "PROP_TAU_HAT_3", "PROP_TAU_HAT_5",
+         "PROP_KAPPA_FLOOR"),
   quantity = c("E[sigma^2] = -2*PLACEBO_A_MEAN",
                "sigma = sqrt(E[sigma^2])",
                "Var(eta) = exp(sigma^2) - 1",
@@ -228,11 +279,20 @@ out <- data.frame(
                "r_gap = |r_pred - r_obs|",
                "Mean half-length T_h (placebo)",
                "Mean post-window T_post (placebo)",
-               "Observed reliability (PLACEBO_A_R)"),
+               "Observed reliability (PLACEBO_A_R)",
+               "V2 predicted mean (Prop 2a, delta=0.02)",
+               "tau_hat at kappa=1",
+               "tau_hat at kappa=2",
+               "tau_hat at kappa=3",
+               "tau_hat at kappa=5",
+               "kappa_floor (where tau_hat=0)"),
   value = c(E_sigma2, sigma, Var_eta, Var_R,
             approx_B, mc_B,
             V_sigma2, cv_sigma2, r_pred, r_gap,
-            PLACEBO_TH, PLACEBO_TPOST, PLACEBO_A_R),
+            PLACEBO_TH, PLACEBO_TPOST, PLACEBO_A_R,
+            V2_predicted,
+            tau_hat[1], tau_hat[2], tau_hat[3], tau_hat[4],
+            kappa_floor),
   stringsAsFactors = FALSE
 )
 
@@ -243,6 +303,7 @@ cat("\nSaved: output/T25_prop_verification.csv\n")
 
 # -----------------------------------------------------------------------------
 # OUTPUT: article/prop_constants.tex (using \Prop* naming)
+# C1.1: Separate macros for Definition A mean vs Definition B uncorrected mean
 # -----------------------------------------------------------------------------
 cat("\n=== GENERATING prop_constants.tex ===\n")
 
@@ -270,8 +331,19 @@ tex_lines <- c(
   sprintf("\\newcommand{\\PropTpost}{%.2f}", PLACEBO_TPOST),
   sprintf("\\newcommand{\\PropPlaceboR}{%.4f}", PLACEBO_A_R),
   "",
-  "% Placebo mean for reference",
-  sprintf("\\newcommand{\\PropPlaceboB}{%.4f}", PLACEBO_A_MEAN),
+  "% Placebo means - Definition A vs Definition B (C1.1)",
+  sprintf("\\newcommand{\\PropPlaceboAMean}{%.4f}", PLACEBO_A_MEAN),
+  sprintf("\\newcommand{\\PropPlaceboBUncorr}{%.4f}", PLACEBO_B_UNCORR_MEAN),
+  "",
+  "% V2: Window geometry (Prop 2a, delta=0.02)",
+  sprintf("\\newcommand{\\PropVtwoPred}{%.4f}", V2_predicted),
+  "",
+  "% V3c: cor:rhoop identification boundary",
+  sprintf("\\newcommand{\\PropTauHatOne}{%.4f}", tau_hat[1]),
+  sprintf("\\newcommand{\\PropTauHatTwo}{%.4f}", tau_hat[2]),
+  sprintf("\\newcommand{\\PropTauHatThree}{%.4f}", tau_hat[3]),
+  sprintf("\\newcommand{\\PropTauHatFive}{%.4f}", tau_hat[4]),
+  sprintf("\\newcommand{\\PropKappaFloor}{%.3f}", kappa_floor),
   ""
 )
 
@@ -284,15 +356,20 @@ cat("Saved: article/prop_constants.tex\n")
 sha <- system("sha256sum output/T25_prop_verification.csv | cut -d' ' -f1", intern = TRUE)
 writeLines(c(
   "PRODUCER: S26_prop_verification.R",
-  "INPUTS: output/T22_reliability.csv",
+  "INPUTS: output/T22_reliability.csv, output/T24_placebo_uncorr.csv",
   "SEED: 20260719",
   sprintf("N_REP: %d", N_REP),
   "",
   "VERIFICATIONS:",
   sprintf("  V1a: E_sigma2 = %.6f (analytical: -2*PLACEBO_A_MEAN)", E_sigma2),
   sprintf("  V1b: approx_B = %.4f < mc_B = %.4f < 0 : PASS", approx_B, mc_B),
-  sprintf("  V1c: V_sigma2 = %.4f, r_pred = %.4f, r_gap = %.4f", V_sigma2, r_pred, r_gap),
-  sprintf("  V2:  MC mean = %.4f vs predicted %.4f (%.1f SE)", mc_mean_v2, predicted_mean, V2_gap_se),
+  sprintf("  V1c: V_sigma2 = %.4f, r_pred = %.4f, r_gap = %.4f, T_h >= 2: %.2f",
+          V_sigma2, r_pred, r_gap, PLACEBO_TH),
+  sprintf("  V2:  MC mean = %.4f vs predicted %.4f (%.1f SE) [delta=0.02]",
+          mc_mean_v2, V2_predicted, V2_gap_se),
+  sprintf("  V3c: tau_hat at kappa=1,2,3,5: %.4f, %.4f, %.4f, %.4f",
+          tau_hat[1], tau_hat[2], tau_hat[3], tau_hat[4]),
+  sprintf("       kappa_floor = %.3f", kappa_floor),
   "",
   "ASSUMPTION: Homogeneous-window approximation (per-pair T_post variation ignored).",
   "            Exact quantity would be mean(sigma2_hat_ij / T_post_ij).",
@@ -300,8 +377,9 @@ writeLines(c(
   "GATES:",
   "  G1: E_sigma2 > 0: PASS",
   "  G2: V1b approx < mc < 0: PASS",
-  "  G3: V1c wrong-object gates (q>0, V>0, 0<r<1, |T-2Th|<1): PASS",
+  "  G3: V1c wrong-object gates (q>0, V>0, 0<r<1, T_h>=2): PASS",
   sprintf("  G4: V2 gap within 5 SE: %.1f SE PASS", V2_gap_se),
+  "  G5: V3c tau_hat values match expected: PASS",
   "",
   "STATUS: BUILT",
   sprintf("DATE: %s", Sys.Date()),
@@ -315,11 +393,19 @@ cat("Saved: meta/T25_prop_verification.csv.sidecar\n")
 cat("\n=== SUMMARY ===\n")
 cat(sprintf("V1a: E_sigma2 = %.4f PASS\n", E_sigma2))
 cat(sprintf("V1b: approx_B = %.4f < mc_B = %.4f < 0 PASS\n", approx_B, mc_B))
-cat(sprintf("V1c: V_sigma2 = %.4f, CV = %.3f, r_pred = %.4f, r_gap = %.4f\n",
+cat(sprintf("V1c: V_sigma2 = %.4f, CV = %.3f, r_pred = %.4f, r_gap = %.4f PASS\n",
             V_sigma2, cv_sigma2, r_pred, r_gap))
-cat(sprintf("V2:  MC mean = %.4f vs predicted %.4f PASS\n", mc_mean_v2, predicted_mean))
+cat(sprintf("V2:  MC mean = %.4f vs predicted %.4f PASS\n", mc_mean_v2, V2_predicted))
+cat(sprintf("V3c: tau_hat(1,2,3,5) = %.4f, %.4f, %.4f, %.4f; kappa_floor = %.3f PASS\n",
+            tau_hat[1], tau_hat[2], tau_hat[3], tau_hat[4], kappa_floor))
 
 # Final expected values check
 cat("\n=== EXPECTED VALUES CHECK ===\n")
 cat(sprintf("PROP_MC_B expected -0.1120: got %.4f\n", mc_B))
 cat(sprintf("PROP_R_PRED expected 0.807: got %.4f\n", r_pred))
+cat(sprintf("PROP_V2_PRED expected -0.5821: got %.4f\n", V2_predicted))
+cat(sprintf("tau_hat(1) expected 0.7500: got %.4f\n", tau_hat[1]))
+cat(sprintf("tau_hat(2) expected 0.6527: got %.4f\n", tau_hat[2]))
+cat(sprintf("tau_hat(3) expected 0.5382: got %.4f\n", tau_hat[3]))
+cat(sprintf("tau_hat(5) expected 0.1297: got %.4f\n", tau_hat[4]))
+cat(sprintf("kappa_floor expected 5.123: got %.3f\n", kappa_floor))

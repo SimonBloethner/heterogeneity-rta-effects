@@ -224,17 +224,11 @@ appendix_file <- file.path(REBUILD_DIR, "article/main.tex")
 if (file.exists(appendix_file)) {
     appendix <- readLines(appendix_file, warn = FALSE)
 
-    # Whitelist for theorem-internal constants (not from ledger)
-    # These appear in formulas and don't need ledger refs
-    # NOTE: 0.39, 0.46 REMOVED - these were retired signal share values;
-    #       arm-indexed values (0.74, 1.48, etc.) require ledger refs
+    # Whitelist for structural integers only (C4.1)
+    # All empirical values must use \Prop* macros from prop_constants.tex
     WHITELIST <- c(
-        "0", "1", "2", "3", "10",  # basic integers
-        "0.5", "1.0", "2.0",       # basic fractions
-        "0.31", "0.156", "-0.156", "0.117", "-0.117",  # theorem expansion coefficients
-        "3.1", "1.85",             # theorem-internal variance values
-        "0.03", "0.12",            # M1 adjudication bounds
-        "0.47", "0.73"             # r scan range
+        "0", "1", "2", "3", "10",  # structural integers
+        "0.5", "1.0", "2.0"        # basic fractions
     )
 
     # Pattern: decimal number not followed by % or } comment
@@ -268,6 +262,59 @@ if (file.exists(appendix_file)) {
         }
     }
     cat("Appendix numeric literal check complete.\n")
+
+    # -----------------------------------------------------------------------------
+    # (f) additional: resolving reference check (C4.2)
+    # Every \Prop* macro used in main.tex must be defined in prop_constants.tex
+    # -----------------------------------------------------------------------------
+    cat("\n=== CHECK (f) additional: Resolving references ===\n")
+
+    prop_file <- file.path(REBUILD_DIR, "article/prop_constants.tex")
+    if (file.exists(prop_file)) {
+        prop_content <- readLines(prop_file, warn = FALSE)
+        # Extract defined macros: \newcommand{\PropXXX}
+        defined_macros <- regmatches(prop_content,
+                                      regexpr("\\\\newcommand\\{\\\\Prop[A-Za-z]+\\}", prop_content))
+        defined_macros <- gsub("\\\\newcommand\\{|\\}", "", defined_macros)
+        cat(sprintf("  Defined \\Prop* macros in prop_constants.tex: %d\n", length(defined_macros)))
+
+        # Extract used macros: \PropXXX in main.tex
+        used_macros <- regmatches(paste(appendix, collapse = " "),
+                                  gregexpr("\\\\Prop[A-Za-z]+", paste(appendix, collapse = " ")))[[1]]
+        used_macros <- unique(used_macros)
+        cat(sprintf("  Used \\Prop* macros in main.tex: %d\n", length(used_macros)))
+
+        # Check each used macro is defined
+        undefined <- setdiff(used_macros, defined_macros)
+        if (length(undefined) > 0) {
+            for (undef in undefined) {
+                report_violation("RESOLVING_REF", sprintf("\\Prop* macro %s used but not defined in prop_constants.tex", undef))
+            }
+        } else {
+            cat("  All \\Prop* macros resolve: PASS\n")
+        }
+    } else {
+        report_violation("RESOLVING_REF", "prop_constants.tex not found")
+    }
+
+    # -----------------------------------------------------------------------------
+    # (g) containment check: prop_constants.tex must not define unused macros (C4.3)
+    # -----------------------------------------------------------------------------
+    cat("\n=== CHECK (g): Macro containment ===\n")
+
+    if (file.exists(prop_file)) {
+        unused <- setdiff(defined_macros, used_macros)
+        if (length(unused) > 0) {
+            cat(sprintf("  WARNING: %d macros defined but not used in main.tex:\n", length(unused)))
+            for (un in unused) {
+                cat(sprintf("    %s\n", un))
+            }
+            # Not a hard violation, just a warning
+        } else {
+            cat("  All defined macros are used: PASS\n")
+        }
+    }
+
 } else {
     cat("Appendix file not found, skipping check.\n")
 }

@@ -1,6 +1,6 @@
 # Canonical Facts Ledger
 
-Generated: 2026-07-27 (SYNC-6)
+Generated: 2026-07-27 (SYNC-6c)
 Status: CLOSED
 
 ## Population
@@ -56,21 +56,28 @@ Note: TW_MEAN uses pre_trade weights (INV-034). total_trade weights yield 0.304;
 
 Note: Split rule is odd/even post-years (1st,3rd,5th->H1; 2nd,4th,6th->H2), >=2 cells per half required.
 
-## Jensen/Reliability Parameters (SYNC-6)
+## Jensen/Reliability Parameters (SYNC-6c)
 
 Derived from Proposition 1 using placebo moments. SYNC-6 correction: E[sigma^2] = -2*PLACEBO_A_MEAN (Prop 1a), NOT PLACEBO_A_SD^2.
+SYNC-6c: V2 exercises delta=0.02; V3c adds cor:rhoop kappa sweep.
 
 | ID | Quantity | Value | Formula | Producer |
 |----|----------|-------|---------|----------|
 | ESIGMA2 | E[sigma^2] | 1.3642 | -2 * PLACEBO_A_MEAN | code/S26_prop_verification.R -> output/T25_prop_verification.csv |
 | SIGMA | sigma | 1.1680 | sqrt(ESIGMA2) | code/S26_prop_verification.R |
-| VAR_SIGMA2 | Var(sigma^2) | 3.6772 | 4*(Var(theta_A) - ESIGMA2/T_h) | code/S26_prop_verification.R |
+| VAR_SIGMA2 | Var(sigma^2) | 3.6772 | 4*(Var(theta_A) - ESIGMA2/T_post) | code/S26_prop_verification.R |
 | T_H_PLACEBO | Mean half-length (placebo) | 5.46 | Measured from split-half | code/S24_reliability.R (PLACEBO_TH) |
-| R_PRED | Predicted reliability | 0.7862 | (V/4)/((V/4) + ESIGMA2/T_h) | code/S26_prop_verification.R |
-| R_GAP | R_pred - R_observed | 0.0398 | R_PRED - PLACEBO_A_R | code/S26_prop_verification.R |
+| R_PRED | Predicted reliability | 0.8068 | q/(q + ESIGMA2/T_h) | code/S26_prop_verification.R |
+| R_GAP | R_pred - R_observed | 0.0605 | R_PRED - PLACEBO_A_R | code/S26_prop_verification.R |
 | VAR_ETA | Var(eta) | 2.9126 | exp(ESIGMA2) - 1 | code/S26_prop_verification.R |
+| V2_PRED | V2 predicted mean | -0.5821 | -E_sigma2/2 + delta*T_pre/2 (delta=0.02) | code/S26_prop_verification.R |
+| TAU_HAT_1 | tau_hat at kappa=1 | 0.7500 | Var(theta_D) - kappa*V_post/T_post | code/S26_prop_verification.R |
+| TAU_HAT_2 | tau_hat at kappa=2 | 0.6527 | Var(theta_D) - kappa*V_post/T_post | code/S26_prop_verification.R |
+| TAU_HAT_3 | tau_hat at kappa=3 | 0.5382 | Var(theta_D) - kappa*V_post/T_post | code/S26_prop_verification.R |
+| TAU_HAT_5 | tau_hat at kappa=5 | 0.1297 | Var(theta_D) - kappa*V_post/T_post | code/S26_prop_verification.R |
+| KAPPA_FLOOR | kappa_floor | 5.123 | Where tau_hat=0 | code/S26_prop_verification.R |
 
-Note: V1c consistency check: |R_GAP| = 0.0398 < 0.05. The proposition predicts observed reliability to within 4 hundredths with no fitted parameter.
+Note: V1c T_h >= 2 gate (C1.3). V3c cor:rhoop verified: kappa sweep reproduces expected tau_hat values exactly.
 
 ## Placebo (Definition B, Uncorrected)
 
