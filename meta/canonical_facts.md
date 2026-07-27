@@ -1,6 +1,6 @@
 # Canonical Facts Ledger
 
-Generated: 2026-07-26
+Generated: 2026-07-27 (SYNC-6)
 Status: CLOSED
 
 ## Population
@@ -56,23 +56,45 @@ Note: TW_MEAN uses pre_trade weights (INV-034). total_trade weights yield 0.304;
 
 Note: Split rule is odd/even post-years (1st,3rd,5th->H1; 2nd,4th,6th->H2), >=2 cells per half required.
 
+## Jensen/Reliability Parameters (SYNC-6)
+
+Derived from Proposition 1 using placebo moments. SYNC-6 correction: E[sigma^2] = -2*PLACEBO_A_MEAN (Prop 1a), NOT PLACEBO_A_SD^2.
+
+| ID | Quantity | Value | Formula | Producer |
+|----|----------|-------|---------|----------|
+| ESIGMA2 | E[sigma^2] | 1.3642 | -2 * PLACEBO_A_MEAN | code/S26_prop_verification.R -> output/T25_prop_verification.csv |
+| SIGMA | sigma | 1.1680 | sqrt(ESIGMA2) | code/S26_prop_verification.R |
+| VAR_SIGMA2 | Var(sigma^2) | 3.6772 | 4*(Var(theta_A) - ESIGMA2/T_h) | code/S26_prop_verification.R |
+| T_H_PLACEBO | Mean half-length (placebo) | 5.46 | Measured from split-half | code/S24_reliability.R (PLACEBO_TH) |
+| R_PRED | Predicted reliability | 0.7862 | (V/4)/((V/4) + ESIGMA2/T_h) | code/S26_prop_verification.R |
+| R_GAP | R_pred - R_observed | 0.0398 | R_PRED - PLACEBO_A_R | code/S26_prop_verification.R |
+| VAR_ETA | Var(eta) | 2.9126 | exp(ESIGMA2) - 1 | code/S26_prop_verification.R |
+
+Note: V1c consistency check: |R_GAP| = 0.0398 < 0.05. The proposition predicts observed reliability to within 4 hundredths with no fitted parameter.
+
 ## Placebo (Definition B, Uncorrected)
+
+theta_B is seed-invariant on the fixed S5R$placebo set (n=17200). SYNC-6 correction: removed fabricated per-seed rows.
 
 | ID | Quantity | Value | n | Definition | Producer |
 |----|----------|-------|---|------------|----------|
-| PLACEBO_B_UNCORR_MEAN | Mean theta_B (uncorrected) | -0.2072 | 17200 | B (uncorrected) | code/S25_placebo_uncorrected.R -> output/T24_placebo_uncorr.csv |
-| PLACEBO_B_UNCORR_SD | SD theta_B (uncorrected) | 0.8244 | 17200 | B (uncorrected) | code/S25_placebo_uncorrected.R -> output/T24_placebo_uncorr.csv |
+| PLACEBO_B_UNCORR_OVERALL | Mean theta_B (uncorrected placebo) | -0.2072 | 17200 | B (uncorrected) | code/S25_placebo_uncorrected.R -> output/T24_placebo_uncorr.csv |
+| PLACEBO_B_UNCORR_SD | SD theta_B (uncorrected placebo) | 0.8244 | 17200 | B (uncorrected) | code/S25_placebo_uncorrected.R -> output/T24_placebo_uncorr.csv |
 | PLACEBO_B_UNCORR_DECILE1 | Mean theta_B decile 1 | -0.2063 | 37 | B (uncorrected) | code/S25_placebo_uncorrected.R -> output/T24_placebo_uncorr.csv |
+| PLACEBO_B_UNCORR_DECILE5 | Mean theta_B decile 5 (peak) | -0.3647 | 2030 | B (uncorrected) | code/S25_placebo_uncorrected.R -> output/T24_placebo_uncorr.csv |
+| PLACEBO_B_UNCORR_DECILE10 | Mean theta_B decile 10 | -0.0570 | 2407 | B (uncorrected) | code/S25_placebo_uncorrected.R -> output/T24_placebo_uncorr.csv |
 
-Note: Gate G2 |mean|>0.05 FAILS for all seeds (bias documented, not a validity failure).
+Note: Gate G2 |mean|>0.05 FAILS (bias documented, not a validity failure). Decile pattern is hump-shaped (peak at D5), not monotone.
 
 ## Anchor Table (D2)
 
 | Definition | Treated Mean | Treated n | Placebo Mean | Placebo n | Producer |
 |------------|--------------|-----------|--------------|-----------|----------|
-| A | -0.2837 | 4182 | -0.6880 | 17200 | code/S24b_anchor_table.R -> output/T23_anchor.csv |
-| B | 0.0758 | 4182 | -0.2072 | 17200 | code/S24b_anchor_table.R -> output/T23_anchor.csv |
-| D | 0.2473 | 4182 | NA | NA | code/S24b_anchor_table.R -> output/T23_anchor.csv |
+| A | -0.2837 | 4182 | -0.6821 | 15683 | code/S24b_anchor_table.R v2 -> output/T23_anchor.csv |
+| B | 0.0758 | 4182 | -0.2072 | 17200 | code/S24b_anchor_table.R v2 -> output/T23_anchor.csv |
+| D | 0.2473 | 4182 | NA | NA | code/S24b_anchor_table.R v2 -> output/T23_anchor.csv |
+
+Note: Definition A placebo from T22 (split-half qualifying n=15683); Definition B placebo from S5R$placebo (fixed pseudo year, n=17200).
 
 ## Superseded Entries
 

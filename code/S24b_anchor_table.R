@@ -1,9 +1,11 @@
 #!/usr/bin/env Rscript
-# S24b_anchor_table.R - Anchor table for D2 (A, B, D definitions)
+# S24b_anchor_table.R v2 - Anchor table for D2 (A, B, D definitions)
 # OUTPUTS: output/T23_anchor.csv, meta/T23_anchor.csv.sidecar
-# INPUTS:  data/S5R_bhat.rds, data/S1R_ppml.rds
+# INPUTS:  data/S5R_bhat.rds, output/T22_theta_A_treated.csv, output/T22_theta_A_placebo.csv
 # SEED:    NONE
 # EXPECTED_N: 4182 (treated), 17200 (S5R$placebo)
+#
+# v2: Consumes T22's stored per-pair theta_A files instead of recomputing.
 #
 # Single-producer anchor table: treated and placebo columns for A, B, D
 # on ONE ledgered placebo population.
@@ -39,8 +41,11 @@ plac <- as.data.table(S5R[["placebo"]])
 stopifnot(nrow(plac) == EXPECTED_N_PLACEBO)
 cat(sprintf("G2 Placebo n = %d: PASS\n", nrow(plac)))
 
-ppml <- readRDS("data/S1R_ppml.rds")
-setDT(ppml)
+# Load T22 per-pair theta_A files (produced by S24_reliability.R)
+theta_A_treated <- fread("output/T22_theta_A_treated.csv")
+theta_A_placebo <- fread("output/T22_theta_A_placebo.csv")
+cat(sprintf("T22 theta_A: treated n=%d, placebo n=%d\n",
+            nrow(theta_A_treated), nrow(theta_A_placebo)))
 
 # -----------------------------------------------------------------------------
 # PLACEBO CENSUS (INV-036)
@@ -57,41 +62,28 @@ cat("\nCanonical: S5R$placebo (n=17200) is the single placebo population.\n")
 cat("Other counts arise from filtering (split-half, decile matching, etc.).\n")
 
 # -----------------------------------------------------------------------------
-# Compute Definition A for treated (from PPML)
+# Merge Definition A from T22 per-pair files
 # -----------------------------------------------------------------------------
-cat("\n=== COMPUTING DEFINITION A (TREATED) ===\n")
+cat("\n=== MERGING DEFINITION A FROM T22 ===\n")
 
-# For treated: need to compute theta_A from PPML
-compute_theta_A <- function(pairs, ppml_dt, adopt_col = "adoption_year") {
-  results <- list()
-  for (i in 1:nrow(pairs)) {
-    p <- pairs$pair[i]
-    adopt_yr <- pairs[[adopt_col]][i]
+# Treated theta_A: merge from T22
+base <- merge(base, theta_A_treated[, .(pair, theta_A_T22 = theta_A)],
+              by = "pair", all.x = TRUE)
+cat(sprintf("Treated theta_A from T22: %d of %d pairs\n",
+            sum(!is.na(base$theta_A_T22)), nrow(base)))
 
-    ppml_pair <- ppml_dt[pair == p]
-    post_cells <- ppml_pair[year > adopt_yr + 1 & trade > 0 & y_hat_0 > 0]
-
-    if (nrow(post_cells) == 0) {
-      results[[i]] <- NA_real_
-    } else {
-      results[[i]] <- mean(log(post_cells$trade) - log(post_cells$y_hat_0), na.rm = TRUE)
-    }
-  }
-  unlist(results)
+# Use T22 theta_A if available, fallback to S5R theta_A
+if ("theta_A" %in% names(base)) {
+  base[!is.na(theta_A_T22), theta_A := theta_A_T22]
+} else {
+  base[, theta_A := theta_A_T22]
 }
 
-# Treated theta_A (already in baseline as theta_A column)
-cat(sprintf("Treated theta_A already in S5R$baseline: using column\n"))
-
-# Placebo theta_A (need to compute from PPML using pseudo adoption year)
-cat("\n=== COMPUTING DEFINITION A (PLACEBO) ===\n")
-placebo_theta_A <- compute_theta_A(
-  pairs = plac[, .(pair, adoption_year = pseudo)],
-  ppml_dt = ppml,
-  adopt_col = "adoption_year"
-)
-plac[, theta_A := placebo_theta_A]
-cat(sprintf("Computed theta_A for %d placebo pairs\n", sum(!is.na(plac$theta_A))))
+# Placebo theta_A: merge from T22
+plac <- merge(plac, theta_A_placebo[, .(pair, theta_A = theta_A)],
+              by = "pair", all.x = TRUE)
+cat(sprintf("Placebo theta_A from T22: %d of %d pairs\n",
+            sum(!is.na(plac$theta_A)), nrow(plac)))
 
 # -----------------------------------------------------------------------------
 # ANCHOR TABLE
@@ -146,8 +138,8 @@ cat("\nSaved: output/T23_anchor.csv\n")
 # Sidecar
 sha <- system("sha256sum output/T23_anchor.csv | cut -d' ' -f1", intern = TRUE)
 writeLines(c(
-  "PRODUCER: S24b_anchor_table.R",
-  "INPUTS: data/S5R_bhat.rds, data/S1R_ppml.rds",
+  "PRODUCER: S24b_anchor_table.R v2",
+  "INPUTS: data/S5R_bhat.rds, output/T22_theta_A_treated.csv, output/T22_theta_A_placebo.csv",
   "SEED: NONE",
   "EXPECTED_N: 4182 (treated), 17200 (placebo)",
   "",

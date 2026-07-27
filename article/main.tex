@@ -853,17 +853,15 @@ direct simulation of the mis-windowed estimator..
 
 \end{corollary}
 
-% LEDGER: SD_THETA_TRUE=[0.74,1.48] (INV-027)
-% Theorem-internal: 0.39, 0.46 (intermediate signal-share calculations)
-\begin{remark}[The empirical bracket, organized]
+% LEDGER: SD_THETA_TRUE=[0.74,1.48] (INV-027), arms A/B/C
+\begin{remark}[The empirical bracket, organized by arm]
 Part (a) is precisely the window-matched estimator used in the R-chain V1
 computation. The SD\_THETA\_TRUE bracket $[0.74,1.48]$% INV-027
-corresponds to the two
-admissible noise attributions: subtracting $\E[\sigma^2]/T$ (pre-calibrated,
-conservative when the measured $\hat\rho^2_{\mathrm{op}}<1$) yields a signal share of $0.39$;
-subtracting $\E[V^{\mathrm{post}}]/T$ per part (a) yields $0.46$. Under the
-stated model the latter is the identified value of the \emph{persistent}
-heterogeneity $\tau$; the transitory slice $\omega^2/T$ remains, by part (b),
+is arm-indexed per INV-027:
+Arm~C (OOS drift subtraction, $\mathrm{Var}_{\mathrm{null}}=1.89$) yields $\mathrm{SD}_{\mathrm{true}}=0.74$;% INV-027 Arm C
+Arm~A (noise-only subtraction, $\mathrm{Var}_{\mathrm{null}}=0.26$) yields $\mathrm{SD}_{\mathrm{true}}=1.48$.% INV-027 Arm A
+Under the stated model, the interval $[0.74,1.48]$ spans the admissible
+noise attributions; the transitory slice $\omega^2/T$ remains, by part (b),
 inseparable from volatility change at any sample size --- the boundary of what
 these data permit anyone to learn.
 \end{remark}

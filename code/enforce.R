@@ -226,12 +226,13 @@ if (file.exists(appendix_file)) {
 
     # Whitelist for theorem-internal constants (not from ledger)
     # These appear in formulas and don't need ledger refs
+    # NOTE: 0.39, 0.46 REMOVED - these were retired signal share values;
+    #       arm-indexed values (0.74, 1.48, etc.) require ledger refs
     WHITELIST <- c(
         "0", "1", "2", "3", "10",  # basic integers
         "0.5", "1.0", "2.0",       # basic fractions
         "0.31", "0.156", "-0.156", "0.117", "-0.117",  # theorem expansion coefficients
         "3.1", "1.85",             # theorem-internal variance values
-        "0.39", "0.46",            # signal share calculations
         "0.03", "0.12",            # M1 adjudication bounds
         "0.47", "0.73"             # r scan range
     )
@@ -309,11 +310,13 @@ cat("================================================================\n\n")
 
 if (n_violations == 0) {
     cat("ALL CHECKS PASS\n")
+    cat(sprintf("\nEnd: %s\n", format(Sys.time())))
 } else {
     cat(sprintf("VIOLATIONS: %d\n\n", n_violations))
     for (v in violations) {
         cat(sprintf("  [%s] %s\n", v$check, v$msg))
     }
+    cat(sprintf("\nEnd: %s\n", format(Sys.time())))
+    # SYNC-6: Gates must halt, not just report
+    stop(sprintf("ENFORCE FAILED: %d violations detected. Fix violations before proceeding.", n_violations))
 }
-
-cat(sprintf("\nEnd: %s\n", format(Sys.time())))
