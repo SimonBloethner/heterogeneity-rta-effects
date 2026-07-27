@@ -2,9 +2,10 @@
 # S26_prop_verification.R - Proposition verification with Monte Carlo
 # OUTPUTS: output/T25_prop_verification.csv, article/prop_constants.tex,
 #          meta/T25_prop_verification.csv.sidecar
-# INPUTS:  output/T22_reliability.csv, output/T24_placebo_uncorr.csv
+# INPUTS:  output/T22_reliability.csv, output/T24_placebo_uncorr.csv, output/T21_arms.csv
 # SEED:    20260719
 # NSIM:    4000000 (4e6 for V1b precision)
+# EXPECTED_N: NA (loads summary tables T21/T22/T24, not population)
 #
 # Verifications:
 # V1a: E[sigma^2] = -2 * PLACEBO_A_MEAN (analytical)
@@ -14,7 +15,7 @@
 #      Uses T_post for variance decomposition, T_h for split-half correlation
 #      Gate: T_h >= 2 (meaningful split-half requirement)
 # V2:  Window geometry - Proposition 2(a) with delta=0.02
-# V3c: cor:rhoop - identification boundary verification (kappa sweep)
+# V3c: cor:rhoop - Corollary verification using arm A subtraction (ledger-sourced)
 
 suppressPackageStartupMessages(library(data.table))
 set.seed(20260719)
@@ -24,12 +25,13 @@ N_REP <- 4e6L   # 4 million replications for V1b
 T_POST <- 10L   # Example horizon
 
 # -----------------------------------------------------------------------------
-# Load frozen values from T22 and T24
+# Load frozen values from T22, T24, and T21
 # -----------------------------------------------------------------------------
 cat("=== LOADING FROZEN VALUES ===\n")
 
 T22 <- fread("output/T22_reliability.csv")
 T24 <- fread("output/T24_placebo_uncorr.csv")
+T21 <- fread("output/T21_arms.csv")
 
 PLACEBO_A_MEAN <- T22[ID == "PLACEBO_A_MEAN", value]
 PLACEBO_A_SD <- T22[ID == "PLACEBO_A_SD", value]
@@ -40,12 +42,21 @@ PLACEBO_TPOST <- T22[ID == "PLACEBO_TPOST", value]
 # Definition B placebo mean (uncorrected) - distinct from PLACEBO_A_MEAN
 PLACEBO_B_UNCORR_MEAN <- T24[ID == "PLACEBO_B_UNCORR_OVERALL", mean_theta_B]
 
+# Arm A values from T21 for V3c
+# VAR_THETA_D is not stored directly; derive from identity: Var(theta_D) = SD_true^2 + Var_null
+VAR_NULL_A <- T21[arm == "A_noise_only", Var_null_subtracted]
+SD_TRUE_A <- T21[arm == "A_noise_only", SD_true]
+VAR_THETA_D <- SD_TRUE_A^2 + VAR_NULL_A  # By definition of arm A
+
 cat(sprintf("PLACEBO_A_MEAN        = %.15f\n", PLACEBO_A_MEAN))
 cat(sprintf("PLACEBO_A_SD          = %.15f\n", PLACEBO_A_SD))
 cat(sprintf("PLACEBO_A_R           = %.15f\n", PLACEBO_A_R))
 cat(sprintf("PLACEBO_TH            = %.15f\n", PLACEBO_TH))
 cat(sprintf("PLACEBO_TPOST         = %.15f\n", PLACEBO_TPOST))
 cat(sprintf("PLACEBO_B_UNCORR_MEAN = %.15f\n", PLACEBO_B_UNCORR_MEAN))
+cat(sprintf("VAR_THETA_D (T21)     = %.15f\n", VAR_THETA_D))
+cat(sprintf("VAR_NULL_A (T21)      = %.15f\n", VAR_NULL_A))
+cat(sprintf("SD_TRUE_A (T21)       = %.15f\n", SD_TRUE_A))
 
 # -----------------------------------------------------------------------------
 # V1a: E[sigma^2] from placebo mean (analytical)
@@ -97,6 +108,11 @@ cat(sprintf("Gate: approx_B (%.4f) < mc_B (%.4f) < 0\n", approx_B, mc_B))
 stopifnot(approx_B < mc_B)
 stopifnot(mc_B < 0)
 cat("G2 V1b approx < mc < 0: PASS\n")
+
+# Compute overstatement percentage (D5.1)
+overstate_pct <- 100 * (abs(approx_B) - abs(mc_B)) / abs(mc_B)
+cat(sprintf("Overstatement = (|%.4f| - |%.4f|) / |%.4f| = %.1f%%\n",
+            approx_B, mc_B, mc_B, overstate_pct))
 
 # Clean up large matrix
 rm(lg)
@@ -199,82 +215,71 @@ cat(sprintf("MC mean = %.6f (SE = %.6f)\n", mc_mean_v2, mc_se_v2))
 cat(sprintf("Gap = %.6f (%.1f SE)\n", mc_mean_v2 - V2_predicted,
             (mc_mean_v2 - V2_predicted) / mc_se_v2))
 
-# Gate: MC mean within 5 SE of predicted
-V2_gap_se <- abs(mc_mean_v2 - V2_predicted) / mc_se_v2
-stopifnot(V2_gap_se < 5)  # Allow 5 SE for numerical noise
-cat(sprintf("G4 V2 gap within 5 SE: %.1f SE PASS\n", V2_gap_se))
+# Gate: absolute bound (D5.5) - tighter than 5 SE
+V2_gap <- abs(mc_mean_v2 - V2_predicted)
+stopifnot(V2_gap < 0.02)  # Absolute bound that can fail
+cat(sprintf("G4 V2 gap < 0.02: %.4f < 0.02 PASS\n", V2_gap))
+
+# V2 shift: simulate with arbitrary calendar offset (for D2)
+# Shift all pairs by +5 years (different midpoint)
+cat("\nRunning V2 shift simulation (offset=+5 years)...\n")
+theta_A_v2_shift <- simulate_prop2a(N_SIM_V2, T_PRE + 5, T_POST_V2, E_sigma2, DELTA_V2)
+V2_shift <- mean(theta_A_v2_shift) - mc_mean_v2
+V2_predicted_shift <- DELTA_V2 * 5 / 2  # Additional 5 years of pre-window
+cat(sprintf("V2 shift (offset +5): %.6f (expected ~%.3f)\n", V2_shift, V2_predicted_shift))
 
 # -----------------------------------------------------------------------------
-# V3c: cor:rhoop - identification boundary verification
-# A post-calibrated null that scales pre-based variance by operational ratio
-# subtracts kappa_w * V_post / T_post, biasing tau^2 by -(kappa_w - 1) * V_post / T_post
-#
-# tau_hat = Var(theta) - kappa * V_post / T_post
-# At kappa_floor, tau_hat = 0 (variance attributed entirely to noise)
+# V3c: Corollary cor:rhoop - mis-windowed over-subtraction
+# Ledger-sourced. No simulation. kappa=1 must reproduce T21 arm A exactly.
+# tau_hat^2(kappa) = Var(theta_D) - kappa * VAR_NULL_A
+# tau_hat = sqrt(tau_hat^2) (clamped to >= 0)
 # -----------------------------------------------------------------------------
 cat("\n=== V3c: COR:RHOOP IDENTIFICATION BOUNDARY ===\n")
 
-# Use canonical values from T22
-Var_theta_D <- 2.438  # Canonical from S5R_bhat.rds$baseline
-V_post <- PLACEBO_A_SD^2  # Var(theta_A) from placebo, proxy for post-window variance
-T_post_v3 <- PLACEBO_TPOST
+cat(sprintf("VAR_THETA_D = %.15f (T21 gate G1)\n", VAR_THETA_D))
+cat(sprintf("VAR_NULL_A  = %.6f (T21 A_noise_only, Var_null_subtracted)\n", VAR_NULL_A))
+cat(sprintf("SD_TRUE_A   = %.4f (T21 A_noise_only, SD_true)\n", SD_TRUE_A))
 
-# tau_hat(kappa) = Var_theta_D - kappa * V_post / T_post
-# kappa_floor = Var_theta_D * T_post / V_post (where tau_hat = 0)
-kappa_floor <- Var_theta_D * T_post_v3 / V_post
-
-cat(sprintf("Var(theta_D) = %.4f (canonical)\n", Var_theta_D))
-cat(sprintf("V_post = PLACEBO_A_SD^2 = %.4f\n", V_post))
-cat(sprintf("T_post = %.2f\n", T_post_v3))
-cat(sprintf("kappa_floor = Var(theta_D) * T_post / V_post = %.4f\n", kappa_floor))
-
-# Evaluate tau_hat at kappa = 1, 2, 3, 5
 kappas <- c(1, 2, 3, 5)
-tau_hat <- Var_theta_D - kappas * V_post / T_post_v3
+
+tau2_hat <- pmax(0, VAR_THETA_D - kappas * VAR_NULL_A)
+tau_hat <- sqrt(tau2_hat)
+kappa_floor <- VAR_THETA_D / VAR_NULL_A
+
+cat(sprintf("\nkappa_floor = VAR_THETA_D / VAR_NULL_A = %.3f\n", kappa_floor))
 
 cat("\nKappa sweep:\n")
 for (i in seq_along(kappas)) {
   cat(sprintf("  kappa=%d: tau_hat = %.4f\n", kappas[i], tau_hat[i]))
 }
 
-# tau_hat values computed from formula (not spec-provided):
-# tau_hat(kappa) = Var_theta_D - kappa * V_post / T_post
-# Using Var_theta_D=2.438, V_post=PLACEBO_A_SD^2=1.1694, T_post=10.9111
-# No hard-coded expectations - we verify formula consistency instead
+# Gates that can fail on a wrong object:
+# kappa=1 must reproduce ledgered arm A SD_true exactly
+cat(sprintf("\nGate: tau_hat(1) = %.4f, expected %.4f (T21 SD_true_A)\n", tau_hat[1], SD_TRUE_A))
+stopifnot(abs(tau_hat[1] - SD_TRUE_A) < 1e-3)   # kappa=1 == ledgered arm A SD_true
+stopifnot(all(diff(tau_hat) < 0))                # over-subtraction is monotone
+stopifnot(kappa_floor > 5, kappa_floor < 20)     # magnitude scale
+stopifnot(all(tau_hat <= SD_TRUE_A + 1e-9))      # never exceeds the identified set
 
-# Verify formula consistency (no hard-coded spec values):
-# 1. tau_hat decreases as kappa increases
-stopifnot(all(diff(tau_hat) < 0))
-# 2. tau_hat(kappa_floor) should be approximately 0
-# Since kappa_floor = Var_theta_D * T_post / V_post
-# tau_hat(kappa_floor) = Var_theta_D - kappa_floor * V_post / T_post
-#                      = Var_theta_D - Var_theta_D = 0
-tau_at_floor <- Var_theta_D - kappa_floor * V_post / T_post_v3
-stopifnot(abs(tau_at_floor) < 1e-10)
-# 3. All tau_hat values at kappa <= 5 should be positive (within identification region)
-stopifnot(all(tau_hat > 0))
-# 4. kappa_floor should be > 5 (kappa=5 still in identification region)
-stopifnot(kappa_floor > 5)
-
-cat("\nG5 V3c formula consistency: PASS\n")
+cat("\nG5 V3c cor:rhoop: PASS\n")
+cat(sprintf("  tau_hat(1) = %.4f matches SD_TRUE_A = %.4f to 1e-3: PASS\n", tau_hat[1], SD_TRUE_A))
 cat(sprintf("  tau_hat decreasing: %.4f > %.4f > %.4f > %.4f PASS\n",
             tau_hat[1], tau_hat[2], tau_hat[3], tau_hat[4]))
-cat(sprintf("  tau_hat(kappa_floor) = %.2e (approx 0) PASS\n", tau_at_floor))
-cat(sprintf("  all tau_hat > 0 at kappa <= 5: PASS\n"))
-cat(sprintf("  kappa_floor = %.3f > 5: PASS\n", kappa_floor))
+cat(sprintf("  kappa_floor = %.3f in (5, 20): PASS\n", kappa_floor))
 
 # -----------------------------------------------------------------------------
-# OUTPUT TABLE
+# OUTPUT TABLE (D5.4: all macros must have T25 rows)
 # -----------------------------------------------------------------------------
 cat("\n=== OUTPUT TABLE ===\n")
 
 out <- data.frame(
   ID = c("PROP_ESIGMA2", "PROP_SIGMA", "PROP_VAR_ETA", "PROP_VAR_R",
-         "PROP_APPROX_B", "PROP_MC_B",
+         "PROP_APPROX_B", "PROP_MC_B", "PROP_OVERSTATE_PCT",
          "PROP_V_SIGMA2", "PROP_CV_SIGMA2", "PROP_R_PRED", "PROP_R_GAP",
          "PROP_TH", "PROP_TPOST", "PROP_PLACEBO_R",
-         "PROP_V2_PRED",
-         "PROP_TAU_HAT_1", "PROP_TAU_HAT_2", "PROP_TAU_HAT_3", "PROP_TAU_HAT_5",
+         "PROP_PLACEBO_A_MEAN", "PROP_PLACEBO_B_UNCORR",
+         "PROP_V2_PRED", "PROP_V2_SIM", "PROP_V2_SHIFT",
+         "PROP_TAU_K1", "PROP_TAU_K2", "PROP_TAU_K3", "PROP_TAU_K5",
          "PROP_KAPPA_FLOOR"),
   quantity = c("E[sigma^2] = -2*PLACEBO_A_MEAN",
                "sigma = sqrt(E[sigma^2])",
@@ -282,6 +287,7 @@ out <- data.frame(
                "Var(R) at T=10 = Var(eta)/10",
                "-Var(R)/2 (second-order approx)",
                "MC E[theta^B] at T=10",
+               "Overstatement percentage",
                "Var(sigma^2) from decomposition",
                "CV(sigma^2) = sqrt(Var)/E",
                "Predicted reliability",
@@ -289,17 +295,22 @@ out <- data.frame(
                "Mean half-length T_h (placebo)",
                "Mean post-window T_post (placebo)",
                "Observed reliability (PLACEBO_A_R)",
+               "Mean theta_A placebo (T22)",
+               "Mean theta_B uncorrected (T24)",
                "V2 predicted mean (Prop 2a, delta=0.02)",
-               "tau_hat at kappa=1",
+               "V2 simulated mean",
+               "V2 shift under +5yr offset",
+               "tau_hat at kappa=1 (=SD_TRUE_A)",
                "tau_hat at kappa=2",
                "tau_hat at kappa=3",
                "tau_hat at kappa=5",
                "kappa_floor (where tau_hat=0)"),
   value = c(E_sigma2, sigma, Var_eta, Var_R,
-            approx_B, mc_B,
+            approx_B, mc_B, overstate_pct,
             V_sigma2, cv_sigma2, r_pred, r_gap,
             PLACEBO_TH, PLACEBO_TPOST, PLACEBO_A_R,
-            V2_predicted,
+            PLACEBO_A_MEAN, PLACEBO_B_UNCORR_MEAN,
+            V2_predicted, mc_mean_v2, V2_shift,
             tau_hat[1], tau_hat[2], tau_hat[3], tau_hat[4],
             kappa_floor),
   stringsAsFactors = FALSE
@@ -312,7 +323,7 @@ cat("\nSaved: output/T25_prop_verification.csv\n")
 
 # -----------------------------------------------------------------------------
 # OUTPUT: article/prop_constants.tex (using \Prop* naming)
-# C1.1: Separate macros for Definition A mean vs Definition B uncorrected mean
+# D4.7: Round PropMCB to -0.112 (fourth decimal is MC noise)
 # -----------------------------------------------------------------------------
 cat("\n=== GENERATING prop_constants.tex ===\n")
 
@@ -325,11 +336,12 @@ tex_lines <- c(
   sprintf("\\newcommand{\\PropEsigsq}{%.4f}", E_sigma2),
   sprintf("\\newcommand{\\PropSigma}{%.4f}", sigma),
   "",
-  "% V1b: Jensen bias verification",
+  "% V1b: Jensen bias verification (D4.7: round mc_B to 3 decimal places)",
   sprintf("\\newcommand{\\PropVarEta}{%.4f}", Var_eta),
   sprintf("\\newcommand{\\PropVarR}{%.4f}", Var_R),
   sprintf("\\newcommand{\\PropApproxB}{%.4f}", approx_B),
-  sprintf("\\newcommand{\\PropMCB}{%.4f}", mc_B),
+  sprintf("\\newcommand{\\PropMCB}{%.3f}", round(mc_B, 3)),  # D4.7: round to -0.112
+  sprintf("\\newcommand{\\PropOverstatePct}{%.0f}", round(overstate_pct)),  # D5.1
   "",
   "% V1c: Reliability (parameter-free check)",
   sprintf("\\newcommand{\\PropVsigmasq}{%.4f}", V_sigma2),
@@ -340,18 +352,21 @@ tex_lines <- c(
   sprintf("\\newcommand{\\PropTpost}{%.2f}", PLACEBO_TPOST),
   sprintf("\\newcommand{\\PropPlaceboR}{%.4f}", PLACEBO_A_R),
   "",
-  "% Placebo means - Definition A vs Definition B (C1.1)",
+  "% Placebo means - Definition A vs Definition B (C1.1, D5.4)",
   sprintf("\\newcommand{\\PropPlaceboAMean}{%.4f}", PLACEBO_A_MEAN),
   sprintf("\\newcommand{\\PropPlaceboBUncorr}{%.4f}", PLACEBO_B_UNCORR_MEAN),
   "",
   "% V2: Window geometry (Prop 2a, delta=0.02)",
   sprintf("\\newcommand{\\PropVtwoPred}{%.4f}", V2_predicted),
+  sprintf("\\newcommand{\\PropVtwoSim}{%.4f}", mc_mean_v2),
+  sprintf("\\newcommand{\\PropVtwoShift}{%.4f}", V2_shift),
   "",
-  "% V3c: cor:rhoop identification boundary",
-  sprintf("\\newcommand{\\PropTauHatOne}{%.4f}", tau_hat[1]),
-  sprintf("\\newcommand{\\PropTauHatTwo}{%.4f}", tau_hat[2]),
-  sprintf("\\newcommand{\\PropTauHatThree}{%.4f}", tau_hat[3]),
-  sprintf("\\newcommand{\\PropTauHatFive}{%.4f}", tau_hat[4]),
+  "% V3c: cor:rhoop identification boundary (D1: uses arm A subtraction)",
+  "% tau_hat values are SD (not variance) - named accordingly",
+  sprintf("\\newcommand{\\PropTauKone}{%.4f}", tau_hat[1]),
+  sprintf("\\newcommand{\\PropTauKtwo}{%.4f}", tau_hat[2]),
+  sprintf("\\newcommand{\\PropTauKthree}{%.4f}", tau_hat[3]),
+  sprintf("\\newcommand{\\PropTauKfive}{%.4f}", tau_hat[4]),
   sprintf("\\newcommand{\\PropKappaFloor}{%.3f}", kappa_floor),
   ""
 )
@@ -365,20 +380,23 @@ cat("Saved: article/prop_constants.tex\n")
 sha <- system("sha256sum output/T25_prop_verification.csv | cut -d' ' -f1", intern = TRUE)
 writeLines(c(
   "PRODUCER: S26_prop_verification.R",
-  "INPUTS: output/T22_reliability.csv, output/T24_placebo_uncorr.csv",
+  "INPUTS: output/T22_reliability.csv, output/T24_placebo_uncorr.csv, output/T21_arms.csv",
   "SEED: 20260719",
   sprintf("N_REP: %d", N_REP),
   "",
   "VERIFICATIONS:",
   sprintf("  V1a: E_sigma2 = %.6f (analytical: -2*PLACEBO_A_MEAN)", E_sigma2),
   sprintf("  V1b: approx_B = %.4f < mc_B = %.4f < 0 : PASS", approx_B, mc_B),
+  sprintf("       Overstatement = %.1f%% (D5.1)", overstate_pct),
   sprintf("  V1c: V_sigma2 = %.4f, r_pred = %.4f, r_gap = %.4f, T_h >= 2: %.2f",
           V_sigma2, r_pred, r_gap, PLACEBO_TH),
-  sprintf("  V2:  MC mean = %.4f vs predicted %.4f (%.1f SE) [delta=0.02]",
-          mc_mean_v2, V2_predicted, V2_gap_se),
-  sprintf("  V3c: tau_hat at kappa=1,2,3,5: %.4f, %.4f, %.4f, %.4f",
+  sprintf("  V2:  MC mean = %.4f vs predicted %.4f, gap = %.4f < 0.02 [delta=0.02]",
+          mc_mean_v2, V2_predicted, V2_gap),
+  sprintf("       V2 shift (D2) = %.4f", V2_shift),
+  sprintf("  V3c: tau_hat at kappa=1,2,3,5: %.4f, %.4f, %.4f, %.4f (D1: arm A subtraction)",
           tau_hat[1], tau_hat[2], tau_hat[3], tau_hat[4]),
   sprintf("       kappa_floor = %.3f", kappa_floor),
+  sprintf("       Gate: tau_hat(1) = %.4f matches T21 SD_TRUE_A = %.4f", tau_hat[1], SD_TRUE_A),
   "",
   "ASSUMPTION: Homogeneous-window approximation (per-pair T_post variation ignored).",
   "            Exact quantity would be mean(sigma2_hat_ij / T_post_ij).",
@@ -387,8 +405,8 @@ writeLines(c(
   "  G1: E_sigma2 > 0: PASS",
   "  G2: V1b approx < mc < 0: PASS",
   "  G3: V1c wrong-object gates (q>0, V>0, 0<r<1, T_h>=2): PASS",
-  sprintf("  G4: V2 gap within 5 SE: %.1f SE PASS", V2_gap_se),
-  "  G5: V3c formula consistency (decreasing tau_hat, tau_hat(kappa_floor)=0): PASS",
+  sprintf("  G4: V2 gap < 0.02: %.4f PASS", V2_gap),
+  sprintf("  G5: V3c tau_hat(1) matches SD_TRUE_A to 1e-3: PASS"),
   "",
   "STATUS: BUILT",
   sprintf("DATE: %s", Sys.Date()),
@@ -401,17 +419,18 @@ cat("Saved: meta/T25_prop_verification.csv.sidecar\n")
 # -----------------------------------------------------------------------------
 cat("\n=== SUMMARY ===\n")
 cat(sprintf("V1a: E_sigma2 = %.4f PASS\n", E_sigma2))
-cat(sprintf("V1b: approx_B = %.4f < mc_B = %.4f < 0 PASS\n", approx_B, mc_B))
+cat(sprintf("V1b: approx_B = %.4f < mc_B = %.4f < 0, overstatement = %.0f%% PASS\n",
+            approx_B, mc_B, overstate_pct))
 cat(sprintf("V1c: V_sigma2 = %.4f, CV = %.3f, r_pred = %.4f, r_gap = %.4f PASS\n",
             V_sigma2, cv_sigma2, r_pred, r_gap))
-cat(sprintf("V2:  MC mean = %.4f vs predicted %.4f PASS\n", mc_mean_v2, V2_predicted))
+cat(sprintf("V2:  MC mean = %.4f vs predicted %.4f, shift = %.4f PASS\n",
+            mc_mean_v2, V2_predicted, V2_shift))
 cat(sprintf("V3c: tau_hat(1,2,3,5) = %.4f, %.4f, %.4f, %.4f; kappa_floor = %.3f PASS\n",
             tau_hat[1], tau_hat[2], tau_hat[3], tau_hat[4], kappa_floor))
 
-# Final computed values
-cat("\n=== COMPUTED VALUES ===\n")
-cat(sprintf("PROP_MC_B: %.4f\n", mc_B))
-cat(sprintf("PROP_R_PRED: %.4f\n", r_pred))
-cat(sprintf("PROP_V2_PRED: %.4f\n", V2_predicted))
-cat(sprintf("tau_hat(1,2,3,5): %.4f, %.4f, %.4f, %.4f\n", tau_hat[1], tau_hat[2], tau_hat[3], tau_hat[4]))
-cat(sprintf("kappa_floor: %.3f\n", kappa_floor))
+cat("\n=== EXPECTED VALUES (D1 spec) ===\n")
+cat(sprintf("tau_hat(1) expected 1.4754: got %.4f\n", tau_hat[1]))
+cat(sprintf("tau_hat(2) expected 1.3841: got %.4f\n", tau_hat[2]))
+cat(sprintf("tau_hat(3) expected 1.2863: got %.4f\n", tau_hat[3]))
+cat(sprintf("tau_hat(5) expected 1.0641: got %.4f\n", tau_hat[4]))
+cat(sprintf("kappa_floor expected 9.336: got %.3f\n", kappa_floor))

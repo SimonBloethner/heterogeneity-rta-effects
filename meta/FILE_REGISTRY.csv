@@ -215,3 +215,10 @@ meta/T21_arms.csv.sidecar,meta,code/S24_arms_canonical.R,output/T21_arms.csv,NON
 code/S24_reliability.R,code,manual,data/S5R_bhat.rds;data/S1R_ppml.rds,20260719,syntax_valid,12,BUILT
 output/T22_reliability.csv,output,code/S24_reliability.R,data/S5R_bhat.rds;data/S1R_ppml.rds,20260719,report_only,12,BUILT
 meta/T22_reliability.csv.sidecar,meta,code/S24_reliability.R,output/T22_reliability.csv,NONE,exists,12,BUILT
+code/S25_placebo_uncorrected.R,code,manual,data/S5R_bhat.rds,NONE,syntax_valid,12,BUILT
+output/T24_placebo_uncorr.csv,output,code/S25_placebo_uncorrected.R,data/S5R_bhat.rds,NONE,G2_FAIL,12,BUILT
+meta/T24_placebo_uncorr.csv.sidecar,meta,code/S25_placebo_uncorrected.R,output/T24_placebo_uncorr.csv,NONE,exists,12,BUILT
+code/S26_prop_verification.R,code,manual,output/T22_reliability.csv;output/T24_placebo_uncorr.csv;output/T21_arms.csv,20260719,syntax_valid,13,BUILT
+output/T25_prop_verification.csv,output,code/S26_prop_verification.R,output/T22_reliability.csv;output/T24_placebo_uncorr.csv;output/T21_arms.csv,20260719,all_gates_pass,13,BUILT
+meta/T25_prop_verification.csv.sidecar,meta,code/S26_prop_verification.R,output/T25_prop_verification.csv,NONE,exists,13,BUILT
+article/prop_constants.tex,article,code/S26_prop_verification.R,output/T25_prop_verification.csv,20260719,macros_generated,13,BUILT

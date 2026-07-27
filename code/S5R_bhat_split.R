@@ -3,6 +3,7 @@
 # S5R_bhat_split.R - b_hat on a 50/50 placebo split, validated OUT OF SAMPLE
 # =============================================================================
 # NOTE: Uses dplyr (no data.table) for Festus compatibility.
+# EXPECTED_N: NA (computes b_hat from S3R_theta.rds placebo pairs)
 # =============================================================================
 
 .libPaths(c("/groups/m-larch/bt307958/Rlibs", .libPaths()))

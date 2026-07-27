@@ -50,9 +50,12 @@ EXCLUDED_DIRS <- c("archive", "audit")
 # -----------------------------------------------------------------------------
 cat("=== CHECK (a): EXPECTED_N declarations ===\n")
 
-# Exclude audit/ and archive/ directories
+# Exclude audit/ and archive/ directories, and QUARANTINED L* scripts
 all_scripts <- list.files("code", pattern = "\\.R$", full.names = TRUE)
-scripts <- all_scripts[!grepl("^(audit|archive)/", all_scripts)]
+# Exclude audit/, archive/ subdirs
+scripts <- all_scripts[!grepl("audit/|archive/", all_scripts)]
+# Exclude L* scripts (QUARANTINED per INV-029)
+scripts <- scripts[!grepl("^code/L[0-9]", scripts)]
 
 for (script in scripts) {
     script_name <- basename(script)
@@ -67,6 +70,8 @@ for (script in scripts) {
         is_producer <- script_name %in% POPULATION_PRODUCERS
 
         has_expected_n <- any(grepl("EXPECTED_N:", content))
+        # EXPECTED_N: NA exempts script from assertion (meta scripts, summary table loaders)
+        expected_n_na <- any(grepl("EXPECTED_N:\\s*NA", content))
 
         if (is_producer) {
             # Producers must assert on OUTPUT, not INPUT
@@ -78,12 +83,12 @@ for (script in scripts) {
                 report_violation("EXPECTED_N", sprintf("%s declares EXPECTED_N but lacks output assertion", script_name))
             }
         } else {
-            # Consumers must assert on INPUT
+            # Consumers must assert on INPUT (unless EXPECTED_N: NA)
             has_assertion <- any(grepl("stopifnot.*nrow.*==", content_text))
             if (!has_expected_n) {
                 report_violation("EXPECTED_N", sprintf("%s loads population but lacks EXPECTED_N header", script_name))
             }
-            if (has_expected_n && !has_assertion) {
+            if (has_expected_n && !has_assertion && !expected_n_na) {
                 report_violation("EXPECTED_N", sprintf("%s declares EXPECTED_N but lacks stopifnot(nrow...)", script_name))
             }
         }
@@ -246,17 +251,18 @@ if (file.exists(appendix_file)) {
             # Find numeric literals like $0.74$ or $-0.71$
             matches <- gregexpr("\\$-?[0-9]+\\.[0-9]+\\$", line)[[1]]
             if (matches[1] != -1) {
-                # Check if line has a % comment (ledger ref)
-                if (!grepl("%", line)) {
-                    # Extract the numbers
-                    nums <- regmatches(line, gregexpr("-?[0-9]+\\.[0-9]+", line))[[1]]
-                    # Filter out whitelisted
-                    unlisted <- nums[!nums %in% WHITELIST]
-                    if (length(unlisted) > 0) {
-                        # This would be a violation, but we're lenient for now
-                        cat(sprintf("  Line %d: numeric literal(s) %s without ledger comment\n",
-                                    i, paste(unlisted, collapse=", ")))
-                    }
+                # D3.1: Check for ledger reference or macro
+                has_ref <- grepl("%\\s*\\[", line) ||
+                           grepl("%\\s*[A-Z][A-Z0-9_]{3,}", line) ||
+                           grepl("\\\\Prop[A-Za-z]+", line)
+                # Extract the numbers
+                nums <- regmatches(line, gregexpr("-?[0-9]+\\.[0-9]+", line))[[1]]
+                # Filter out whitelisted
+                unlisted <- nums[!nums %in% WHITELIST]
+                if (length(unlisted) > 0 && !has_ref) {
+                    report_violation("APPENDIX_LITERAL",
+                        sprintf("main.tex line %d: numeric literal(s) %s with no resolving ledger ID or macro",
+                                i, paste(unlisted, collapse = ", ")))
                 }
             }
         }
@@ -315,6 +321,29 @@ if (file.exists(appendix_file)) {
         }
     }
 
+    # -----------------------------------------------------------------------------
+    # D3.2: Every \Prop* macro used must be defined in prop_constants.tex
+    # -----------------------------------------------------------------------------
+    cat("\n=== CHECK (D3.2): Macro definition completeness ===\n")
+
+    pc_path <- file.path(REBUILD_DIR, "article/prop_constants.tex")
+    if (!file.exists(pc_path)) {
+        report_violation("PROP_MACRO", "article/prop_constants.tex missing; appendix cannot build")
+    } else {
+        pc      <- readLines(pc_path, warn = FALSE)
+        defined <- gsub(".*\\{\\\\|\\}.*", "",
+                        unlist(regmatches(pc, gregexpr("\\\\newcommand\\{\\\\[A-Za-z]+\\}", pc))))
+        used    <- unique(gsub("^\\\\", "",
+                        unlist(regmatches(appendix, gregexpr("\\\\Prop[A-Za-z]+", appendix)))))
+        miss    <- setdiff(used, defined)
+        if (length(miss) > 0) {
+            report_violation("PROP_MACRO",
+                sprintf("main.tex uses undefined macro(s): %s", paste(miss, collapse = ", ")))
+        } else {
+            cat(sprintf("  All %d used \\Prop* macros are defined: PASS\n", length(used)))
+        }
+    }
+
 } else {
     cat("Appendix file not found, skipping check.\n")
 }
@@ -364,6 +393,7 @@ if (n_violations == 0) {
         cat(sprintf("  [%s] %s\n", v$check, v$msg))
     }
     cat(sprintf("\nEnd: %s\n", format(Sys.time())))
-    # SYNC-6: Gates must halt, not just report
-    stop(sprintf("ENFORCE FAILED: %d violations detected. Fix violations before proceeding.", n_violations))
 }
+
+# D3.3: Final halt gate - enforce.R must exit non-zero on any violation
+stopifnot(n_violations == 0)

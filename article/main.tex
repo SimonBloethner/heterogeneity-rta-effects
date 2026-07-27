@@ -730,26 +730,37 @@ High split-half reliability certifies persistence, not validity: any dispersed,
 persistent artifact (Jensen, drift) passes.
 \end{corollary}
 
-% REMARK 1: Empirical scale (uses prop_constants.tex macros)
+% REMARK 1: Empirical scale (uses prop_constants.tex macros) - D5.1 rewrite
 % LEDGER: PLACEBO_A_MEAN=-0.6821 (\PropPlaceboAMean), PLACEBO_B_UNCORR_MEAN=-0.2072 (\PropPlaceboBUncorr)
 \begin{remark}[Empirical scale; validity of the expansions]
-At the ledgered dispersion ($\E[\sigma^2]\!=\!\PropEsigsq$,
-i.e.\ mean placebo $\PropPlaceboAMean$ under Definition~$A$),
-$\Var(\eta)\approx\PropVarEta$: the generic Taylor form $-\Var(\eta)/2$ is
-\emph{invalid} for $\theta^A$ (the exact lognormal value applies), and for
-$\theta^B$ at $T=10$, $\Var(R)\approx\PropVarR$, so $-\Var(R)/2=\PropApproxB$ is a rough guide
-only. At the empirical scale ($\sigma=\PropSigma$, $T=10$), simulation gives
-$\E[\theta^B]=\PropMCB$ against the second-order approximation $\PropApproxB$:
-the expansion overstates the bias magnitude by roughly a third, the
-positive third-order (skewness) term partially offsetting the variance
-term. The approximation is thus a conservative guide at this scale. The R-chain $B$-placebo mean
-$\PropPlaceboBUncorr$ (Definition~$B$, uncorrected)
+Part~(a) identifies the mean dispersion directly from the zero-effect
+population, since $\E[\theta^A]=-\E[\sigma^2]/2$ exactly: at the R-chain placebo
+mean $\PropPlaceboAMean$ under Definition~$A$ this gives
+$\E[\sigma^2]=\PropEsigsq$ and $\sigma=\PropSigma$. At that dispersion
+$\Var(\eta)=\PropVarEta$, so the generic Taylor form $-\Var(\eta)/2$ is
+\emph{invalid} for $\theta^A$ and the exact lognormal value applies; and for
+$\theta^B$ at $T=10$, $\Var(R)=\PropVarR$, so $-\Var(R)/2=\PropApproxB$ is a
+rough guide only. Simulation at the same $(\sigma,T)$ gives
+$\E[\theta^B]=\PropMCB$: the second-order expansion overstates the bias
+magnitude by about $\PropOverstatePct$ percent, the positive third-order
+(skewness) term partially offsetting the variance term, so the approximation is
+conservative at this scale. The R-chain $B$-placebo mean $\PropPlaceboBUncorr$
+% [T24: PLACEBO_B_UNCORR_MEAN]
 additionally contains drift (Proposition~\ref{prop:drift}).
-Consistency check [V1c]: the R-chain $(r,\E[\sigma^2])=(\PropPlaceboR, \PropEsigsq)$
-are jointly consistent with the part-(c) formula for $\Var(\sigma^2)\approx\PropVsigmasq$
-(CV of $\sigma^2_{ij}\approx\PropCVsigsq$) --- a plausible but not independently measured
-dispersion. The predicted reliability $r_{\mathrm{pred}}=\PropRpred$ matches the observed
-$\PropPlaceboR$ to within $\PropRgap$ (no fitted parameter).
+Consistency check [V1c]: part~(c) is over-identified here, and the check is
+parameter-free. The cross-pair variance of $\theta^A$ on the zero-effect
+population decomposes as $\Var(\sigma^2)/4+\E[\sigma^2]/T_{\mathrm{post}}$,
+which at the observed mean post-window length $T_{\mathrm{post}}=\PropTpost$
+yields $\Var(\sigma^2)=\PropVsigmasq$, a coefficient of variation of
+$\sigma^2_{ij}$ of $\PropCVsigsq$. Substituting that into the split-half formula
+at the observed mean half-length $T_h=\PropTh$ \emph{predicts} a placebo
+reliability of $\PropRpred$, against the observed $\PropPlaceboR$
+% [PLACEBO_A_R]
+. The formula reproduces the observed reliability to within $\PropRgap$,
+over-predicting slightly, with no parameter fitted to it; the residual is
+consistent with the homogeneous-window approximation the decomposition makes.
+This is consistent with, though not an independent measurement of, the observed
+reliability.
 \end{remark}
 
 %------------------------------------------------------------
@@ -788,16 +799,23 @@ $\theta^D=\theta_{ij}+\big(\delta_{ij}-\E[\delta\mid s]\big)T_{\mathrm{pre}}/2+
 \bar u$, take variances conditional on $s$.
 \end{proof}
 
-% REMARK 2: Window geometry (Prop 2a verification)
+% REMARK 2: Window geometry (Prop 2a verification) - D2 rewrite
 % LEDGER: V2 predicted = \PropVtwoPred with delta=0.02
 \begin{remark}
-Part~(a) explains the R-chain calendar invariance of the placebo bias
-($R^2<1\%$ on pseudo-year dummies) and, with size-correlated $\delta$, the
-size-graded placebo means; [V2] verifies the formula with $\delta=0.02$:
-predicted mean $\PropVtwoPred$ matches simulation to within MC noise.
-The M1 adjudication --- stationary resampling produced $b\in[0.03,0.12]$,
-incapable of generating the placebo pattern --- is the empirical counterpart
-of the exclusion of (A2)-only mechanisms.
+Part~(a) predicts a placebo bias governed by window geometry alone and, where
+$\delta_{ij}$ correlates with size, graded in size. Simulation confirms both:
+at $\delta=0.02$ the mean pseudo-effect matches the predicted $\PropVtwoPred$ at
+$\PropVtwoSim$, and shifting every pair's span by an arbitrary calendar offset
+moves it by $\PropVtwoShift$
+% [T25: PROP_V2_PRED, PROP_V2_SIM, PROP_V2_SHIFT]
+. Empirically the R-chain placebo means under Definition~$B$ are graded over the
+upper size deciles, falling in magnitude from $-0.365$ at the fifth decile to
+$-0.057$ at the largest, and are non-monotone below the fifth: the smallest
+decile returns $-0.206$ against an overall mean of $-0.207$
+% [T24: PLACEBO_B_UNCORR_DECILE5, DECILE10, DECILE1, OVERALL]
+. The proposition predicts grading conditional on the size--drift correlation and
+does not predict monotonicity across the full support; the observed profile is
+reported as it stands.
 \end{remark}
 
 %------------------------------------------------------------
@@ -844,7 +862,7 @@ $\kappa_{\mathrm{floor}}$ the entire treatment variance is absorbed:
 $\hat\tau^2(\kappa_{\mathrm{floor}})=0$.
 \end{corollary}
 
-% REMARK 3: Empirical bracket and cor:rhoop (V3c verification)
+% REMARK 3: Empirical bracket and cor:rhoop (V3c verification) - D1 rewrite
 % LEDGER: SD_THETA_TRUE=[0.74,1.48] (INV-027); kappa_floor = \PropKappaFloor
 \begin{remark}[The empirical bracket, organized by arm]
 Part~(a) is precisely the window-matched estimator used in the R-chain V1
@@ -853,9 +871,15 @@ is arm-indexed:
 Arm~C (OOS drift subtraction, $\mathrm{Var}_{\mathrm{null}}=1.89$) yields $\mathrm{SD}_{\mathrm{true}}=0.74$;
 Arm~A (noise-only subtraction, $\mathrm{Var}_{\mathrm{null}}=0.26$) yields $\mathrm{SD}_{\mathrm{true}}=1.48$.
 Under the stated model, the interval spans the admissible noise attributions.
-Corollary~\ref{cor:rhoop} [V3c]: at window factor $\kappa=1,2,3,5$, the recovered
-$\hat\tau^2$ is $\PropTauHatOne$, $\PropTauHatTwo$, $\PropTauHatThree$, $\PropTauHatFive$;
-at $\kappa_{\mathrm{floor}}=\PropKappaFloor$, the variance is fully absorbed by noise.
+Corollary~\ref{cor:rhoop} quantifies what a mis-specified null window costs. At
+window factor $\kappa=1$ the subtraction is the noise-only arm and returns its
+$\mathrm{SD}_{\mathrm{true}}$ of $\PropTauKone$ by construction; at
+$\kappa=2,3,5$ the recovered dispersion falls to $\PropTauKtwo$, $\PropTauKthree$
+and $\PropTauKfive$, reaching zero at $\kappa_{\mathrm{floor}}=\PropKappaFloor$
+% [T25: Cor:rhoop rows]
+. A null calibrated on a window shorter than the estimation window therefore
+absorbs true heterogeneity at a computable rate, and at
+$\kappa_{\mathrm{floor}}$ absorbs all of it.
 The transitory slice $\omega^2/T$ remains, by part~(b), inseparable from volatility
 change at any sample size --- the boundary of what these data permit anyone to learn.
 \end{remark}
