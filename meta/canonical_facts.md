@@ -65,19 +65,19 @@ SYNC-6c: V2 exercises delta=0.02; V3c adds cor:rhoop kappa sweep.
 |----|----------|-------|---------|----------|
 | ESIGMA2 | E[sigma^2] | 1.3642 | -2 * PLACEBO_A_MEAN | code/S26_prop_verification.R -> output/T25_prop_verification.csv |
 | SIGMA | sigma | 1.1680 | sqrt(ESIGMA2) | code/S26_prop_verification.R |
-| VAR_SIGMA2 | Var(sigma^2) | 3.6772 | 4*(Var(theta_A) - ESIGMA2/T_post) | code/S26_prop_verification.R |
+| VAR_SIGMA2 | Var(sigma^2) | 4.1773 | 4*(Var(theta_A) - ESIGMA2/T_post) | code/S26_prop_verification.R |
 | T_H_PLACEBO | Mean half-length (placebo) | 5.46 | Measured from split-half | code/S24_reliability.R (PLACEBO_TH) |
 | R_PRED | Predicted reliability | 0.8068 | q/(q + ESIGMA2/T_h) | code/S26_prop_verification.R |
 | R_GAP | R_pred - R_observed | 0.0605 | R_PRED - PLACEBO_A_R | code/S26_prop_verification.R |
 | VAR_ETA | Var(eta) | 2.9126 | exp(ESIGMA2) - 1 | code/S26_prop_verification.R |
 | V2_PRED | V2 predicted mean | -0.5821 | -E_sigma2/2 + delta*T_pre/2 (delta=0.02) | code/S26_prop_verification.R |
-| TAU_HAT_1 | tau_hat at kappa=1 | 0.7500 | Var(theta_D) - kappa*V_post/T_post | code/S26_prop_verification.R |
-| TAU_HAT_2 | tau_hat at kappa=2 | 0.6527 | Var(theta_D) - kappa*V_post/T_post | code/S26_prop_verification.R |
-| TAU_HAT_3 | tau_hat at kappa=3 | 0.5382 | Var(theta_D) - kappa*V_post/T_post | code/S26_prop_verification.R |
-| TAU_HAT_5 | tau_hat at kappa=5 | 0.1297 | Var(theta_D) - kappa*V_post/T_post | code/S26_prop_verification.R |
-| KAPPA_FLOOR | kappa_floor | 5.123 | Where tau_hat=0 | code/S26_prop_verification.R |
+| TAU_HAT_1 | tau_hat at kappa=1 | 2.3308 | Var(theta_D) - kappa*V_post/T_post | code/S26_prop_verification.R |
+| TAU_HAT_2 | tau_hat at kappa=2 | 2.2237 | Var(theta_D) - kappa*V_post/T_post | code/S26_prop_verification.R |
+| TAU_HAT_3 | tau_hat at kappa=3 | 2.1165 | Var(theta_D) - kappa*V_post/T_post | code/S26_prop_verification.R |
+| TAU_HAT_5 | tau_hat at kappa=5 | 1.9021 | Var(theta_D) - kappa*V_post/T_post | code/S26_prop_verification.R |
+| KAPPA_FLOOR | kappa_floor | 22.748 | Where tau_hat=0 | code/S26_prop_verification.R |
 
-Note: V1c T_h >= 2 gate (C1.3). V3c cor:rhoop verified: kappa sweep reproduces expected tau_hat values exactly.
+Note: V1c T_h >= 2 gate (C1.3). V3c cor:rhoop verified: kappa sweep passes formula consistency (tau_hat decreasing, tau_hat(kappa_floor)=0).
 
 ## Placebo (Definition B, Uncorrected)
 

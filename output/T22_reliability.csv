@@ -1,9 +1,13 @@
-"ID","quantity","value","retired_value","definition","deviation"
-"SPLITHALF_A_R","Split-half Pearson r (treated)",0.924344682321206,0.972,"A (mean of log gaps)",-0.0476553176787943
-"SPLITHALF_A_RELIABILITY","Spearman-Brown reliability (treated)",0.960685152522917,NA,"A (mean of log gaps)",NA
-"THETA_A_MEAN","Mean theta_A (treated)",-0.254767840590491,NA,"A (mean of log gaps)",NA
-"THETA_A_SD","SD theta_A (treated)",1.63179321184444,NA,"A (mean of log gaps)",NA
-"PLACEBO_A_MEAN","Mean theta_A (placebo)",-0.68210567525916,-0.7121,"A (mean of log gaps)",0.0299943247408399
-"PLACEBO_A_SD","SD theta_A (placebo)",1.08137161999524,1.1165,"A (mean of log gaps)",-0.0351283800047557
-"PLACEBO_A_R","Split-half Pearson r (placebo)",0.74630841671878,0.62,"A (mean of log gaps)",0.12630841671878
-"PLACEBO_A_RELIABILITY","Spearman-Brown reliability (placebo)",0.854726930906115,NA,"A (mean of log gaps)",NA
+"ID","quantity","value","n","definition"
+"SPLITHALF_A_R","Split-half Pearson r (treated)",0.924344682321206,4120,"A (mean of log gaps)"
+"SPLITHALF_A_RELIABILITY","Spearman-Brown reliability (treated)",0.960685152522917,4120,"A (mean of log gaps)"
+"THETA_A_MEAN","Mean theta_A (treated)",-0.254767840590491,4120,"A (mean of log gaps)"
+"THETA_A_SD","SD theta_A (treated)",1.63179321184444,4120,"A (mean of log gaps)"
+"PLACEBO_A_MEAN","Mean theta_A (placebo)",-0.68210567525916,15683,"A (mean of log gaps)"
+"PLACEBO_A_SD","SD theta_A (placebo)",1.08137161999524,15683,"A (mean of log gaps)"
+"PLACEBO_A_R","Split-half Pearson r (placebo)",0.74630841671878,15683,"A (mean of log gaps)"
+"PLACEBO_A_RELIABILITY","Spearman-Brown reliability (placebo)",0.854726930906115,15683,"A (mean of log gaps)"
+"TREATED_TH","Mean post cells per split half (treated)",5.88094660194175,4120,"A (mean of log gaps)"
+"PLACEBO_TH","Mean post cells per split half (placebo)",5.45552509086272,15683,"A (mean of log gaps)"
+"TREATED_TPOST","Mean post cells per pair (treated)",11.7618932038835,4120,"A (mean of log gaps)"
+"PLACEBO_TPOST","Mean post cells per pair (placebo)",10.9110501817254,15683,"A (mean of log gaps)"

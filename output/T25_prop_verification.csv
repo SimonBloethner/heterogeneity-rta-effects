@@ -1,0 +1,20 @@
+"ID","quantity","value"
+"PROP_ESIGMA2","E[sigma^2] = -2*PLACEBO_A_MEAN",1.36421135051832
+"PROP_SIGMA","sigma = sqrt(E[sigma^2])",1.16799458496961
+"PROP_VAR_ETA","Var(eta) = exp(sigma^2) - 1",2.91263613644454
+"PROP_VAR_R","Var(R) at T=10 = Var(eta)/10",0.291263613644454
+"PROP_APPROX_B","-Var(R)/2 (second-order approx)",-0.145631806822227
+"PROP_MC_B","MC E[theta^B] at T=10",-0.112120137991782
+"PROP_V_SIGMA2","Var(sigma^2) from decomposition",4.1773373153297
+"PROP_CV_SIGMA2","CV(sigma^2) = sqrt(Var)/E",1.49819420919883
+"PROP_R_PRED","Predicted reliability",0.806812807675821
+"PROP_R_GAP","r_gap = |r_pred - r_obs|",0.0605043909570413
+"PROP_TH","Mean half-length T_h (placebo)",5.45552509086272
+"PROP_TPOST","Mean post-window T_post (placebo)",10.9110501817254
+"PROP_PLACEBO_R","Observed reliability (PLACEBO_A_R)",0.74630841671878
+"PROP_V2_PRED","V2 predicted mean (Prop 2a, delta=0.02)",-0.58210567525916
+"PROP_TAU_HAT_1","tau_hat at kappa=1",2.33082749496564
+"PROP_TAU_HAT_2","tau_hat at kappa=2",2.22365498993128
+"PROP_TAU_HAT_3","tau_hat at kappa=3",2.11648248489692
+"PROP_TAU_HAT_5","tau_hat at kappa=5",1.9021374748282
+"PROP_KAPPA_FLOOR","kappa_floor (where tau_hat=0)",22.74837188156
