@@ -1,21 +1,20 @@
-PRODUCER: S26_prop_verification.R v2
-INPUTS: output/T22_reliability.csv, output/T24_placebo_uncorr.csv, output/T21_arms.csv,
-        output/T28b_v1c_arm1p.csv
+PRODUCER: S26_prop_verification.R v3
+INPUTS: T22_reliability.csv, T24_placebo_uncorr.csv, T21_arms.csv, T28b_v1c_arm1p.csv
 SEED: 20260719
 N_REP: 4000000
 
-V1c SOURCED FROM ARM 1' (T28b):
+V1c CHAIN ON ARM 1' DECOMPOSITION:
+  A1p (from T28b) = 1.005256314737820
+  V_sigma2 = 4 * A1p = 4.021025258951280
+  CV_sigma2 = sqrt(V)/E = 1.469896453257486
   r_pred (Arm 1') = 0.753863355754621
-  r_gap = |R_GAP_1p| = 0.007554939035841
-  r_pred_plugin (Arm 0, retained) = 0.806812807675821
+  r_gap = 0.007554939035841
 
-VERIFICATIONS:
-  V1a: E_sigma2 = 1.364211 (analytical: -2*PLACEBO_A_MEAN)
-  V1b: approx_B = -0.1456 < mc_B = -0.1121 < 0 : PASS
-  V1c: r_pred (Arm 1') = 0.7539, r_gap = 0.0076
-  V2:  MC mean = -0.5808 vs predicted -0.5821, gap = 0.0013 < 0.02
-  V3c: tau_hat(1,2,3,5) = 1.4754, 1.3841, 1.2863, 1.0641
+PLUG-IN DIAGNOSTICS (Arm 0, retained):
+  V_sigma2_plugin = 4.177337315329701
+  CV_sigma2_plugin = 1.498194209198825
+  r_pred_plugin = 0.806812807675821
 
 STATUS: BUILT
 DATE: 2026-07-29
-SHA256: 61addf4654af00f11259de7e19dd2813f99ab70638507c367a9c92dab0af1a0a
+SHA256: 36e275bd0c84ef2c4f0374c61ae75510f9a3635eecb4410e8c2a4b2449585db5

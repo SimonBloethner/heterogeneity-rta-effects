@@ -6,11 +6,13 @@
 "PROP_APPROX_B","-Var(R)/2 (second-order approx)",-0.145631806822227
 "PROP_MC_B","MC E[theta^B] at T=10",-0.112120137991782
 "PROP_OVERSTATE_PCT","Overstatement percentage",29.8890720531413
-"PROP_V_SIGMA2","Var(sigma^2) from decomposition",4.1773373153297
-"PROP_CV_SIGMA2","CV(sigma^2) = sqrt(Var)/E",1.49819420919883
+"PROP_V_SIGMA2","Var(sigma^2) from Arm 1' decomposition",4.02102525895128
+"PROP_CV_SIGMA2","CV(sigma^2) = sqrt(Var)/E (Arm 1')",1.46989645325749
 "PROP_R_PRED","Predicted reliability (Arm 1')",0.753863355754621
 "PROP_R_GAP","r_gap = |r_pred - r_obs| (Arm 1')",0.00755493903584137
 "PROP_R_PRED_PLUGIN","Predicted reliability (plug-in, Arm 0)",0.806812807675821
+"PROP_V_SIGMA2_PLUGIN","Var(sigma^2) from plug-in decomposition",4.1773373153297
+"PROP_CV_SIGMA2_PLUGIN","CV(sigma^2) = sqrt(Var)/E (plug-in)",1.49819420919883
 "PROP_TH","Mean half-length T_h (placebo)",5.45552509086272
 "PROP_TPOST","Mean post-window T_post (placebo)",10.9110501817254
 "PROP_PLACEBO_R","Observed reliability (PLACEBO_A_R)",0.74630841671878
