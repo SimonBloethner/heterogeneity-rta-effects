@@ -13,6 +13,9 @@
 #   (d) no BUILT output may depend on QUARANTINE, SUPERSEDED, or RETIRED input
 #       (match only in load calls: readRDS, read.csv, fread, load; not comments)
 #   (e) every sidecar's recorded SHA256 must match current file SHA256
+#   (h) every producer path in canonical_facts.md must resolve to a file in tree
+
+stopifnot(!grepl("login", Sys.info()[["nodename"]]))
 
 cat("================================================================\n")
 cat("ENFORCE.R - GATE CONSISTENCY CHECK\n")
@@ -346,6 +349,59 @@ if (file.exists(appendix_file)) {
 
 } else {
     cat("Appendix file not found, skipping check.\n")
+}
+
+cat("\n")
+
+# -----------------------------------------------------------------------------
+# (h) canonical_facts.md producer paths must resolve
+# -----------------------------------------------------------------------------
+cat("=== CHECK (h): canonical_facts.md producer paths ===\n")
+
+cf_path <- "meta/canonical_facts.md"
+if (file.exists(cf_path)) {
+    cf <- readLines(cf_path, warn = FALSE)
+    
+    # Only check lines that are table rows (start with |)
+    table_lines <- cf[grepl("^\\|", cf)]
+    
+    # Extract all paths matching (code|data|output|meta)/[A-Za-z0-9_./]+
+    path_pattern <- "(code|data|output|meta)/[A-Za-z0-9_./]+"
+    
+    all_paths <- character()
+    for (line in table_lines) {
+        matches <- gregexpr(path_pattern, line, perl = TRUE)
+        if (matches[[1]][1] != -1) {
+            extracted <- regmatches(line, matches)[[1]]
+            # Strip trailing "." if present
+            extracted <- gsub("\\.$", "", extracted)
+            all_paths <- c(all_paths, extracted)
+        }
+    }
+    
+    # Deduplicate
+    unique_paths <- unique(all_paths)
+    cat(sprintf("  Producer paths extracted (unique): %d\n", length(unique_paths)))
+    
+    # Per-path report
+    dangling <- character()
+    for (p in unique_paths) {
+        exists_flag <- file.exists(p)
+        status <- if (exists_flag) "OK" else "MISSING"
+        cat(sprintf("    %s: %s\n", p, status))
+        if (!exists_flag) dangling <- c(dangling, p)
+    }
+    
+    cat(sprintf("  Dangling paths: %d\n", length(dangling)))
+    if (length(dangling) > 0) {
+        for (d in dangling) {
+            report_violation("CF_PRODUCER", sprintf("canonical_facts.md references non-existent path: %s", d))
+        }
+    } else {
+        cat("  All producer paths resolve: PASS\n")
+    }
+} else {
+    report_violation("CF_PRODUCER", "meta/canonical_facts.md not found")
 }
 
 cat("\n")
