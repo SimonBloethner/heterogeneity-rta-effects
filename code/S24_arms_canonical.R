@@ -2,15 +2,19 @@
 # S24_arms_canonical.R - Canonical Arms Table
 # OUTPUTS: output/T21_arms.csv, meta/T21_arms.csv.sidecar
 # INPUTS:  data/S5R_bhat.rds (for Var(theta_D) and TW_MEAN verification)
+#          output/T12_N1b_horizon.csv (N1b OOS variances per horizon bin)
+#          output/T12_N1_oos_null.csv (symmetric-window treated weights)
 # SEED:    NONE
 # EXPECTED_N: 4182
 # GATES:   G1 Var(theta_D) == 2.438; G2 shares sum correctly;
-#          G3 TW_MEAN from pre_trade weights
+#          G3 TW_MEAN from pre_trade weights;
+#          G4 Var_null_C = 1.8868 (from N1b × symmetric weights)
 #
-# This script creates the canonical arms table with hardcoded values
-# from the investigation register, with assertions to verify consistency.
+# This script creates the canonical arms table. Arm C is computed explicitly
+# from T12_N1b_horizon.csv variances × symmetric-window treated weights.
 #
 # INV-027: SD_true identified set [0.74, 1.48]
+# INV-027a: CLOSED - V4/S18 measure in-sample null; N1b measures OOS null
 # INV-022: Arm A noise-only Var_null = 0.261145
 # INV-034: TW_MEAN = 0.0897 (pre_trade weights, canonical)
 
@@ -32,14 +36,54 @@ stopifnot(abs(var_theta_D - VAR_THETA_D_CANON) < 1e-2)
 cat("G1 Var(theta_D) matches canonical: PASS\n")
 
 # -----------------------------------------------------------------------------
-# CANONICAL ARMS TABLE (hardcoded from register)
+# G4: EXPLICIT ARM C COMPUTATION (INV-027a resolution)
+# Arm C = Σ (N1b_variance_b × symmetric_weight_b)
+# -----------------------------------------------------------------------------
+cat("\n=== G4: Arm C explicit computation ===\n")
+
+# Load N1b OOS variances per horizon bin
+N1b <- read.csv("output/T12_N1b_horizon.csv", stringsAsFactors = FALSE)
+cat("Loaded T12_N1b_horizon.csv\n")
+
+# Load symmetric weights from T12_N1_oos_null.csv
+N1_weights <- read.csv("output/T12_N1_oos_null.csv", stringsAsFactors = FALSE)
+sym_weights <- data.frame(
+  horizon_bin = c("2-3", "4-5", "6-10", "11+"),
+  weight = c(
+    as.numeric(N1_weights$value[N1_weights$quantity == "weight_2-3"]),
+    as.numeric(N1_weights$value[N1_weights$quantity == "weight_4-5"]),
+    as.numeric(N1_weights$value[N1_weights$quantity == "weight_6-10"]),
+    as.numeric(N1_weights$value[N1_weights$quantity == "weight_11+"])
+  )
+)
+cat("Loaded symmetric weights from T12_N1_oos_null.csv\n")
+
+# Merge N1b variances with symmetric weights
+arm_c_data <- merge(N1b[N1b$horizon_bin != "MATCHED", c("horizon_bin", "var_pseudo")],
+                    sym_weights, by = "horizon_bin")
+arm_c_data$contribution <- arm_c_data$var_pseudo * arm_c_data$weight
+
+cat("\nArm C per-bin contributions:\n")
+print(arm_c_data)
+
+# Compute Var_null_C
+Var_null_C <- sum(arm_c_data$contribution)
+cat(sprintf("\nVar_null_C = Σ (N1b_var × sym_weight) = %.6f\n", Var_null_C))
+cat(sprintf("Expected: 1.8868\n"))
+
+# Gate: Var_null_C must match 1.8868 to 3 decimal places
+stopifnot(abs(Var_null_C - 1.8868) < 1e-3)
+cat("G4 Var_null_C matches 1.8868 to 3 decimals: PASS\n")
+
+# -----------------------------------------------------------------------------
+# CANONICAL ARMS TABLE
 # -----------------------------------------------------------------------------
 
 arms <- data.frame(
   arm = c("A_noise_only", "B_placebo", "C_OOS"),
   window = c("horizon-matched", "in-sample", "symmetric"),
-  Var_null_subtracted = c(0.261145, 0.679560, 1.887),
-  source_INV = c("INV-022", "in-sample", "INV-027 corrected"),
+  Var_null_subtracted = c(0.261145, 0.679560, Var_null_C),
+  source_INV = c("INV-022", "in-sample", "G4 (N1b × sym weights)"),
   stringsAsFactors = FALSE
 )
 
@@ -72,7 +116,10 @@ cat(sprintf("  C_OOS SD_true = %.4f (expected 0.7420)\n", arms$SD_true[3]))
 
 stopifnot(abs(arms$SD_true[1] - 1.4754) < 0.001)
 stopifnot(abs(arms$SD_true[2] - 1.3260) < 0.001)
-stopifnot(abs(arms$SD_true[3] - 0.7420) < 0.001)
+# Arm C SD_true computed from Var_null_C: sqrt(2.438 - 1.8868) = 0.7424
+expected_SD_C <- sqrt(VAR_THETA_D_CANON - Var_null_C)
+cat(sprintf("  C_OOS SD_true = %.4f (computed from G4)\n", arms$SD_true[3]))
+stopifnot(abs(arms$SD_true[3] - expected_SD_C) < 0.001)
 cat("G2b SD_true values match register: PASS\n")
 
 # -----------------------------------------------------------------------------
@@ -130,7 +177,7 @@ cat("\nSaved: output/T21_arms.csv\n")
 sha <- system("sha256sum output/T21_arms.csv | cut -d' ' -f1", intern = TRUE)
 writeLines(c(
   "PRODUCER: S24_arms_canonical.R",
-  "INPUTS: data/S5R_bhat.rds (verification only)",
+  "INPUTS: data/S5R_bhat.rds, output/T12_N1b_horizon.csv, output/T12_N1_oos_null.csv",
   "SEED: NONE",
   "EXPECTED_N: 4182",
   sprintf("VAR_THETA_D: %.4f", var_theta_D),
@@ -139,10 +186,15 @@ writeLines(c(
   "  G2: shares = Var_null / Var_theta_D - PASS",
   "  G2b: SD_true values match register - PASS",
   sprintf("  G3: TW_MEAN = %.4f (canonical 0.0897) - PASS", tw_mean_pre),
+  sprintf("  G4: Var_null_C = %.6f (from N1b × symmetric weights) - PASS", Var_null_C),
   "STATUS: BUILT",
   sprintf("DATE: %s", Sys.Date()),
-  "NOTE: Arm C uses the symmetric-window Var_null_matched of 1.887 per INV-027",
-  "   (CORRECTED). The value 0.389 in T12 is the pre-correction W0-window generation.",
+  "",
+  "INV-027a RESOLVED:",
+  "  Arm C computed explicitly from T12_N1b_horizon.csv (OOS variances) ×",
+  "  symmetric-window treated weights (from T12_N1_oos_null.csv).",
+  "  T26_null_stack.csv (0.389) is the IN-SAMPLE pseudo null, not Arm C.",
+  "",
   "INV-034: TW_MEAN = 0.0897 (pre_trade weights). T10R used total_trade (0.304),",
   "   retired pack used unknown weights (0.141). C4 adjudicated pre_trade as canonical",
   "   since total_trade is endogenous to the effect.",

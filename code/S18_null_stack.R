@@ -121,6 +121,7 @@ var_by_bin <- pseudo_results %>%
         n = n(),
         var_pseudo_B = var(pseudo_theta_B, na.rm = TRUE),
         var_pseudo_D = var(pseudo_theta_D, na.rm = TRUE),
+        mean_pseudo_B = mean(pseudo_theta_B, na.rm = TRUE),
         mean_pseudo_D = mean(pseudo_theta_D, na.rm = TRUE),
         .groups = "drop"
     )
@@ -234,6 +235,8 @@ say("")
 code_sha <- get_sha256("code/S18_null_stack.R")
 
 # T26_null_stack.csv - SYNC-6e: Commit per-bin variances at full precision
+# Task 4.3: Add diagnostic columns for between/within decomposition
+
 t26 <- var_by_bin %>%
     left_join(weights_sym %>% select(horizon_bin, weight), by = "horizon_bin") %>%
     mutate(
@@ -241,18 +244,114 @@ t26 <- var_by_bin %>%
         weight_treated = weight,
         contribution = weight * var_pseudo_D
     ) %>%
-    select(horizon_bin, n_pseudo, var_pseudo_D, weight_treated, contribution)
+    select(horizon_bin, n_pseudo, var_pseudo_B, var_pseudo_D, mean_pseudo_D, weight_treated, contribution)
+
+# Confirm var_pseudo_B == var_pseudo_D (mean_bhat is scalar, so must be identical)
+var_diff <- max(abs(t26$var_pseudo_B - t26$var_pseudo_D), na.rm = TRUE)
+say("")
+say("Task 4.3 Diagnostic: var_pseudo_B vs var_pseudo_D")
+say("  max|var_B - var_D| = %.2e (expect < 1e-12)", var_diff)
+stopifnot(var_diff < 1e-10)
+
+# Compute between-group variance: Σ w_b·(mean_b − m̄)² where m̄ = Σ w_b·mean_b
+m_bar <- sum(t26$weight_treated * t26$mean_pseudo_D, na.rm = TRUE)
+between_contrib <- t26$weight_treated * (t26$mean_pseudo_D - m_bar)^2
+within_total <- sum(t26$contribution, na.rm = TRUE)
+between_total <- sum(between_contrib, na.rm = TRUE)
+total_full <- within_total + between_total
+
+say("")
+say("Task 4.3: Between/Within Variance Decomposition (n=5,169)")
+say("  m_bar (weighted grand mean): %.6f", m_bar)
+say("  WITHIN  = Σ w_b·var_b:       %.6f", within_total)
+say("  BETWEEN = Σ w_b·(mean_b-m̄)²: %.6f", between_total)
+say("  TOTAL_full = within+between: %.6f", total_full)
+say("  Ledgered Var_null (1.887)?   %s", ifelse(abs(total_full - 1.887) < 0.01, "YES", "NO"))
+
+# Add between contribution column
+t26$between_contrib <- between_contrib
 
 # Add TOTAL row
 total_row <- data.frame(
     horizon_bin = "TOTAL",
     n_pseudo = sum(t26$n_pseudo),
+    var_pseudo_B = NA,
     var_pseudo_D = NA,
+    mean_pseudo_D = m_bar,
     weight_treated = sum(t26$weight_treated),
-    contribution = sum(t26$contribution, na.rm = TRUE),
+    contribution = within_total,
+    between_contrib = between_total,
     stringsAsFactors = FALSE
 )
-t26 <- rbind(as.data.frame(t26), total_row)
+
+# Add TOTAL_FULL row
+total_full_row <- data.frame(
+    horizon_bin = "TOTAL_FULL",
+    n_pseudo = sum(t26$n_pseudo),
+    var_pseudo_B = NA,
+    var_pseudo_D = NA,
+    mean_pseudo_D = NA,
+    weight_treated = NA,
+    contribution = NA,
+    between_contrib = NA,
+    stringsAsFactors = FALSE
+)
+# Store total_full in contribution column for TOTAL_FULL row
+total_full_row$contribution <- total_full
+
+t26 <- rbind(as.data.frame(t26), total_row, total_full_row)
+
+# Unweighted pooled variance over all 5,169 pairs
+var_pooled_5169 <- var(pseudo_results$pseudo_theta_D, na.rm = TRUE)
+say("")
+say("Unweighted pooled var(pseudo_theta_D) over 5,169 pairs: %.6f", var_pooled_5169)
+
+# =============================================================================
+# 4,244-pair population (INV-026 R1: pseudo pairs overlapping with baseline)
+# =============================================================================
+baseline_pairs <- unique(baseline$pair)
+pseudo_in_baseline <- pseudo_results %>%
+    filter(pair %in% baseline_pairs)
+
+say("")
+say("4,244-pair population check:")
+say("  Baseline pairs: %d", length(baseline_pairs))
+say("  Pseudo pairs in baseline: %d", nrow(pseudo_in_baseline))
+
+# Compute same statistics for 4,244 subset
+var_by_bin_4244 <- pseudo_in_baseline %>%
+    group_by(horizon_bin) %>%
+    summarise(
+        n = n(),
+        var_pseudo_D = var(pseudo_theta_D, na.rm = TRUE),
+        mean_pseudo_D = mean(pseudo_theta_D, na.rm = TRUE),
+        .groups = "drop"
+    )
+
+# Get weights for this subset (using same treated weights - symmetric)
+t26_4244 <- var_by_bin_4244 %>%
+    left_join(weights_sym %>% select(horizon_bin, weight), by = "horizon_bin") %>%
+    mutate(
+        weight_treated = weight,
+        contribution = weight * var_pseudo_D
+    )
+
+m_bar_4244 <- sum(t26_4244$weight_treated * t26_4244$mean_pseudo_D, na.rm = TRUE)
+between_4244 <- sum(t26_4244$weight_treated * (t26_4244$mean_pseudo_D - m_bar_4244)^2, na.rm = TRUE)
+within_4244 <- sum(t26_4244$contribution, na.rm = TRUE)
+total_full_4244 <- within_4244 + between_4244
+var_pooled_4244 <- var(pseudo_in_baseline$pseudo_theta_D, na.rm = TRUE)
+
+say("")
+say("Task 4.3: 4,244-pair population (pseudo ∩ baseline)")
+say("  Pairs: %d", nrow(pseudo_in_baseline))
+say("  m_bar: %.6f", m_bar_4244)
+say("  WITHIN:  %.6f", within_4244)
+say("  BETWEEN: %.6f", between_4244)
+say("  TOTAL_full: %.6f", total_full_4244)
+say("  Unweighted pooled var: %.6f", var_pooled_4244)
+say("  Per-bin counts:")
+print(as.data.frame(var_by_bin_4244 %>% select(horizon_bin, n, var_pseudo_D, mean_pseudo_D)))
 
 write.csv(t26, "output/T26_null_stack.csv", row.names = FALSE)
 say("Wrote output/T26_null_stack.csv")
@@ -272,16 +371,22 @@ writeLines(c(
     "INPUTS:    data/S1R_ppml.rds, data/S5R_bhat.rds",
     sprintf("SEED:      %d", SEED),
     "",
+    "DEFINITION: IN-SAMPLE PSEUDO NULL",
+    "  This is NOT Arm C. S18 reuses S1R$y_hat_0, which was fitted on all pre-period",
+    "  cells including the LATE cells used for pseudo_theta computation.",
+    "",
     "COLUMNS:",
     "  horizon_bin:   Horizon bin (2-3, 4-5, 6-10, 11+, TOTAL)",
     "  n_pseudo:      Number of pseudo pairs in bin",
-    "  var_pseudo_D:  Variance of pseudo_theta_D in bin",
+    "  var_pseudo_D:  Variance of pseudo_theta_D in bin (IN-SAMPLE)",
     "  weight_treated: Proportion of treated pairs in bin (SYMMETRIC window)",
     "  contribution:  weight_treated * var_pseudo_D (sums to Var_null_matched)",
     "",
-    "NOTES:",
-    sprintf("  TOTAL contribution = %.6f = Var_null for arm C (INV-027)", total_row$contribution),
-    "  This is the ledgered value 1.887 cited in canonical_facts.md",
+    sprintf("TOTAL (in-sample): %.6f", total_row$contribution),
+    "",
+    "ARM C (OOS): 1.8868 (from T12_N1b_horizon.csv × symmetric weights)",
+    "  N1b refits PPML excluding LATE cells (true OOS).",
+    "  Arm C is computed in S24_arms_canonical.R, not here.",
     "",
     sprintf("CREATED:   %s", format(Sys.time()))
 ), "meta/T26_null_stack.csv.sidecar")

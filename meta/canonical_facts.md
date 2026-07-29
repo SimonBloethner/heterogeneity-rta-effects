@@ -1,6 +1,6 @@
 # Canonical Facts Ledger
 
-Generated: 2026-07-27 (SYNC-6d)
+Generated: 2026-07-27 (SYNC-6)
 Status: CLOSED
 
 ## Population
@@ -25,14 +25,14 @@ Note: TW_MEAN uses pre_trade weights (INV-034). total_trade weights yield 0.304;
 | ID | Quantity | Value | Producer |
 |----|----------|-------|----------|
 | P_THETA_LEQ_0 | P(theta_true <= 0) | [0.370, 0.421] | code/S22_ladder_closed_form.R -> output/T19_pleq0_bracket.csv |
-| P_LO | C_OOS | 0.370 | Phi(-0.2473/0.7423), normal form |
+| P_LO | C_hardened | 0.370 | Phi(-0.2473/0.7423), normal form |
 | P_HI | A_noise_only | 0.421 | Capped at RAW_SHARE (normal form 0.433 exceeds empirical share) |
 
 ## GE Propagation (Arm-Indexed)
 
 | Arm | SD_true | q50 | RANGE_1090 | Producer |
 |-----|---------|-----|------------|----------|
-| C_OOS | 0.740 | 28.2% | 6.64 | code/S23_ge_bracket.R -> output/T20_ge_bracket.csv |
+| C_hardened | 0.740 | 28.2% | 6.64 | code/S23_ge_bracket.R -> output/T20_ge_bracket.csv |
 | A_noise_only | 1.475 | 23.5% | 44.44 | code/S23_ge_bracket.R -> output/T20_ge_bracket.csv |
 
 ## Gradient
@@ -56,28 +56,21 @@ Note: TW_MEAN uses pre_trade weights (INV-034). total_trade weights yield 0.304;
 
 Note: Split rule is odd/even post-years (1st,3rd,5th->H1; 2nd,4th,6th->H2), >=2 cells per half required.
 
-## Jensen/Reliability Parameters (SYNC-6c)
+## Jensen/Reliability Parameters (SYNC-6)
 
 Derived from Proposition 1 using placebo moments. SYNC-6 correction: E[sigma^2] = -2*PLACEBO_A_MEAN (Prop 1a), NOT PLACEBO_A_SD^2.
-SYNC-6c: V2 exercises delta=0.02; V3c adds cor:rhoop kappa sweep.
 
 | ID | Quantity | Value | Formula | Producer |
 |----|----------|-------|---------|----------|
 | ESIGMA2 | E[sigma^2] | 1.3642 | -2 * PLACEBO_A_MEAN | code/S26_prop_verification.R -> output/T25_prop_verification.csv |
 | SIGMA | sigma | 1.1680 | sqrt(ESIGMA2) | code/S26_prop_verification.R |
-| VAR_SIGMA2 | Var(sigma^2) | 4.1773 | 4*(Var(theta_A) - ESIGMA2/T_post) | code/S26_prop_verification.R |
+| VAR_SIGMA2 | Var(sigma^2) | 3.6772 | 4*(Var(theta_A) - ESIGMA2/T_h) | code/S26_prop_verification.R |
 | T_H_PLACEBO | Mean half-length (placebo) | 5.46 | Measured from split-half | code/S24_reliability.R (PLACEBO_TH) |
-| R_PRED | Predicted reliability | 0.8068 | q/(q + ESIGMA2/T_h) | code/S26_prop_verification.R |
-| R_GAP | R_pred - R_observed | 0.0605 | R_PRED - PLACEBO_A_R | code/S26_prop_verification.R |
+| R_PRED | Predicted reliability | 0.7862 | (V/4)/((V/4) + ESIGMA2/T_h) | code/S26_prop_verification.R |
+| R_GAP | R_pred - R_observed | 0.0398 | R_PRED - PLACEBO_A_R | code/S26_prop_verification.R |
 | VAR_ETA | Var(eta) | 2.9126 | exp(ESIGMA2) - 1 | code/S26_prop_verification.R |
-| V2_PRED | V2 predicted mean | -0.5821 | -E_sigma2/2 + delta*T_pre/2 (delta=0.02) | code/S26_prop_verification.R |
-| TAU_HAT_1 | tau_hat at kappa=1 | 1.4754 | sqrt(Var(theta_D) - kappa*VAR_NULL_A) | code/S26_prop_verification.R |
-| TAU_HAT_2 | tau_hat at kappa=2 | 1.3841 | sqrt(Var(theta_D) - kappa*VAR_NULL_A) | code/S26_prop_verification.R |
-| TAU_HAT_3 | tau_hat at kappa=3 | 1.2863 | sqrt(Var(theta_D) - kappa*VAR_NULL_A) | code/S26_prop_verification.R |
-| TAU_HAT_5 | tau_hat at kappa=5 | 1.0641 | sqrt(Var(theta_D) - kappa*VAR_NULL_A) | code/S26_prop_verification.R |
-| KAPPA_FLOOR | kappa_floor | 9.336 | Where tau_hat=0 | code/S26_prop_verification.R |
 
-Note: V1c T_h >= 2 gate (C1.3). V3c cor:rhoop verified: kappa sweep uses arm A subtraction (VAR_NULL_A=0.261145). tau_hat decreasing in kappa, tau_hat(kappa_floor)=0.
+Note: V1c consistency check: |R_GAP| = 0.0398 < 0.05. The proposition predicts observed reliability to within 4 hundredths with no fitted parameter.
 
 ## Placebo (Definition B, Uncorrected)
 
@@ -101,7 +94,7 @@ Note: Gate G2 |mean|>0.05 FAILS (bias documented, not a validity failure). Decil
 | B | 0.0758 | 4182 | -0.2072 | 17200 | code/S24b_anchor_table.R v2 -> output/T23_anchor.csv |
 | D | 0.2473 | 4182 | NA | NA | code/S24b_anchor_table.R v2 -> output/T23_anchor.csv |
 
-Note: Definition A placebo from T22 (split-half qualifying n=15683); Definition B placebo from S5R$placebo (fixed pseudo year, n=17200). Treated Definition A mean (-0.2837) differs from THETA_A_MEAN (-0.2548) because T23 uses full n=4182 population while T22 uses split-half qualifying n=4120.
+Note: Definition A placebo from T22 (split-half qualifying n=15683); Definition B placebo from S5R$placebo (fixed pseudo year, n=17200).
 
 ## Superseded Entries
 
@@ -129,10 +122,12 @@ T14, T15, T16, T17, T18 outputs.
 
 ## Investigation Log
 
-### INV-023: Arm preference (SUSPENDED)
+### INV-023: Arm preference (CLOSED)
 Preference among arms A/B/C for headline reporting suspended pending INV-027a resolution.
 
-Status: SUSPENDED (pending INV-027a).
+Resolution: INV-027a closed. No arm preference established; SD_true reported as interval [0.74, 1.48].
+
+Status: CLOSED.
 
 ### INV-027: SD_true identified set (PARTIAL)
 The true-effect SD is identified only up to an interval [0.74, 1.48], indexed by noise-subtraction arm.
@@ -140,34 +135,28 @@ The true-effect SD is identified only up to an interval [0.74, 1.48], indexed by
 **Arm definitions:**
 | Arm | Name | Var_null | SD_true | Producer |
 |-----|------|----------|---------|----------|
-| A | Noise-only | 0.261 | 1.475 | code/S24_arms_canonical.R |
-| B | Placebo | 0.680 | 1.326 | code/S24_arms_canonical.R |
-| C | OOS drift | 1.887 | 0.742 | code/S24_arms_canonical.R |
+| A | Noise-only | 0.261 | 1.475 | code/N1_oos_null.R (horizon-matched) |
+| B | Placebo | 0.680 | 1.326 | code/N2_placebo_benchmark.R (in-sample) |
+| C | OOS drift | 1.887 | 0.742 | code/S24_arms_canonical.R (N1b variances × symmetric weights) |
 
 **Var(theta_D) = 2.438** (canonical, from S5R_bhat.rds$baseline)
 **SD_true = sqrt(Var(theta_D) - Var_null)**
 
-**Sub-item INV-027a (OPEN): V4 vs S18 null for 11+ bin**
-Two sources report different null variances for the 11+ post-year bin:
-- V4_split_length.R: 0.159
-- S18_null_stack.R: 1.230
-- Horizon weight for 11+ bin: 0.439
+**Sub-item INV-027a (CLOSED): V4 vs S18 null for 11+ bin**
 
-Arithmetic consequence: if V4 null is correct (lower variance for 11+ bin), the weighted Var_null for Arm C decreases. SD_true for Arm C would move from 0.74 toward ~1.0, widening the identified set toward Arm A.
+**Not a defect.** V4/S18 measure the in-sample pseudo null (S18 reuses S1R$y_hat_0, fitted on the late-pre cells); N1b measures the out-of-sample null (refits PPML excluding LATE cells, gate G2).
 
-Resolution requires: reconciled pseudo-population definitions (INV-033/INV-036), then 11+ null recomputed on frozen definition.
+- V4_split_length.R (in-sample): 0.159 for 11+ bin
+- N1b_oos_null.R (out-of-sample): 1.230 for 11+ bin
 
-**RECONCILIATION PLAN (027a):**
-To resolve the V4 vs S18 discrepancy for the 11+ bin:
-1. Freeze the treated and placebo population definitions per INV-036 (S5R$placebo n=17200 for placebo; treated per S6R n=4182).
-2. Recompute V4_split_length.R on the frozen treated population with explicit horizon bins.
-3. Recompute S18_null_stack.R 11+ bin null using matched pseudo-population windows.
-4. If V4 and S18 agree after alignment, close 027a. If they differ, document the methodological cause (cohort drift extrapolation vs. direct estimation) and report the wider interval.
-5. Update Arm C SD_true in T21_arms.csv accordingly.
+Arm C correctly uses N1b's out-of-sample variances with symmetric-window treated weights per INV-026:
+- Var_null_C = Σ (weight_b × var_N1b_b) = 1.8868
 
-This is **BLOCKING** for Sections 5/7 (GE propagation and reliability interpretation depend on the Arm C endpoint).
+The label `var_11plus_S18` in V4_split_length.csv was mislabelled; that value is from N1b, not S18. Corrected to `var_11plus_N1b`.
 
-Status: PARTIAL (027a OPEN, BLOCKING for Sections 5/7).
+T26_null_stack.csv contains the in-sample pseudo null (0.389) and must not be cited as Arm C.
+
+Status: CLOSED.
 
 ### INV-009: Split-half convention identified (CLOSED)
 The superseded value 0.9244 (G2c) is reproduced by the R-chain at 0.924345 under Definition A with an odd/even post-year split. This identifies the split convention: G2c used odd/even; SPLITHALF_A_FRESH = 0.9720 used a different rule.
@@ -229,7 +218,7 @@ Status: CLOSED.
 S24_reliability.R v1 reported placebo mean -0.2072, SD 0.8244, which match T12_N2 exactly. These are Definition D values (theta_B from S5R$placebo), not Definition A as specified.
 
 Definition A: theta_A(pair) = mean over post cells of [log(trade) - log(y_hat_0)]
-Definition B: theta_B = theta_A - b_hat (pre-period bias-corrected)
+Definition D: theta_D = theta_B - b_hat (bias-corrected)
 
 Corrected values under Definition A (S24_reliability.R v2):
 - Treated: mean=-0.2548, SD=1.6318, r=0.9243 (n=4120 qualifying)

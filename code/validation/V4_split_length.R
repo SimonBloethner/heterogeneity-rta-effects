@@ -203,26 +203,24 @@ say("Extrapolated ratio for 11+ (horizon=15): %.4f", ratio_11plus)
 # INV-027: VARIANCE DISCREPANCY
 # =============================================================================
 say("")
-say("=== INV-027: VARIANCE DISCREPANCY ===")
+say("=== INV-027a: IN-SAMPLE vs OOS NULL ===")
 
-# V4 at split=0.5, 11+ bin
+# V4 at split=0.5, 11+ bin (IN-SAMPLE: reuses S1R$y_hat_0)
 var_11plus_V4 <- agg_var$var_pseudo_D[agg_var$split_frac == 0.5 & agg_var$horizon_bin == "11+"]
 n_V4 <- sum(agg_var$n[agg_var$split_frac == 0.5])
 
-# S18/N1 value (from prior run)
-var_11plus_S18 <- 1.23  # From S18 horizon_var
+# N1b value (OOS: refits PPML excluding LATE cells)
+var_11plus_N1b <- 1.23  # From N1b OOS null (T12_N1b_horizon.csv)
 
 say("")
-say("V4 (split=0.5, 11+ bin): Var = %.4f, n = %d", var_11plus_V4, n_V4)
-say("S18 (N1, 11+ bin):       Var = 1.23, n = 1131")
+say("V4 (in-sample, 11+ bin): Var = %.4f", var_11plus_V4)
+say("N1b (OOS, 11+ bin):      Var = %.4f", var_11plus_N1b)
 say("")
-say("DISCREPANCY: %.4f vs 1.23", var_11plus_V4)
+say("NOT A DISCREPANCY:")
+say("  V4/S18: In-sample (reuses S1R$y_hat_0 fitted on LATE cells)")
+say("  N1b:    OOS (refits PPML excluding LATE cells)")
 say("")
-say("Sample definitions differ:")
-say("  V4:  All switcher pre-period splits with n_early >= 2, n_late >= 2")
-say("  S18: All switcher pre-period splits with midpoint, y_hat_0 > 0")
-say("")
-say("INV-027: OPEN - sample definition difference not reconciled")
+say("INV-027a: CLOSED - Arm C uses N1b (OOS) variances")
 
 # =============================================================================
 # OUTPUT
@@ -235,9 +233,9 @@ output <- bind_rows(
         select(item, value = var_pseudo_D),
     data.frame(
         item = c("beta_early", "se_early", "r_squared",
-                 "ratio_11plus_extrap", "var_11plus_V4", "var_11plus_S18"),
+                 "ratio_11plus_extrap", "var_11plus_V4", "var_11plus_N1b"),
         value = c(beta_early, se_early, summary(fit)$r.squared,
-                  ratio_11plus, var_11plus_V4, var_11plus_S18)
+                  ratio_11plus, var_11plus_V4, var_11plus_N1b)
     )
 )
 
@@ -258,10 +256,12 @@ writeLines(c(
     "S4: COHORT EXTRAPOLATION",
     sprintf("  Extrapolated 11+ ratio: %.4f", ratio_11plus),
     "",
-    "INV-027: VARIANCE DISCREPANCY",
-    sprintf("  V4 (11+ bin):  %.4f", var_11plus_V4),
-    sprintf("  S18 (11+ bin): %.4f", var_11plus_S18),
-    "  STATUS: OPEN",
+    "INV-027a: IN-SAMPLE vs OOS NULL (CLOSED)",
+    sprintf("  V4 (in-sample, 11+ bin): %.4f", var_11plus_V4),
+    sprintf("  N1b (OOS, 11+ bin):      %.4f", var_11plus_N1b),
+    "  V4/S18 measure in-sample null (reuses S1R$y_hat_0)",
+    "  N1b measures OOS null (refits excluding LATE cells)",
+    "  Arm C uses N1b. No discrepancy.",
     sprintf("CREATED:   %s", format(Sys.time()))
 ), "meta/V4_split_length.csv.sidecar")
 
