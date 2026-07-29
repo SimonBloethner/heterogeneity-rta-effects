@@ -22,10 +22,20 @@ cat("ENFORCE.R - GATE CONSISTENCY CHECK\n")
 cat("Run:", format(Sys.time()), "\n")
 cat("================================================================\n\n")
 
+cat("Working directory:", getwd(), "\n")
+cat("Git HEAD:", system("git rev-parse HEAD", intern = TRUE), "\n")
+dirty_count <- length(system("git status --porcelain", intern = TRUE))
+cat("Dirty files:", dirty_count, "\n\n")
+
 library(data.table)
 
-REBUILD_DIR <- Sys.getenv("REBUILD_DIR", "/groups/m-larch/bt307958/REBUILD_V2")
-setwd(REBUILD_DIR)
+# Repo-root assertion: enforce.R must run from repo root containing code/, meta/, article/
+stopifnot(
+    dir.exists("code"),
+    dir.exists("meta"),
+    dir.exists("article"),
+    file.exists("meta/FILE_REGISTRY.csv")
+)
 
 violations <- list()
 n_violations <- 0
@@ -149,8 +159,8 @@ cat("\n")
 cat("=== CHECK (d): BUILT dependencies ===\n")
 
 if (exists("registry")) {
-    quarantined <- registry[status == "QUARANTINE", file]
-    superseded <- registry[status == "SUPERSEDED", file]
+    quarantined <- registry[status == "QUARANTINE", file_path]
+    superseded <- registry[status == "SUPERSEDED", file_path]
 
     cat(sprintf("QUARANTINE outputs: %d\n", length(quarantined)))
     cat(sprintf("SUPERSEDED outputs: %d\n", length(superseded)))
@@ -228,7 +238,7 @@ cat("\n")
 # -----------------------------------------------------------------------------
 cat("=== CHECK (f): Appendix numeric literals ===\n")
 
-appendix_file <- file.path(REBUILD_DIR, "article/main.tex")
+appendix_file <- "article/main.tex"
 if (file.exists(appendix_file)) {
     appendix <- readLines(appendix_file, warn = FALSE)
 
@@ -278,7 +288,7 @@ if (file.exists(appendix_file)) {
     # -----------------------------------------------------------------------------
     cat("\n=== CHECK (f) additional: Resolving references ===\n")
 
-    prop_file <- file.path(REBUILD_DIR, "article/prop_constants.tex")
+    prop_file <- "article/prop_constants.tex"
     if (file.exists(prop_file)) {
         prop_content <- readLines(prop_file, warn = FALSE)
         # Extract defined macros: \newcommand{\PropXXX}
@@ -322,6 +332,8 @@ if (file.exists(appendix_file)) {
         } else {
             cat("  All defined macros are used: PASS\n")
         }
+    } else {
+        report_violation("MACRO_CONTAINMENT", "prop_constants.tex not found (containment check skipped)")
     }
 
     # -----------------------------------------------------------------------------
@@ -329,7 +341,7 @@ if (file.exists(appendix_file)) {
     # -----------------------------------------------------------------------------
     cat("\n=== CHECK (D3.2): Macro definition completeness ===\n")
 
-    pc_path <- file.path(REBUILD_DIR, "article/prop_constants.tex")
+    pc_path <- "article/prop_constants.tex"
     if (!file.exists(pc_path)) {
         report_violation("PROP_MACRO", "article/prop_constants.tex missing; appendix cannot build")
     } else {
@@ -348,7 +360,7 @@ if (file.exists(appendix_file)) {
     }
 
 } else {
-    cat("Appendix file not found, skipping check.\n")
+    report_violation("APPENDIX", "article/main.tex not found")
 }
 
 cat("\n")
@@ -411,7 +423,7 @@ cat("\n")
 # -----------------------------------------------------------------------------
 cat("=== OUTPUT VALIDATION ===\n")
 
-t19_file <- file.path(REBUILD_DIR, "output/T19_pleq0_bracket.csv")
+t19_file <- "output/T19_pleq0_bracket.csv"
 if (file.exists(t19_file)) {
     t19 <- fread(t19_file)
     cat("T19_pleq0_bracket.csv:\n")
@@ -422,7 +434,7 @@ if (file.exists(t19_file)) {
 
 cat("\n")
 
-t20_file <- file.path(REBUILD_DIR, "output/T20_ge_bracket.csv")
+t20_file <- "output/T20_ge_bracket.csv"
 if (file.exists(t20_file)) {
     t20 <- fread(t20_file)
     cat("T20_ge_bracket.csv:\n")
