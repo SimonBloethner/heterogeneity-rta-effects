@@ -1,0 +1,32 @@
+FILE:      T27_gradient_B.csv
+SHA256:    7175460ce8e37e5de914ce981bbef499702773b8998ed7f94c19a10b2110cc61
+PRODUCER:  S28_gradient_B.R
+INPUTS:
+  data/S5R_bhat.rds:           d46910ef55f0a22018baf8bd218dac5548bde98150d798ad85aa1914af8d12d8
+  output/T12_N4_gradient.csv:  1bcf1f815ce0bf45466c0e2146ce171bda443d475c8d4cd195901a419f4b8bf8
+  output/T5R_theta_summary.csv: aed2be043386613b31f1848e4861ea3d9ea4afb687eec2247faf5feddfb92f8f
+SEED:      NONE
+
+GATES:
+  G1: nrow(baseline) == 4182                           -> 4182 == 4182: PASS
+  G2: quintile counts == (837,836,836,836,837)          -> (837,836,836,836,837): PASS
+  G3: max|mean_theta_D - T12| < 1e-9                    -> 3.89e-16: PASS
+  G4: max|mean_theta_B - T12| < 1e-9                    -> 4.72e-16: PASS
+  G5: max|se_mean_D - T12$se_mean| < 1e-9               -> 4.16e-17: PASS
+  G6: |mean(theta_B) - 0.0758107555171095| < 1e-9       -> 4.16e-17: PASS
+  G7: |spread_D_se - 0.0808586479445326| < 1e-9         -> 1.39e-17: PASS
+  G8: |spread_D_value - 0.9137352197507282| < 1e-9      -> 1.11e-16: PASS
+  G9: |share_B_of_D - 0.7471646326198405| < 1e-9        -> 5.55e-16: PASS
+
+SPREAD:
+  spread_B_Q1_Q5: 0.6827106397768614 (SE: 0.0820824651425626)
+  spread_D_Q1_Q5: 0.9137352197507281 (SE: 0.0808586479445326)
+  share_B_of_D:   0.7471646326198399 (SE: NA)
+
+NOTE (share SE):
+  Ratio of two spreads; no SE reported - the sampling distribution of the
+  ratio is not established by this task.
+
+T27_gradient_B_spread.csv SHA256: 872152a314bf6e76968f15a73cdf790122495e94789d3352836bc3c022f40f6c
+
+CREATED: 2026-07-29 15:45:57
