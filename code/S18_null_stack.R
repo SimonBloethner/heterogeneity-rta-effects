@@ -230,6 +230,62 @@ say("      OOS null (N1) is the correct object for deconvolution")
 # =============================================================================
 say("")
 
+# Compute SHA for sidecars
+code_sha <- get_sha256("code/S18_null_stack.R")
+
+# T26_null_stack.csv - SYNC-6e: Commit per-bin variances at full precision
+t26 <- var_by_bin %>%
+    left_join(weights_sym %>% select(horizon_bin, weight), by = "horizon_bin") %>%
+    mutate(
+        n_pseudo = n,
+        weight_treated = weight,
+        contribution = weight * var_pseudo_D
+    ) %>%
+    select(horizon_bin, n_pseudo, var_pseudo_D, weight_treated, contribution)
+
+# Add TOTAL row
+total_row <- data.frame(
+    horizon_bin = "TOTAL",
+    n_pseudo = sum(t26$n_pseudo),
+    var_pseudo_D = NA,
+    weight_treated = sum(t26$weight_treated),
+    contribution = sum(t26$contribution, na.rm = TRUE),
+    stringsAsFactors = FALSE
+)
+t26 <- rbind(as.data.frame(t26), total_row)
+
+write.csv(t26, "output/T26_null_stack.csv", row.names = FALSE)
+say("Wrote output/T26_null_stack.csv")
+say("T26 contents:")
+print(t26)
+
+# Verify TOTAL matches Var_null_matched
+stopifnot(abs(total_row$contribution - Var_null_matched) < 0.001)
+say("Gate: T26 TOTAL (%.6f) matches Var_null_matched (%.6f) to 3 decimals: PASS",
+    total_row$contribution, Var_null_matched)
+
+# Write T26 sidecar
+writeLines(c(
+    "FILE:      T26_null_stack.csv",
+    sprintf("SHA256:    %s", get_sha256("output/T26_null_stack.csv")),
+    sprintf("PRODUCER:  code/S18_null_stack.R (SHA256: %s)", code_sha),
+    "INPUTS:    data/S1R_ppml.rds, data/S5R_bhat.rds",
+    sprintf("SEED:      %d", SEED),
+    "",
+    "COLUMNS:",
+    "  horizon_bin:   Horizon bin (2-3, 4-5, 6-10, 11+, TOTAL)",
+    "  n_pseudo:      Number of pseudo pairs in bin",
+    "  var_pseudo_D:  Variance of pseudo_theta_D in bin",
+    "  weight_treated: Proportion of treated pairs in bin (SYMMETRIC window)",
+    "  contribution:  weight_treated * var_pseudo_D (sums to Var_null_matched)",
+    "",
+    "NOTES:",
+    sprintf("  TOTAL contribution = %.6f = Var_null for arm C (INV-027)", total_row$contribution),
+    "  This is the ledgered value 1.887 cited in canonical_facts.md",
+    "",
+    sprintf("CREATED:   %s", format(Sys.time()))
+), "meta/T26_null_stack.csv.sidecar")
+
 # N1 output
 n1_results <- data.frame(
     quantity = c("n_pseudo", "Var_null_raw", "Var_null_matched",

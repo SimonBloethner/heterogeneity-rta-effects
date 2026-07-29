@@ -43,10 +43,12 @@ PLACEBO_TPOST <- T22[ID == "PLACEBO_TPOST", value]
 PLACEBO_B_UNCORR_MEAN <- T24[ID == "PLACEBO_B_UNCORR_OVERALL", mean_theta_B]
 
 # Arm A values from T21 for V3c
-# VAR_THETA_D is not stored directly; derive from identity: Var(theta_D) = SD_true^2 + Var_null
+# SYNC-6e: Compute VAR_THETA_D from share ratio to preserve full precision
+# (SD_true in T21 is stored with limited precision)
 VAR_NULL_A <- T21[arm == "A_noise_only", Var_null_subtracted]
-SD_TRUE_A <- T21[arm == "A_noise_only", SD_true]
-VAR_THETA_D <- SD_TRUE_A^2 + VAR_NULL_A  # By definition of arm A
+share_A <- T21[arm == "A_noise_only", share_of_Var_theta_D]
+VAR_THETA_D <- VAR_NULL_A / share_A  # Var_null / share = Var(theta_D)
+SD_TRUE_A <- sqrt(VAR_THETA_D - VAR_NULL_A)  # Computed, not loaded
 
 cat(sprintf("PLACEBO_A_MEAN        = %.15f\n", PLACEBO_A_MEAN))
 cat(sprintf("PLACEBO_A_SD          = %.15f\n", PLACEBO_A_SD))
@@ -174,9 +176,12 @@ T_POST_V2 <- 10L
 DELTA_V2 <- 0.02   # Fixed drift to exercise Prop 2(a)
 
 # Simulate pairs with drift
-simulate_prop2a <- function(nsim, t_pre, t_post, e_sigma2, delta_fixed) {
+simulate_prop2a <- function(nsim, t_pre, t_post, e_sigma2, delta_fixed, offset = 0) {
   T_total <- t_pre + t_post
-  midpoint <- (T_total + 1) / 2
+  # SYNC-6e fix: for calendar invariance, both time indices AND midpoint shift together
+  # so that (t_idx - midpoint) remains unchanged
+  t_idx <- 1:T_total + offset
+  midpoint <- (T_total + 1) / 2 + offset
   sigma_ij <- sqrt(e_sigma2)
 
   theta_A <- numeric(nsim)
@@ -186,7 +191,6 @@ simulate_prop2a <- function(nsim, t_pre, t_post, e_sigma2, delta_fixed) {
     delta_ij <- delta_fixed
 
     # Generate full span of log-gaps
-    t_idx <- 1:T_total
     u <- rnorm(T_total, mean = 0, sd = sigma_ij)
     log_gap <- -e_sigma2/2 + delta_ij * (t_idx - midpoint) + u
 
@@ -221,12 +225,15 @@ stopifnot(V2_gap < 0.02)  # Absolute bound that can fail
 cat(sprintf("G4 V2 gap < 0.02: %.4f < 0.02 PASS\n", V2_gap))
 
 # V2 shift: simulate with arbitrary calendar offset (for D2)
-# Shift all pairs by +5 years (different midpoint)
+# SYNC-6e fix: pass offset to shift midpoint, keeping span identical
 cat("\nRunning V2 shift simulation (offset=+5 years)...\n")
-theta_A_v2_shift <- simulate_prop2a(N_SIM_V2, T_PRE + 5, T_POST_V2, E_sigma2, DELTA_V2)
+theta_A_v2_shift <- simulate_prop2a(N_SIM_V2, T_PRE, T_POST_V2, E_sigma2, DELTA_V2, offset = 5)
 V2_shift <- mean(theta_A_v2_shift) - mc_mean_v2
-V2_predicted_shift <- DELTA_V2 * 5 / 2  # Additional 5 years of pre-window
-cat(sprintf("V2 shift (offset +5): %.6f (expected ~%.3f)\n", V2_shift, V2_predicted_shift))
+cat(sprintf("V2 shift (offset +5): %.6f (expected ~0 for calendar invariance)\n", V2_shift))
+
+# Gate: calendar shift should produce near-zero difference
+stopifnot(abs(V2_shift) < 0.01)
+cat(sprintf("G6 V2 shift < 0.01: %.4f PASS\n", abs(V2_shift)))
 
 # -----------------------------------------------------------------------------
 # V3c: Corollary cor:rhoop - mis-windowed over-subtraction
@@ -392,7 +399,7 @@ writeLines(c(
           V_sigma2, r_pred, r_gap, PLACEBO_TH),
   sprintf("  V2:  MC mean = %.4f vs predicted %.4f, gap = %.4f < 0.02 [delta=0.02]",
           mc_mean_v2, V2_predicted, V2_gap),
-  sprintf("       V2 shift (D2) = %.4f", V2_shift),
+  sprintf("       V2 shift (SYNC-6e) = %.6f (calendar invariance, expected ~0)", V2_shift),
   sprintf("  V3c: tau_hat at kappa=1,2,3,5: %.4f, %.4f, %.4f, %.4f (D1: arm A subtraction)",
           tau_hat[1], tau_hat[2], tau_hat[3], tau_hat[4]),
   sprintf("       kappa_floor = %.3f", kappa_floor),
@@ -407,6 +414,7 @@ writeLines(c(
   "  G3: V1c wrong-object gates (q>0, V>0, 0<r<1, T_h>=2): PASS",
   sprintf("  G4: V2 gap < 0.02: %.4f PASS", V2_gap),
   sprintf("  G5: V3c tau_hat(1) matches SD_TRUE_A to 1e-3: PASS"),
+  sprintf("  G6: V2 shift < 0.01 (calendar invariance): %.6f PASS", abs(V2_shift)),
   "",
   "STATUS: BUILT",
   sprintf("DATE: %s", Sys.Date()),

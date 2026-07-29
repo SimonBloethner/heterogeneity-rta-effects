@@ -56,7 +56,20 @@ for analysis. Each entry documents what was wrong and what supersedes it.
 - **Date superseded:** 2026-07-26
 - **Status:** SUPERSEDED — retained for audit
 
+### T7_placebo_validity.csv
+- **Superseded by:** T24_placebo_uncorr.csv
+- **Producer:** code/S14_placebo_diagnostic.R (audit tier)
+- **Issue:** Partial run (job killed after 15 min); inputs S1_ppml.rds,
+  S2_pairs.rds, S3_theta.rds all retired by INV-017; the seed-12345 row was
+  extrapolated rather than computed. Its sidecar's Branch C2 verdict ("placebo
+  design INVALID") is superseded by INV-015 RESOLVED and was never updated.
+- **Status:** SUPERSEDED — moved to audit/
+
 ## Invalidation Register
+
+NOTE: The INV series is split across two files. INV-001 to INV-026 are recorded
+here. INV-027 to INV-036 are recorded in the Investigation Log of
+meta/canonical_facts.md. There is no INV-027 entry in this file by design.
 
 ### INV-010: README Gate Table Chimera
 - **Location:** replication_package/README.md, Validation Gates table
