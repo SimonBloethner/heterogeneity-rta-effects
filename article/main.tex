@@ -390,6 +390,26 @@ corrected effect distribution and its variation across pair types, and (iv) in t
 composition of the treated population --- and Section~\ref{sec:conclusion}
 reports which survived.
 
+% ¶N — States the scorecard in advance so the reader holds the conjunction
+%      with the right expectations; mirrors §5.4 and the coda.
+We state the outcome in advance, because the conjunction is only as strong as
+its weakest leg and the reader should know from the outset which leg that is.
+Lognormal-type outcome tails are confirmed: the observed flows are heavy-tailed
+without being Pareto, and the apparent divergence of higher moments is an
+artifact of the estimator rather than a property of the data. Effects graded in
+size and prior integration are confirmed, and in the specific form this
+mechanism requires --- a steep decline across the less integrated pairs
+followed by a common floor, not a smooth monotone descent, which would count
+against the mechanism rather than for it. Selection on match quality is
+supported: the pairs that adopt are systematically unlike the pairs that do
+not, in ways that persist and that the correction layer detects without fully
+purging. Right-skewed effects are neither confirmed nor refuted. The shape of
+the effect distribution is not identified at the signal share these data
+achieve, and we report that as a limit of the measurement rather than as
+evidence against the prediction. Three legs carry weight and one is left
+standing open; we take the conjunction to be informative on that basis and not
+on a stronger one.
+
 % =============================================================================
 % SECTION 3 — DATA AND THE ESTIMATING POPULATION
 % Draft DATA-2 (final). Supersedes DATA-1.
@@ -1295,6 +1315,425 @@ Definition~$A$
 %     and recover it % [T25: PROP_MC_B, PROP_V2_SIM], and the cor:rhoop ladder
 %     shows the failure mode occurring at the derived magnitude.
 %
+
+% =============================================================================
+% SECTION 5 — WHAT SURVIVES
+% Drafted against meta/canonical_facts.md at commit 42f2e83 (SYNC-8).
+% Every number carries a % [FACT_ID] comment. Nothing here is from memory.
+% D2 captions, D3 reconciliation note and D4 ambiguities follow the section.
+% =============================================================================
+
+\section{What Survives}
+\label{sec:results}
+
+% ¶1 — The headline mean, with the level-scale caveat stated once and not repeated.
+Table~\ref{tab:effect-distribution} collects what the corrected distribution
+identifies. Across the $4{,}182$ pairs of the canonical population, the
+agreement effect has a mean of $0.2473$ with a standard error of $0.0241$
+% [MEAN_THETA_D]
+--- a positive average effect, precisely estimated, and roughly a fifth of the
+dispersion around it. The quantity is a log change, so the level-scale
+counterpart of the average pair is not the exponential of this number: with
+dispersion of the order documented below, $\E[\exp(\theta)]$ and
+$\exp(\E[\theta])$ differ materially, and the two should not be substituted for
+one another. We report effects on the log scale throughout and defer the
+level-scale translation, where it is needed, to
+Section~\ref{sec:results}'s successor.
+
+% ¶2 — Trade-weighted mean, with the endogeneity-of-weights sentence required by INV-034.
+Weighting pairs by the volume of trade they carry rather than counting them
+equally drives the average down to $0.0898$ % [TW_MEAN]. The weights are
+pre-adoption trade, not contemporaneous or post-adoption trade, and the choice
+is not innocuous: post-treatment volume is itself a function of the effect
+being estimated, so weighting by it would let large estimated effects earn
+themselves large weights % [INV-034]. On pre-adoption weights, the
+dollar-weighted average agreement effect is roughly a third of the
+pair-weighted one. That gap is not measurement error. It is the first
+appearance of a structural feature that organises the rest of this section:
+the effect is not the same size everywhere, and the places where trade is
+concentrated are not the places where the effect is large.
+
+% ¶3 — Dispersion as an interval, arm logic in one sentence, cross-ref to the derivation.
+The dispersion of true effects is identified only up to an interval. Subtracting
+the noise-only null from the observed variance leaves a standard deviation of
+$1.475$; subtracting the hardened out-of-sample drift null leaves $0.740$; the
+identified set is $[0.74,\,1.48]$ % [SD\_THETA\_TRUE], and the two endpoints
+differ in exactly one assumption --- whether the persistent, pair-specific
+component that the placebo machinery reproduces is counted as noise to be
+removed or as effect heterogeneity to be retained. The construction is derived
+in Section~\ref{sec:empirical-dispersion} and we do not prefer an arm here.
+Both endpoints are large relative to the mean. Under either, the standard
+deviation of the effect exceeds the average effect by a factor of three or
+more, and any statement about ``the'' agreement effect is a statement about the
+first moment of a distribution whose second moment dwarfs it.
+
+% ¶4 — The P(theta<=0) bracket, both assumptions in the sentence that reports it.
+The probability that a randomly chosen pair's true effect is non-positive lies
+in $[0.370,\,0.421]$ % [P\_THETA\_LEQ\_0], where the lower endpoint is the
+normal-form probability evaluated at the hardened arm and the upper endpoint is
+capped at the empirical share of non-positive estimates rather than taken from
+the normal form, which at the noise-only arm returns a value exceeding that
+share % [P\_LO; P\_HI]. Both assumptions are load-bearing and neither is
+innocent: the first imposes a shape the data do not identify, the second
+substitutes an observed frequency for a modelled one. Separately, $42.11$
+percent of the pair-level estimates are themselves non-positive
+% [RAW\_SHARE], but that figure is a property of the noisy estimates, not of
+the effects, and it bounds nothing but itself.
+
+% ¶5 — The honesty paragraph: what the achievable signal share does and does not permit.
+What cannot be reported is the shape. At the signal share these data achieve
+--- roughly $0.37$ of the observed variance attributable to true effect
+variation --- the mixture deconvolution does not resolve: fitting three
+components returns duplicates sitting at the standard-deviation floor rather
+than distinct subpopulations % [INV-029]. This is a limit of the measurement,
+and it forecloses a family of claims that the literature makes casually. We
+cannot report the share of pairs that are winners, because that requires
+locating mass on one side of a threshold in a density we do not have. We cannot
+report tail asymmetry, or skewness, or the weight of an upper component, or a
+bulk-and-winners decomposition, because each of those is a statement about
+shape. We cannot report a point probability of a non-positive effect, which is
+why the previous paragraph reports a bracket assembled from two assumptions
+rather than a number.
+
+% ¶6 — What the shape limit does NOT foreclose; sets up S5.2 and S5.3.
+What survives the limit is more than it might appear. The first moment is
+point-identified and precisely estimated. The second is set-identified, with
+both endpoints reported and the assumption separating them named. And the
+systematic variation in the first moment across observable pair
+characteristics --- the subject of the next subsection --- is point-identified
+throughout, because it requires only conditional means, not a density. A
+distribution can be unknown in shape while its location, its spread to within
+an interval, and its dependence on covariates are all recoverable. That is the
+position these data put us in, and the rest of this section works within it
+rather than around it.
+
+\begin{table}[htbp]
+\centering
+\caption{The corrected effect distribution}
+\label{tab:effect-distribution}
+\begin{tabular}{lr}
+\toprule
+Quantity & Value \\
+\midrule
+Pairs & $4{,}182$ \\
+Mean effect $\bar\theta_D$ & $0.2473$ \\
+\quad standard error & $(0.0241)$ \\
+Trade-weighted mean, pre-adoption weights & $0.0898$ \\
+Standard deviation of estimates & $1.5614$ \\
+Standard deviation of true effects, identified set & $[0.74,\,1.48]$ \\
+\quad hardened drift arm & $0.740$ \\
+\quad noise-only arm & $1.475$ \\
+$\Pr(\theta \leq 0)$, bracket & $[0.370,\,0.421]$ \\
+Share of estimates $\leq 0$ & $0.4211$ \\
+Signal share & $0.37$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{The Size Gradient}
+\label{sec:results-gradient}
+
+% ¶7 — The gradient itself: fall-then-floor, with the SEs that make the shape claim.
+Sorting pairs into quintiles of pre-adoption trade volume produces the sharpest
+structural fact in the data. The profile is reported in
+Table~\ref{tab:gradient}. It runs from $0.855$ in the smallest quintile to
+$-0.058$ in the largest % [GRADIENT\_Q1; GRADIENT\_Q5], a spread of $0.914$
+with a standard error of $0.081$ % [GRADIENT] --- eleven standard errors from
+zero. Two features of its shape carry the argument. The decline is steep across
+the first three quintiles and then stops: the fourth and fifth quintiles differ
+by $-0.008$ against a standard error of $0.046$, which is to say they cannot be
+told apart. And the floor they share is small but not zero, the largest
+quintile differing from zero at the five percent level where the fourth does
+not.
+
+% ¶8 — Why fall-then-floor is the predicted shape, not a weaker version of monotonicity.
+The shape matters as much as the slope. Section~\ref{sec:theory-primitive}
+predicts effects that decline in prior integration and then settle at a common
+floor once the constraints an agreement removes have stopped binding, and it is
+explicit that a smoothly monotone decline continuing through the largest pairs
+would count against the mechanism rather than for it: there is no reason for
+integration to keep reducing an effect that has already been exhausted. The
+observed profile is a fall and then a floor. The floor is small and slightly
+negative rather than exactly zero, which the mechanism does not forbid --- what
+it forbids is continued decline --- and the two quintiles that constitute it
+cannot be told apart. This is a more specific prediction than a negative slope,
+and it is the one the data deliver.
+
+% ¶9 — Economic reading, tied to the theory's graded-effects prediction.
+The economic content is straightforward. An agreement removes a set of
+constraints, and the gain from removing them scales with how tightly they bind.
+Pairs in the smallest quintile trade an average of well under a million dollars
+before adoption; pairs in the largest average more than fifteen billion
+(Table~\ref{tab:gradient}). Four orders of magnitude separate them,
+and they are not the same economic object. For a pair already trading heavily,
+the frictions an agreement addresses are, by revealed behaviour, not the
+frictions that were preventing trade; whatever was binding has already been
+worked around, absorbed into distribution networks, or negotiated away
+bilaterally. For a pair trading almost nothing, the same removed constraint can
+be the difference between a market that exists and one that does not. The
+gradient is what graded effects look like when the grading variable is prior
+integration.
+
+% ¶10 — Robustness: the gradient predates the correction layer.
+The gradient is not manufactured by the correction. Computing the same
+quintile profile on the uncorrected pair-level estimates --- before the
+placebo-based bias correction is applied, reported alongside the corrected
+profile in Table~\ref{tab:gradient} --- returns a smallest-to-largest spread of
+$0.683$ with a standard error of $0.082$ % [GRADIENT\_B], which is
+$74.7$ percent of the corrected spread % [GRADIENT\_B\_SHARE]. Three quarters
+of the gradient is present in the raw estimates. The correction sharpens it and
+shifts its level, as it shifts every level in this paper, but it does not
+create it. A reader who distrusts the correction machinery entirely still faces
+a size gradient of roughly seven tenths of a log point across the trade
+distribution.
+
+\begin{table}[htbp]
+\centering
+\caption{Agreement effects by pre-adoption trade quintile}
+\label{tab:gradient}
+\begin{tabular}{lrrrrr}
+\toprule
+ & \multicolumn{2}{c}{Corrected ($D$)} & \multicolumn{2}{c}{Uncorrected ($B$)} & Pre-adoption \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}
+Quintile & Mean & (SE) & Mean & (SE) & trade (\$m) \\
+\midrule
+1 (smallest) & $0.855$ & $(0.076)$ & $0.557$ & $(0.077)$ & $0.7$ \\
+2            & $0.374$ & $(0.060)$ & $0.137$ & $(0.062)$ & $7.8$ \\
+3            & $0.131$ & $(0.049)$ & $-0.022$ & $(0.050)$ & $47.1$ \\
+4            & $-0.066$ & $(0.037)$ & $-0.168$ & $(0.038)$ & $251.6$ \\
+5 (largest)  & $-0.058$ & $(0.028)$ & $-0.126$ & $(0.028)$ & $15{,}691.0$ \\
+\midrule
+Spread, 1 $-$ 5 & $0.914$ & $(0.081)$ & $0.683$ & $(0.082)$ & \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{The Specification Spread, Resolved}
+\label{sec:results-spread}
+
+% ¶11 — Restate the puzzle from the introduction, now with the four numbers.
+The puzzle set out in Section~\ref{sec:introduction} can now be answered. Four
+specifications of the same gravity equation, on the same data, estimating the
+same nominal parameter, return agreement effects of $1.402$, $0.922$, $0.411$
+and $0.095$ % [T1R\_spec\_spread]. The spread is a factor of fifteen. Each of
+the four is defensible by some standard in the literature, and the discipline
+has largely treated the range as a robustness exercise --- a band within which
+the truth presumably lies, to be narrowed by better controls.
+
+% ¶12 — Dismiss (i) and (ii) in one sentence, as the structure requires.
+Two of the four can be set aside quickly. The first and second omit
+multilateral resistance terms, and their deviation from the remainder is bias
+of a kind the literature settled decades ago; nothing in this paper is required
+to explain why they are wrong.
+
+% ¶13 — The genuine puzzle: (iii) vs (iv), both defensible.
+The genuine puzzle is the third against the fourth: $0.411$ from a
+country-year fixed-effects specification and $0.095$ once pair fixed effects
+are added. Both handle multilateral resistance. Both are standard. The second
+is the more conservative and is frequently described as such, on the reasoning
+that identifying from within-pair variation strips out whatever is fixed about
+a pair and leaves the agreement's own contribution. On that reasoning the
+smaller number is the more credible one, and the discipline has broadly
+accepted the ordering.
+
+% ¶14 — The resolution: differently-weighted averages over one sloped distribution.
+The results above supply a different reading. If the effect were a constant,
+every consistent estimator would recover it and the spread would be sampling
+noise. The effect is not a constant; it is a distribution with a strong slope
+in pair size. Every estimator therefore reports an average over that
+distribution, and which average it reports is determined by its implicit
+weights. A specification whose identifying variation is dominated by large
+trade flows samples the flat end of the gradient, where effects are near the
+floor. A pair-fixed-effects specification identifies only from switchers, on a
+subpopulation defined by the exclusion rules set out in
+Section~\ref{sec:data-population}, and weights them non-convexly. Neither is
+estimating the other's parameter incorrectly. They are estimating different
+weighted averages of the same sloped object, and the ordering between them
+carries no presumption about credibility.
+
+% ¶15 — Anchor in the paper's own numbers, with the honest limit on what is identified.
+The paper's own estimates trace the same pattern. The dollar-weighted mean is
+$0.0898$ % [TW\_MEAN], close to the fourth specification's $0.095$; the
+unweighted pair-level mean is $0.2473$ % [MEAN\_THETA\_D]; the country-year
+specification returns $0.411$. Moving from counting pairs to counting dollars
+moves the average by roughly the same distance as moving between the two
+defensible specifications. We state plainly what this does and does not
+establish. It establishes that weighting alone generates spread of the observed
+magnitude on a distribution with this slope. It does not establish that
+weighting is the whole of the wedge between the pair-level means and the
+cross-sectional coefficient: that wedge also contains selection on match
+quality, since the pairs that sign agreements are not drawn at random from the
+pairs that could, and this design does not separately identify the two
+channels. What can be said is the weaker and sufficient claim. The coefficient
+any one specification reports is an average over a slope, addressed to no
+particular pair.
+
+\subsection{What This Confirms and What It Leaves Open}
+\label{sec:results-reconciliation}
+
+% ¶16 — Predictions (i) and (iii): confirmed.
+Section~\ref{sec:theory-distribution} advanced four predictions and asked that
+they be held jointly. Three now carry evidence. Lognormal-type outcome tails
+were confirmed by the distributional diagnostics of
+Section~\ref{sec:empirical}, where the observed flows are heavy-tailed without
+being Pareto and the apparent divergence of higher moments is an estimator
+artifact rather than a property of the data. Effects graded in size and prior
+integration are confirmed here, and confirmed in the specific fall-then-floor
+form the mechanism requires rather than merely as a negative slope
+% [NEEDED: literature comparison --- no ledgered source supports a claim about
+% the magnitude of this gradient relative to prior estimates].
+
+% ¶17 — Prediction (iv) supported; prediction (ii) under-identified, and what that means.
+Selection on match quality is supported rather than confirmed, on the placebo
+and stability evidence assembled in Section~\ref{sec:empirical-diagnostics}:
+the pairs that adopt are systematically unlike the pairs that do not, in ways
+that persist and that the correction layer detects but does not fully purge.
+Right-skewed effects are neither confirmed nor refuted. The prediction is
+under-identified at the signal share these data achieve, for the reason given
+above, and we decline to report the skewness statistics that would appear to
+settle it. This is the one point in the paper where a prediction that could
+have been tested is not, and it should be read as a measurement limit rather
+than as a null result: nothing here weighs against right-skewed effects, and
+nothing here weighs for them.
+
+% ¶18 — The conjunction, stated exactly: three legs and one open.
+The abductive argument therefore stands on three confirmed legs and one open
+one. That is weaker than the argument as originally posed and stronger than any
+of its parts taken alone, since the conjunction of lognormal outcomes, graded
+effects and selection on match quality is not jointly delivered by the
+alternatives currently on the table. The open leg is recoverable in principle:
+a longer post-adoption panel, or a research design achieving a higher signal
+share, would identify the shape and settle the fourth prediction in either
+direction. It is not recoverable from these data, and we do not claim it.
+
+% =============================================================================
+% D2 — TABLE NOTES
+% =============================================================================
+% Short captions are live in the table environments above. The following notes
+% belong beneath each table; they are held here rather than inline so the
+% caption stays scannable.
+%
+% Table~\ref{tab:effect-distribution}. Canonical population of 4,182 country
+% pairs adopting an agreement between 1992 and 2015, each observed over a
+% symmetric pre- and post-adoption window. theta_D is the pair-level log effect
+% after bias correction against a never-treated placebo population with
+% pseudo-adoption dates. The mean and its standard error are point-identified.
+% The standard deviation of true effects is an identified set whose endpoints
+% differ in whether the persistent pair-specific component reproduced by the
+% placebo machinery is treated as noise or as effect heterogeneity; no arm is
+% preferred. Pr(theta <= 0) is a bracket, not an estimate: the lower endpoint
+% imposes a normal form at the hardened arm, the upper is capped at the
+% empirical share of non-positive estimates. THE SHAPE OF THE EFFECT
+% DISTRIBUTION IS NOT IDENTIFIED at this signal share; mixture deconvolution
+% returns duplicate components at the standard-deviation floor (INV-029). No
+% quantity in the table depends on a distributional assumption about the
+% effects except where stated.
+%
+% Table~\ref{tab:gradient}. Quintiles are formed on pre-adoption bilateral
+% trade volume over the canonical population (n = 837, 836, 836, 836, 837).
+% Definition D is the bias-corrected pair-level effect; Definition B is the
+% same quantity before correction, reported so the gradient can be assessed
+% independently of the correction layer. Standard errors are within-quintile
+% standard deviations divided by the root of the quintile count; the spread's
+% standard error combines the two endpoint standard errors. THE PROFILE IS NOT
+% MONOTONE: quintiles 4 and 5 are statistically indistinguishable from one
+% another, and the mechanism of Section 2 predicts a floor rather than
+% continued decline. Pre-adoption trade is the within-quintile mean in millions
+% of US dollars.
+
+% =============================================================================
+% D3 — RECONCILIATION NOTE (verbatim reuse in the theory section and the coda)
+% =============================================================================
+
+% Of the four predictions advanced in Section~\ref{sec:theory-distribution},
+% three now carry evidence and one does not. Lognormal-type outcome tails are
+% confirmed by the distributional diagnostics of Section~\ref{sec:empirical}.
+% Effects graded in size and prior integration are confirmed in
+% Section~\ref{sec:results}, in the specific fall-then-floor form the mechanism
+% requires rather than as a bare negative slope. Selection on match quality is
+% supported by the placebo and stability evidence of
+% Section~\ref{sec:empirical-diagnostics}. Right-skewed effects are neither
+% confirmed nor refuted: the shape of the effect distribution is not identified
+% at the signal share these data achieve, and we report that as a measurement
+% limit rather than as a null result. The abductive conjunction therefore
+% stands on three legs and one open question, and the open question is
+% recoverable in principle from a longer panel or a higher-signal design.
+
+% =============================================================================
+% D4 — AMBIGUITIES (unresolved)
+% =============================================================================
+%
+% A1. [NEEDED: literature comparison] S5.4 was specified to state that the
+%     graded-effects finding is "larger than any prior literature reports."
+%     No ledgered source supports a comparison to prior estimates. The claim is
+%     omitted and marked in place at ¶16. Supplying it requires either a
+%     citable set of published gradient estimates or the removal of the clause.
+%
+% A2. [SUPERSEDED VALUE] The drafting specification froze TW_MEAN at 0.0897.
+%     The ledger records 0.0898 (raw 0.0897566731583432 at four decimal
+%     places); the earlier figure truncated rather than rounded. 0.0898 is used
+%     throughout. See canonical_facts.md, Effect Distribution note.
+%
+% A3. [SPECIFICATION CONTRADICTED BY DATA] The specification required S5.2 to
+%     state that the effect "declines monotonically" and that the largest
+%     pairs' effects are "statistically indistinguishable from zero." Both fail
+%     against T27_gradient_B.csv: Q5 (-0.0583) lies above Q4 (-0.0664), and Q5
+%     differs from zero at t = -2.11 while Q4 does not (t = -1.80). The section
+%     reports fall-then-floor, per the binding shape note in the ledger's
+%     Gradient section. This is the stronger reading: Section 2 states that a
+%     smoothly monotone negative profile would falsify the mechanism.
+%
+% A4. [SOURCE SUBSTITUTION] The specification named T12_N4_gradient as the
+%     gradient source. That file is registered SUPERSEDED (SYNC-4). All
+%     gradient quantities are cited from the ledger, whose producer is
+%     S28_gradient_B.R -> T27_gradient_B*.csv; T27 reproduces every
+%     T12_N4_gradient column byte-identically under gates G3-G5.
+%
+% A5. [SOURCE RESTRICTION] T10R_reconciliation.csv, a permitted source, carries
+%     three forbidden values in its `pack` column (0.304, 0.214, 0.465). Only
+%     the `fixed` column is cited. No quantity in this section is sourced from
+%     T10R directly.
+%
+% A6. [PLACEHOLDER RESOLVED] The specification's [NEEDED: gradient share
+%     attributable to theta_B] is closed. GRADIENT_B = 0.6827 (SE 0.0821) and
+%     GRADIENT_B_SHARE = 0.7472 are ledgered as of SYNC-7.
+%
+% A7. [STRUCTURAL DEVIATION] S5.3 was specified to open by restating the
+%     introduction's puzzle by cross-reference. The four specification
+%     estimates do not currently appear in Section 1; the puzzle is restated in
+%     words with a cross-reference to sec:introduction, and the four numbers
+%     appear here for the first time. If Section 1 is later revised to state
+%     them, ¶11 should be trimmed accordingly.
+%
+% A8. [FORWARD REFERENCE] ¶1 defers level-scale translation to "Section
+%     \ref{sec:results}'s successor" because sec:robustness and sec:conclusion
+%     do not yet exist and the GE material is Section 7's property. Replace
+%     with a direct \ref once that section is labelled.
+%
+% A9. [UNVERIFIED CROSS-REFERENCE] ¶14 cites sec:data-population for the
+%     switcher exclusion rules and the non-convex weighting. The switcher
+%     material is located there (main.tex lines 492-530), but the projection
+%     algebra referred to in the drafting specification was not located under
+%     any label; if it lives elsewhere, the reference should move.
+%
+% A10. [APPENDIX TABLES ABSENT] Three [X-REF:] placeholders remain in main.tex
+%     (threshold grid, T9, T22) because app:tables is empty. They are outside
+%     this section but block a clean compile without undefined-reference
+%     warnings.
+%
+% A11. [WORD COUNT] Body prose is approximately 1,770 words, below the
+%     specified 2,400-3,200 band. Paragraph 7 was shortened when the quintile
+%     profile moved into Table~\ref{tab:gradient}, since reproducing it in
+%     prose contradicted the specification's instruction that tables be
+%     referenced and not reproduced. The remaining shortfall is A1 and the
+%     compression of S5.1's honesty paragraph. Expanding either requires
+%     material the fact sources do not currently contain.
+%
+% A12. [TABLES] Both exhibits are now written inline with live labels
+%     (tab:effect-distribution, tab:gradient) and are cited at paragraphs 1, 7,
+%     9 and 10. Sources: the ledger for the distribution summary,
+%     output/T27_gradient_B.csv for every gradient cell. booktabs is loaded in
+%     the preamble; no siunitx, so alignment is plain r-columns.
 
 \newpage
 \bibliographystyle{aer}
