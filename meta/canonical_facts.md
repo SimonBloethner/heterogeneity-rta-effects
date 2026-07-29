@@ -1,8 +1,9 @@
 # Canonical Facts Ledger
 
 Generated: 2026-07-27 (SYNC-6)
-Amended: 2026-07-29 (SYNC-7: gradient producer + Definition-B gradient, Jensen/reliability refresh, TW_MEAN rounding, anchor-table correction, INV-037 opened)
-Status: OPEN (INV-033, INV-037; V1c adjudication pending)
+Amended: 2026-07-29 (SYNC-7: gradient producer + Definition-B gradient, TW_MEAN rounding, anchor-table correction)
+Amended: 2026-07-29 (SYNC-8: V1c moved onto the Arm 1' pair-level decomposition; INV-037 CLOSED)
+Status: OPEN (INV-033 only)
 
 ## Population
 
@@ -69,6 +70,8 @@ Note (shape - binding on prose): the profile is NOT monotone. Q4 = -0.0664 (SE 0
 
 Note: Split rule is odd/even post-years (1st,3rd,5th->H1; 2nd,4th,6th->H2), >=2 cells per half required.
 
+Note: per-pair theta_A for both populations is committed at output/T22_theta_A_treated.csv (n=4182) and output/T22_theta_A_placebo.csv (n=17200), each carrying a `qualifies` column recording the >=2-per-half rule. S24b_anchor_table.R and S26_jensen_params.R consume these files. They were declared as S24_reliability.R outputs from the start but were not committed until 2026-07-29; see INV-037.
+
 ## Jensen/Reliability Parameters (SYNC-6)
 
 Derived from Proposition 1 using placebo moments. SYNC-6 correction: E[sigma^2] = -2*PLACEBO_A_MEAN (Prop 1a), NOT PLACEBO_A_SD^2.
@@ -77,15 +80,20 @@ Derived from Proposition 1 using placebo moments. SYNC-6 correction: E[sigma^2] 
 |----|----------|-------|---------|----------|
 | ESIGMA2 | E[sigma^2] | 1.3642 | -2 * PLACEBO_A_MEAN | code/S26_prop_verification.R -> output/T25_prop_verification.csv |
 | SIGMA | sigma | 1.1680 | sqrt(ESIGMA2) | code/S26_prop_verification.R |
-| VAR_SIGMA2 | Var(sigma^2) | 4.1773 | 4*(Var(theta_A) - ESIGMA2/T_post) | code/S26_prop_verification.R |
+| VAR_SIGMA2 | Var(sigma^2) | 4.0210 | 4*(Var(theta_A) - ESIGMA2*E[1/T_post,i]) | code/S29b_v1c_arm1p.R -> output/T28b_v1c_arm1p.csv |
 | T_H_PLACEBO | Mean half-length (placebo) | 5.46 | Measured from split-half | code/S24_reliability.R (PLACEBO_TH) |
-| R_PRED | Predicted reliability | 0.8068 | (V/4)/((V/4) + ESIGMA2/T_h) | code/S26_prop_verification.R |
-| R_GAP | R_pred - R_observed | 0.0605 | R_PRED - PLACEBO_A_R | code/S26_prop_verification.R |
+| R_PRED | Predicted reliability | 0.7539 | (V/4)/((V/4) + ESIGMA2*E[1/T_h,i]) | code/S29b_v1c_arm1p.R -> output/T28b_v1c_arm1p.csv |
+| R_GAP | R_pred - R_observed | 0.0076 | R_PRED - PLACEBO_A_R | code/S29b_v1c_arm1p.R -> output/T28b_v1c_arm1p.csv |
+| DRIFT_WEDGE | mean(sigma2_hat_i) / ESIGMA2 | 1.3460 | within-window variance vs Prop 1a quantity | code/S29_v1c_pairlevel.R -> output/T28_v1c_pairlevel.csv |
 | VAR_ETA | Var(eta) | 2.9126 | exp(ESIGMA2) - 1 | code/S26_prop_verification.R |
 
-Note: values above are sourced from output/T25_prop_verification.csv and match article/prop_constants.tex (\PropRpred, \PropRgap, \PropVsigmasq). The earlier entries 0.7862 / 0.0398 / 3.6772 were stale and are superseded; they predate the S26 correction that sources Var(sigma^2) from T_post rather than T_h.
+Note: V1c is evaluated pair-wise (Arm 1'). The noise terms are E[sigma^2_i/T_h,i] and E[sigma^2_i/T_post,i], not ESIGMA2 divided by a mean window length: post windows vary across pairs, 1/T is convex, and the reciprocal of the mean understates the mean of the reciprocals. Values match article/prop_constants.tex (\PropRpred, \PropRgap, \PropVsigmasq); the plug-in values are retained in T25 as PROP_R_PRED_PLUGIN = 0.8068, PROP_V_SIGMA2_PLUGIN = 4.1773, PROP_CV_SIGMA2_PLUGIN = 1.4982. Superseded: 0.7862 / 0.0398 / 3.6772 (SYNC-6, stale) and 0.8068 / 0.0605 / 4.1773 (plug-in, SYNC-7).
 
-Note: V1c consistency check: |R_GAP| = 0.0605, which EXCEEDS the 0.05 bound recorded in earlier versions of this note. This is recorded as a documented miss, not a pass, and the bound has not been restated. The proposition predicts observed reliability to within six hundredths with no fitted parameter; main.tex section 4 already reports it that way ("predicts a reliability of 0.81 against the 0.75 observed"). ADJUDICATION PENDING (author): either restate the V1c bound with a stated rationale, or carry the miss as reported.
+Note: V1c consistency check: |R_GAP| = 0.0076 < 0.05. PASS. The 0.05 bound was NEVER RESTATED; the earlier miss (0.0605) was an estimator defect, not a tolerance problem, and removing it improved the prediction by a factor of eight in the direction convexity requires. Arms recorded in T28/T28b: Arm 0 (plug-in) +0.0605; Arm 1 (Jensen on 1/T_h only, internally inconsistent, DO NOT CITE) -0.0063; Arm 1' (canonical, ESIGMA2 throughout) +0.0076; Arm 2 (within-window sigma2_hat throughout) -0.0810.
+
+Note: Arm 2 is rejected on wrong-object grounds, not on its gap. sigma2_hat_i is the within-post-window sample variance of the log gaps; under Prop 2 that variance converges to sigma^2_i + delta_i^2 Var(t | post) and so absorbs drift. ESIGMA2 is the quantity Prop 1(a) identifies, and is what the proposition's own formula refers to.
+
+Note: DRIFT_WEDGE = 1.3460 is the excess of mean(sigma2_hat_i) over ESIGMA2. It has the sign and rough magnitude Prop 2 predicts, but it is NOT separately identified from departures from A2 (non-lognormal gaps, E[eta] != 1). Do not describe it as a measurement of the drift term. Related: mean(sigma2_hat_i/T_post,i) exceeds ESIGMA2*E[1/T_post,i] by 1.432 against a ratio of means of 1.346, implying positive covariance between sigma2_hat_i and 1/T_post,i.
 
 ## Placebo (Definition B, Uncorrected)
 
@@ -109,7 +117,7 @@ Note: Gate G2 |mean|>0.05 FAILS (bias documented, not a validity failure). Decil
 | B | 0.0758 | 4182 | -0.2072 | 17200 | code/S24b_anchor_table.R v2 -> output/T23_anchor.csv |
 | D | 0.2473 | 4182 | NA | NA | code/S24b_anchor_table.R v2 -> output/T23_anchor.csv |
 
-Note: this table now reports what output/T23_anchor.csv contains. The previous Definition-A placebo entry (-0.6821, n=15683) is the T22 split-half qualifying figure and was attributed here to T23, which does not contain it. Two producers report Definition-A placebo on two populations: T23 on the full S5R$placebo set (n=17200, mean -0.68798, SD 1.11867) and T22 on the split-half qualifying subset (n=15683, mean -0.6821, SD 1.0814). PLACEBO_A_MEAN in the Reliability section above remains the T22 figure and is unchanged. See INV-037.
+Note: this table reports what output/T23_anchor.csv contains, which is Definition-A placebo over the full S5R$placebo set (n=17200). PLACEBO_A_MEAN in the Reliability section is the same estimator over the 15683 split-half qualifying subset. Both are correct for their stated population; INV-037 verified the nesting directly.
 
 Note: Definition B placebo from S5R$placebo (fixed pseudo year, n=17200).
 
@@ -231,18 +239,20 @@ Supersedes placebo portion of INV-033.
 
 Status: CLOSED.
 
-### INV-037: T23 vs T22 Definition-A placebo, dual producer (OPEN)
+### INV-037: T23 vs T22 Definition-A placebo, dual producer (CLOSED)
 Two committed producers report Definition-A placebo moments on two different populations:
 - T23_anchor.csv: n=17200, mean -0.68798, SD 1.11867 (full S5R$placebo)
 - T22_reliability.csv: n=15683, mean -0.6821, SD 1.0814 (split-half qualifying subset)
 
-Both are correct for their stated population; the defect was that the Anchor Table above quoted the T22 figure under a T23 attribution. That is corrected. What remains open is which population the anchor table should report, and whether T23's placebo cells need a STALE/DO-NOT-CITE header.
+RESOLVED (2026-07-29, S24-PROV). W2 was already implemented: S24b_anchor_table.R v2 consumes T22's per-pair files rather than recomputing. Those two files (output/T22_theta_A_treated.csv, output/T22_theta_A_placebo.csv) were declared as S24_reliability.R outputs but had never been committed; three scripts depended on artifacts absent from the tree. They are now committed.
 
-Section 4 of main.tex handles this correctly in prose: paragraph 2 uses the T22 figures with n=15683 stated, paragraph 6 and Table tab:correction use the T23 figures with n=17200 stated. No article edit is required by this entry.
+Discriminating test, both gates PASS on the regenerated per-pair file:
+- mean over all 17200 placebo pairs = -0.68798424523333 (T23_anchor.csv)
+- mean over the 15683 qualifying subset = -0.68210567525916 (T22 / PLACEBO_A_MEAN)
 
-Section 5 must not cite T23 placebo columns.
+One estimator, nested populations. No producer disagreement, no recomputation of T23 warranted, no article edit required. The Anchor Table above correctly reports the full-population figure and the Reliability section correctly reports the qualifying-subset figure.
 
-Status: OPEN. Blocked on author decision (recompute T23 placebo from T22's per-pair file, or mark T23 placebo cells stale).
+Status: CLOSED.
 
 ### INV-035: Placebo reliability reported under wrong definition (CLOSED)
 S24_reliability.R v1 reported placebo mean -0.2072, SD 0.8244, which match T12_N2 exactly. These are Definition D values (theta_B from S5R$placebo), not Definition A as specified.
