@@ -668,6 +668,635 @@ totals are frozen and verified at load
 \end{minipage}
 \end{table}
 
+% =============================================================================
+% SECTION 4 — THE ANATOMY OF THE ARTIFACT
+% Draft SECTION4-1 (final). Hands off from sec:data-comparison (§3.4).
+%
+% Fact convention: every number carries a trailing "% [ID]".
+%   [T5R: col]      -> output/T5R_theta_summary.csv (BASELINE row, n=4182)
+%   [T21: arm]      -> output/T21_arms.csv
+%   [T22 / <ID>]    -> output/T22_reliability.csv, IDs as in meta/canonical_facts.md
+%   [T23: row,col]  -> output/T23_anchor.csv (anchor table, D2)
+%   [T24: row]      -> output/T24_placebo_uncorr.csv
+%   [T9: <row>]     -> output/T9_placebo_holdout.csv
+%   [T11: item]     -> output/T11_se_decomposition.csv
+%   [MEAN_THETA_D], [SD_THETA_TRUE], [SPLITHALF_A_R], [SPLITHALF_A_RELIABILITY],
+%   [PLACEBO_A_MEAN], [PLACEBO_A_SD], [PLACEBO_A_R], [PLACEBO_A_RELIABILITY]
+%                   -> meta/canonical_facts.md (SOLE AUTHORITY)
+%   [INV-nnn]       -> meta/SUPERSEDED.md invalidation register
+%   [Prop1] [Prop1c] [Cor:rel] [Prop2] [Prop3] [Cor:rhoop] -> article/main.tex appendix
+%
+% Verified against repo HEAD (main, post-SYNC-6e). No open ledger-vs-output
+% disagreements and no [NEEDED] markers remain; see D4 at the foot of this file.
+% =============================================================================
+
+\section{\label{sec:empirical}The Anatomy of the Artifact}
+
+% ¶1 — Reports the naive estimate deadpan. No foreshadowing; the reader is meant
+% to find it credible on the diagnostics standard practice would apply.
+
+The counterfactual of Section~\ref{sec:data-comparison} makes a pair-level
+estimate available without further apparatus. For each switching pair, take the
+untreated-only PPML fit, impute the trade the pair would have carried in each of
+its post-adoption years, and average the log gap between realized and imputed
+trade over those years. Call this Definition~$A$. Across the canonical
+population it returns a mean of $-0.2837$
+% [T5R: Mean_theta_A]
+, a standard deviation of $1.6630$
+% [T5R: SD_theta_A]
+, and a split-half correlation across disjoint halves of each pair's post window
+of $0.9243$, on the $4{,}120$ pairs with at least two post-adoption years in
+each half
+% [SPLITHALF_A_R]
+, or $0.9607$ once corrected for split length
+% [SPLITHALF_A_RELIABILITY]
+. The estimator is thus sign-wrong against everything the aggregate literature
+reports, enormously dispersed, and---by the one diagnostic that pair-level
+estimation makes available---close to perfectly reliable.
+
+% ¶2 — Applies the identical machinery to a population where the answer is known
+% in advance. This is the section's thesis paragraph.
+
+The never-treated pairs of Section~\ref{sec:data-comparison} carry
+pseudo-adoption dates assigned under the same band and minimum-length rules, and
+nothing whatever happens to them at those dates. Run Definition~$A$ on them
+unchanged. On the $15{,}683$ never-treated pairs that qualify for the same split, the mean
+``effect'' is $-0.6821$
+% [PLACEBO_A_MEAN]
+, with a standard deviation of $1.0814$
+% [PLACEBO_A_SD]
+and a split-half correlation of $0.7463$
+% [PLACEBO_A_R]
+, or $0.8547$ corrected for split length
+% [PLACEBO_A_RELIABILITY]
+. A population in which the effect is zero by construction thus reproduces
+roughly four-fifths of the treated estimator's reliability---$0.7463$ against
+$0.9243$, computed under the same split rule in the same run
+% [PLACEBO_A_R; SPLITHALF_A_R]
+---and rather more than twice its mean in magnitude.
+
+% ¶3 — Names the mechanism that makes the paradox general rather than an
+% accident of this design, and hands the exact statement to the appendix.
+
+The reason is not subtle once stated, and it is a property of the diagnostic
+rather than of this application. Split-half reliability asks whether a pair's
+estimate in one half of its post window predicts its estimate in the other. Any
+quantity that is a persistent trait of the pair will answer yes. The artifacts
+at work here---each pair's own volatility, and each pair's own trend relative to
+its fitted level---are exactly such traits: they are properties of the
+relationship, not of the years sampled from it, so they replicate across
+splits as faithfully as a real effect would. Proposition~\ref{prop:jensen}(c)
+gives the exact result under the stated assumptions: the split-half correlation
+of a zero-effect estimator equals the share of its variance carried by
+persistent bias, $\Var(b)/\big(\Var(b)+\E[\sigma^2]/T_h\big)$
+% [Prop1c]
+. Corollary~\ref{cor:rel} states the consequence without reference to any
+particular artifact: \emph{any} dispersed, persistent per-pair bias passes
+% [Cor:rel]
+. High reliability certifies persistence. It does not certify validity, and no
+amount of it can, because the two are different questions and only one of them
+is being asked.
+
+% ¶3a — Bounds the claim before the anatomy begins, so that the section is not
+% read as asserting that the treated estimate is entirely artifact.
+
+It is worth being precise about what the placebo population establishes and what
+it does not. It establishes that the machinery, applied to pairs where the
+answer is known to be zero, returns numbers that are large, dispersed, and
+stable across resplits, and that the diagnostics conventionally used to
+adjudicate such estimates do not distinguish that case from a real one. It does
+not establish that the treated estimates are artifact; the treated pairs
+received agreements and the never-treated pairs did not, and nothing in the
+comparison speaks to what the agreements did. What the comparison does is set
+the standard the treated estimate has to clear, which is not zero but whatever
+the same machinery returns when there is nothing to find. The rest of this
+section is the accounting that clears it, layer by layer, and the accounting is
+worth doing precisely because the diagnostics that would ordinarily settle the
+matter have been shown not to.
+
+% ¶4 — Opens the anatomy and states the justification standard that governs all
+% three layers, with the fixed-effects contrast made once.
+
+What follows takes the naive estimate apart into three layers. Each has a
+mechanism with a derivation, a correction, and a population in which effects are
+absent by construction and the mechanism is therefore visible on its own. That
+last requirement is the justification standard we hold the corrections to
+throughout: a subtraction is licensed when there exists a population where the
+quantity subtracted is all there is to find. The contrast with the conventional
+instrument is worth making once. Fixed effects remove identifying dimensions
+before estimation, and what they remove is unavailable for inspection
+afterwards; the corrections below remove what the estimator is demonstrated to
+report when the effect is zero, and the demonstration is a table one can read.
+
+% ¶5 — Layer (i): the mechanism and its exact form.
+
+The first layer is aggregation. Definition~$A$ averages log ratios, and the
+logarithm is concave, so a pair whose realized trade is volatile around its
+counterfactual is penalized for the volatility itself. Under the assumptions of
+the appendix and with zero treatment effect,
+$\E[\theta^A_{ij}\mid ij]=-\sigma^2_{ij}/2$ exactly
+% [Prop1]
+: the estimator returns a negative number whose magnitude is half the pair's own
+log-variance and has nothing to do with any agreement. The remedy is to
+aggregate before taking the logarithm rather than after---the log of the ratio
+of sums over the post window, Definition~$B$---which replaces a pair-level
+penalty of order $\sigma^2_{ij}$ with one of order
+$\Var(R_{ij})=\Var(\eta_{ij})\sum_t w_t^2$, smaller by roughly the number of
+post years
+% [Prop1]
+.
+
+% ¶6 — Layer (i) empirics: the sign flip is located, and the residual failure
+% that motivates layer (ii) is stated rather than deferred.
+
+The move is decisive for the mean and only for the mean. Across the canonical
+population the average effect goes from $-0.2837$ under $A$ to $0.0758$ under
+$B$
+% [T5R: Mean_theta_A; T5R: Mean_theta_B]
+: the sign flip happens here, at an arithmetic layer, before any correction that
+uses information about untreated pairs. The zero-effect population moves in the
+same direction and by more. Measured on the same $17{,}200$ never-treated pairs
+by the same producer, its mean rises from $-0.6880$ under $A$ to $-0.2072$ under
+$B$
+% [T23: A,placebo_mean; T23: B,placebo_mean]
+. It does not, however, reach zero. Against the validity threshold of $0.05$
+carried by the pipeline's gate library, the uncorrected placebo mean under
+Definition~$B$ sits at roughly four times the threshold
+% [T24: PLACEBO_B_UNCORR_OVERALL]
+. That residual is systematic rather than incidental---it is a property of the
+population and the window, not of any resampling---and the second layer is what
+it is made of.
+
+% ¶7 — Layer (ii): the drift mechanism, with its two testable signatures.
+
+The second layer is within-pair drift. Trade relationships do not hold station
+around their fitted level; they fade or strengthen relative to it, and a pair
+fixed effect centers the level without touching the trend. Any comparison of a
+late window to an early one therefore reads a fading relationship as a negative
+effect. Proposition~\ref{prop:drift}(a) makes the size of the misreading
+explicit: for a never-treated pair with a post window equal to the last
+$T_{\mathrm{post}}$ years of its span, the post-window mean of centered time is
+$T_{\mathrm{pre}}/2$, so
+$\E[\theta^{A}_{ij}]=-\sigma^2_{ij}/2+\delta_{ij}T_{\mathrm{pre}}/2$
+% [Prop2]
+. Two signatures follow and are jointly restrictive. The bias depends on window
+geometry alone and never on calendar time, so it cannot be a macroeconomic
+episode in disguise. And where drift correlates with pair size, the bias is
+graded in size---which is what makes a size-cell correction the right shape of
+instrument rather than an arbitrary one.
+% [Prop2]
+% NOTE (deliberate, not outstanding): the empirical size profile is monotone
+%  only over the upper deciles. T24 gives placebo-B means of -0.365 at decile 5
+%  falling to -0.057 at decile 10, but -0.206 at decile 1 and -0.217 at decile 2,
+%  so the smallest pairs are NOT the most biased and the profile is hump-shaped.
+%  The sentence above therefore states the grading conditionally, exactly as
+%  Proposition 2 derives it, and asserts no empirical monotonicity. The
+%  propositions appendix reports the full profile.
+
+% ¶8 — Layer (ii) correction and its own validation, including the honest partial.
+
+The correction estimates, within size cells, the mean effect the machinery
+returns on never-treated pairs, and subtracts it. Two features make this more
+than a relabeling. It is estimated on held-out placebo splits and applied out of
+sample, so no pair contributes to its own correction. And it is validated on the
+held-out half, where the corrected placebo effect should be zero if the
+subtraction removed an artifact and nothing else. It is: across $8{,}545$
+validation pairs the mean corrected placebo effect is $0.0188$ with a standard
+error of $0.0087$
+% [T9: NA row]
+, inside the $0.10$ decile bound of the pipeline's three-state gate and inside
+the stricter $0.05$ bound as well
+% [INV-016]
+. One of the ten size deciles does not clear the first bound. The third decile
+returns $-0.1013$ on $314$ validation pairs, with a standard error of $0.0591$
+% [T9: decile 3]
+, which registers as PARTIAL under the three-state rule---beyond $0.10$, well
+inside $0.20$, and $1.7$ standard errors from zero
+% [INV-016]
+. We report it as such rather than absorbing it into an average that would hide
+it. Applying the correction moves the mean from $0.0758$ under $B$ to $0.2473$
+under $D$, with a standard error of $0.0241$
+% [T5R: Mean_theta_B; MEAN_THETA_D]
+.
+
+% ¶8a — Explains the resolution of the correction and marks where it stops,
+% which is the hinge into layer (iii).
+
+The unit of the correction is worth dwelling on, because it is also the source
+of the layer's limitation. Proposition~\ref{prop:drift}(c) is explicit that
+subtracting a size-cell mean removes $\E[\delta_{ij}\mid s]T_{\mathrm{pre}}/2$
+and leaves the within-cell dispersion of drift untouched, so that
+$\Var(\theta^D\mid s)$ still contains $(T_{\mathrm{pre}}/2)^2\Var(\delta_{ij}\mid
+s)$ alongside the true effect variance and the sampling term
+% [Prop2]
+. A finer partition would remove more of it. The binding constraint is that the
+correction must be estimated on held-out placebo pairs and validated on them,
+and the validation folds are already thin at the current resolution: the
+smallest size decile contributes $19$ validation pairs and the second $94$
+% [T9: deciles 1 and 2]
+, against $1{,}365$ in the eighth. Refining the partition would buy a smaller
+residual at the cost of a correction no held-out population is large enough to
+certify, which is the trade the current design declines to make. The consequence
+is carried forward: whatever drift heterogeneity survives within cells is still
+in the dispersion, and the next layer has to account for it rather than assume
+it away.
+
+% ¶9 — Layer (iii) opens by showing that the first two layers did nothing to
+% dispersion, which is the fact that organizes the rest of the subsection.
+
+The two corrections between them move the mean by roughly half a log point. They
+do almost nothing to the spread. The standard deviation is $1.6630$ under $A$,
+$1.5799$ under $B$, and $1.5614$ under $D$
+% [T5R: SD_theta_A; SD_theta_B; SD_theta_D]
+---a decline of about six percent across a path that reversed the sign of the
+mean. This is not a failure of the corrections. It is a statement about what
+they were built to remove: both are corrections to a location, the first to a
+pair's own expected penalty and the second to a size cell's average drift, and
+neither has any purchase on variation across pairs within a cell. The dispersion
+that remains is a different object and has to be accounted for separately.
+
+% ¶10 — Layer (iii): the null accounting, arm by arm, with each arm's assumption
+% named where its number is given.
+
+That accounting proceeds by asking how much of the observed dispersion a
+zero-effect population reproduces, and the answer depends on which zero-effect
+population one is entitled to use. Against a total variance of $2.4380$
+% [T21: VAR_THETA_D]
+, three admissible nulls have been computed. Sampling noise from finite post
+windows, augmented by the uncertainty in the estimated counterfactual itself,
+accounts for $0.2611$, or $11$ percent
+% [T21: A_noise_only]
+; the counterfactual component is a third of that total and cannot be dropped
+% [T11: share_sd_cf; INV-022]
+. The in-sample placebo null---the dispersion the machinery generates on
+never-treated pairs over the same years---accounts for $0.6796$, or $28$ percent
+% [T21: B_placebo]
+. The out-of-sample drift null, computed under the canonical symmetric-window
+design so that treated and pseudo-treated pairs are compared across identically
+drawn windows, accounts for $1.887$, or $77$ percent
+% [T21: C\_OOS]
+.
+
+% ¶10a — Prevents the arithmetic misreading of the three shares and states the
+% ordering as a consequence of what each null admits.
+
+These three shares do not partition anything and must not be added. The nulls
+are nested by construction: the first admits sampling variability and the
+uncertainty of the imputation and nothing else; the second admits those together
+with whatever the machinery generates on pairs that received no agreement over
+the same calendar years; the third admits those together with the
+window-geometry drift of Proposition~\ref{prop:drift}, measured on pseudo-treated
+pairs whose windows are drawn as the treated pairs' windows are. Each is the
+previous one plus a further admitted source, which is why they run $11$, $28$,
+and $77$ percent rather than in any other order
+% [T21: all arms]
+, and why the middle one is an interior value rather than an endpoint. Choosing
+among them is choosing how much of the observed spread one is prepared to
+concede to a mechanism that produces spread without producing effects, and the
+propositions do not settle that choice---they establish what is at stake in it.
+
+% ¶11 — Converts the accounting into the reported conclusion and licenses the
+% interval form by Proposition 3's logic rather than by caution.
+
+The first and third of these are the admissible endpoints, and they bracket the
+standard deviation of true effects at $[0.74,\,1.48]$
+% [SD_THETA_TRUE / INV-027]
+. We report the interval and no point inside it, and the reason is not caution
+but Proposition~\ref{prop:ident}. Part~(a) identifies the variance of persistent
+effects as the cross-pair variance of the estimate minus the expected
+within-pair variance over the post window, which is estimable
+% [Prop3]
+. Part~(b) shows that the composition of that within-pair variance is not:
+under the stated normality, transitory effect heterogeneity and a
+treatment-coincident change in volatility enter the likelihood only through
+their sum, so any two parameterizations with equal composites generate identical
+data distributions
+% [Prop3]
+. The split between them is a modeling label, not an estimable quantity, and the
+two endpoints are what the two admissible labels imply. The interval is
+therefore the dispersion conclusion of this section, with each arm's assumption
+attached to it: the upper endpoint concedes only noise, the lower concedes
+everything an out-of-sample zero-effect population reproduces.
+One feature of the lower endpoint deserves emphasis, because it is what makes
+that endpoint conservative rather than merely small. The out-of-sample null is
+not formed by applying an already-fitted counterfactual to held-out years. The
+counterfactual is re-estimated from a sample from which the evaluation window
+has been excluded entirely, so that no cell used to judge the null contributed
+to the fit that generates it
+% [INV-027a]
+. This matters more than it may appear. A null built the other way---reusing a
+counterfactual fitted on the very cells it is then evaluated against---reproduces
+substantially less of the observed dispersion, because the fit has already
+absorbed part of what the null is meant to measure, and it would place the lower
+endpoint considerably higher. We report the construction that is harder on the
+result.
+
+\subsection*{The certificate}
+
+% ¶12 — States what the corrections must be shown NOT to do, and names the two
+% instruments before running either.
+
+A correction that removes an artifact and a correction that removes the signal
+look identical in a table of means. The distinguishing evidence has to come from
+data whose truth is known in advance: the propositions are evaluated
+numerically, with parameters planted and recovered, and the evaluation is run
+at the parameter values where the derived approximations are supposed to fail
+as well as where they are supposed to hold. What that establishes is that the
+arithmetic underlying each correction is sound and that its stated failure modes
+occur where the derivation says they will.
+
+% ¶13 — Instrument (a): the verification, including the diagnostic value of the
+% one variant that collapses.
+
+The first is available in full. Each proposition is evaluated numerically at the
+ledgered dispersion, which the zero-effect population identifies directly, since
+the mean log-ratio there is exactly minus half the mean log-variance
+% [T25: PROP_ESIGMA2]
+. Three of the evaluations plant a parameter and recover it. The Jensen
+expansion is checked where it is weakest: at the empirical scale the generic
+second-order form is invalid for Definition~$A$ altogether, and for
+Definition~$B$ it overstates the bias magnitude by about thirty percent, the
+positive third-order term partially offsetting the variance term
+% [T25: PROP_APPROX_B, PROP_MC_B, PROP_OVERSTATE_PCT]
+. The drift formula is checked by planting a per-pair trend and recovering the
+window-geometry prediction
+% [T25: PROP_V2_PRED, PROP_V2_SIM]
+. And the reliability decomposition is over-identified, which permits a check
+with nothing fitted to it: the cross-pair variance of the estimator on the
+zero-effect population implies a dispersion of pair volatilities, and
+substituting that into the split-half formula \emph{predicts} a reliability of
+$0.81$ against the $0.75$ observed
+% [T25: PROP_R_PRED, PROP_PLACEBO_R]
+. The formula reproduces the observed figure to within six hundredths,
+over-predicting slightly, with no parameter chosen to make it do so.
+
+% ¶13a — The variant that fails, which is the sharper half of the certificate.
+
+The most informative check is of an estimator variant that does not work. A null
+calibrated on a window shorter than the window over which the estimate is formed
+over-subtracts by a computable factor $\kappa_w:=T_{\mathrm{post}}/T_0>1$,
+biasing the recovered variance by
+$-(\kappa_w-1)\E[V^{\mathrm{post}}]/T_{\mathrm{post}}$
+% [Cor:rhoop]
+. The consequence is exact and can be read off. At $\kappa_w=1$ the subtraction
+is the noise-only arm and returns its dispersion of $1.475$ by construction; at
+$\kappa_w=2,3,5$ the recovered dispersion falls to $1.384$, $1.286$ and $1.064$;
+and at $\kappa_w=9.34$ the entire estimated heterogeneity is absorbed
+% [T25: PROP_TAU_K1, PROP_TAU_K2, PROP_TAU_K3, PROP_TAU_K5, PROP_KAPPA_FLOOR]
+. A mis-specified null window therefore consumes true heterogeneity at a rate the
+derivation gives in closed form, and a sufficiently mis-specified one consumes
+all of it while returning a number that looks like an answer. That the failure
+occurs at the magnitude the derivation predicts is a stronger statement than a
+variant that succeeds, and it is the reason the null used above is matched to the
+treated design rather than to convenience.
+
+% ¶14 — States the limit of the certificate honestly, and names the stronger
+% test that these results do not supply.
+
+What this does not establish should be stated with equal clarity. Verifying the
+arithmetic of a correction is weaker than verifying the pipeline that applies
+it. The stronger test simulates panels carrying a known effect distribution
+alongside a known artifact, runs the estimator and both corrections without
+modification, and asks whether the recovered distribution matches the planted
+one while the planted artifact is returned as zero; a pipeline that passes the
+first requirement and fails the second is absorbing signal, and one that passes
+the second and fails the first is leaving artifact behind. We report the
+propositions' verification and do not claim that end-to-end test, which we
+regard as the standard such corrections should eventually be held to rather
+than one this paper meets.
+
+\subsection*{Diagnostics that survive}
+
+% ¶15 — The constructive close, item one: reliability is reported against its
+% null, never raw.
+
+The negative result of this section is narrow: reliability statistics answer a
+question about persistence and were never answering the question they are
+conventionally read as answering. The constructive one is that the same
+machinery, pointed at the right comparison, is informative. Five practices
+follow, and the first fixes the diagnostic that failed. A reliability
+statistic is uninterpretable in isolation and interpretable against its own
+null: report the split-half correlation of the estimator on a population where
+effects are absent by construction, computed under the identical split rule in
+the same run, and read the treated figure against it. The contrast is the
+statistic; either number alone is not.
+
+% ¶16 — Items two and three: self-calibrated nulls, and verification on planted
+% truth.
+
+Second, a pair's own pre-adoption years are a null it calibrates for itself, and
+pseudo-effects estimated on them measure what the machinery returns from that
+pair when there is nothing to find. The out-of-sample drift null used above is
+this instrument at population scale, and its discipline is that the window
+geometry of the null must match the window geometry of the estimate---the
+comparison is uninformative, and can be badly misleading, when the two are drawn
+differently. Third, verification on planted truth is the certificate a pipeline
+cannot supply about itself from observational data alone. Its value is not
+confirmation that the estimator works; it is the location of the parameter
+region where it stops working, which is knowable in simulation and not knowable
+otherwise.
+
+% ¶17 — Item four: identified-set reporting as a positive practice, not a hedge.
+
+Fourth, where point identification fails, the honest object is the identified
+set with each arm's assumption labeled, and the labeling is the substance. An
+interval reported without its arms is a confession of uncertainty; an interval
+reported with them is a statement about which assumption would have to be true
+for which endpoint to hold, and it tells a reader who disagrees with one of the
+assumptions exactly which number to take. Proposition~\ref{prop:ident}(b) is the
+model case, because it establishes that a particular decomposition is
+unavailable at any sample size
+% [Prop3]
+: no amount of additional data moves that boundary, and reporting a point inside
+it would represent as measured what is in fact chosen.
+
+% ¶18 — Item five: content-pinning assertions, framed prospectively as the
+% general defense against a general failure class.
+
+Fifth and most general, the properties an estimate must satisfy should be
+asserted in code rather than checked by reading. A long empirical pipeline
+carries a recurring failure class that no amount of care in the substantive
+analysis addresses: the wrong-object substitution, in which an estimate of a
+different quantity, a different population, or a different window flows into a
+slot whose label it matches and is then reported, cited, and built upon. What
+defeats it is not vigilance but assertion---automated gates on properties the
+wrong object cannot satisfy. A truncation bound the quantity must respect. A
+magnitude scale it must lie on. A sample size, a window length, a standard error
+inconsistent with the source the value claims to come from. Such gates are cheap
+to write and they fail loudly, which is the only property that matters, because
+the wrong object's distinguishing feature is that it is plausible. Taken
+together the five are a single standard: every number reported about an effect
+should be accompanied by what the same machinery returns when there is no effect
+to find, and the accompaniment should be enforced rather than remembered.
+
+% =============================================================================
+% D2 — CAPTION FOR THE CORRECTION-PATH ANCHOR TABLE
+% =============================================================================
+
+\begin{table}[htbp]
+\centering
+\caption{The correction path, with zero-effect benchmarks}
+\label{tab:correction}
+% Body: output/T23_anchor.csv (producer S24b_anchor_table.R).
+% Memo row 1: output/T9_placebo_holdout.csv, row NA.
+% Memo row 2: output/T22_reliability.csv (SPLITHALF_A_R, PLACEBO_A_R) with n.
+% Standard errors are SD/sqrt(n); this reproduces the ledgered SE of
+% MEAN_THETA_D (0.0241) exactly, so the column is a transformation of two
+% committed columns rather than a separate estimate.
+\begin{tabular}{lcccccc}
+\toprule
+ & \multicolumn{3}{c}{Switching pairs} & \multicolumn{3}{c}{Zero-effect benchmark} \\
+\cmidrule(lr){2-4}\cmidrule(lr){5-7}
+Definition & Mean & SD & $n$ & Mean & SD & $n$ \\
+\midrule
+$A$: mean of log ratios     & $-0.2837$  & $1.6630$ & $4{,}182$ & $-0.6880$  & $1.1187$ & $17{,}200$ \\
+                            & $(0.0257)$ &          &           & $(0.0085)$ &          &            \\
+\addlinespace
+$B$: log of ratio of sums   & $0.0758$   & $1.5799$ & $4{,}182$ & $-0.2072$  & $0.8244$ & $17{,}200$ \\
+                            & $(0.0244)$ &          &           & $(0.0063)$ &          &            \\
+\addlinespace
+$D$: $B$ less cell drift    & $0.2473$   & $1.5614$ & $4{,}182$ & ---        & ---      & ---        \\
+                            & $(0.0241)$ &          &           &            &          &            \\
+\midrule
+\multicolumn{7}{l}{\footnotesize\emph{Memo.} Held-out corrected placebo under $D$: $0.0188$ $(0.0087)$, $n=8{,}545$.} \\
+\multicolumn{7}{l}{\footnotesize\phantom{\emph{Memo.}} Split-half reliability under $A$: $0.9243$ $(n=4{,}120)$ against $0.7463$ $(n=15{,}683)$.} \\
+\bottomrule
+\end{tabular}
+ 
+\vspace{0.5em}
+\begin{minipage}{0.95\textwidth}
+\footnotesize
+\emph{Notes.} Each row is a pair-level effect definition applied to the
+canonical population of $4{,}182$ switching pairs
+% [T23: treated_n]
+, and each is paired with the same definition applied to the $17{,}200$
+never-treated pairs carrying pseudo-adoption dates, for which the effect is zero
+by construction
+% [T23: placebo_n; INV-036]
+. Definition~$A$ averages the log ratio of realized to imputed trade over a
+pair's post-adoption years. Definition~$B$ takes the log of the ratio of the
+sums over the same years, aggregating before the logarithm rather than after,
+which removes the concavity penalty of Proposition~\ref{prop:jensen}.
+Definition~$D$ subtracts from $B$ the mean placebo effect of the pair's size
+cell, estimated on held-out placebo splits and applied out of sample, which
+removes the window-geometry drift of Proposition~\ref{prop:drift}. All six
+treated cells and all four placebo cells come from a single producer on a single
+pair of populations, so the counterfactual, the exclusion band and the
+post-window definition are common to every cell shown. The $D$ row has no
+placebo entry: the correction is defined by subtracting a placebo mean, so its
+zero-effect benchmark is not a column of this table but the held-out validation
+of Table~[X-REF: T9], where the corrected placebo effect on $8{,}545$ pairs the
+correction never saw is $0.0188$ with a standard error of $0.0087$
+% [T9: NA row]
+. Reliability is reported separately, in Table~[X-REF: T22], because it is
+computed on the subsets with at least two post-adoption years in each half
+($4{,}120$ treated, $15{,}683$ placebo) and so does not share this table's row
+denominators; it is reported for treated and placebo as a pair, since the
+treated figure alone is uninterpretable---$0.9243$ against $0.7463$ under
+Definition~$A$
+% [SPLITHALF\_A\_R; PLACEBO\_A\_R]
+. Standard errors in parentheses.
+\end{minipage}
+\end{table}
+
+% =============================================================================
+% D3 — 120-WORD SUMMARY FOR THE INTRODUCTION'S CONTRIBUTION PARAGRAPH
+% =============================================================================
+
+% Estimating agreement effects pair by pair, the way standard practice would,
+% returns a mean of $-0.2837$ with a standard deviation of $1.6630$ and a
+% split-half reliability of $0.9243$ % [T5R: Mean_theta_A; T5R: SD_theta_A;
+% SPLITHALF_A_R] — a sign-wrong, hugely dispersed estimate that every available
+% diagnostic certifies. Applied to never-treated pairs with pseudo-adoption
+% dates, where the effect is zero by construction, the identical machinery
+% returns $-0.6821$ with reliability $0.7463$ % [PLACEBO_A_MEAN; PLACEBO_A_R]:
+% roughly four-fifths of the treated estimator's stability, with no effects
+% anywhere. We show why this must be so. Reliability statistics test whether a
+% quantity is a persistent trait of the pair, and the artifacts at work —
+% pair-specific volatility and pair-specific drift — are persistent traits.
+% Corollary~\ref{cor:rel}: any dispersed persistent bias passes. % [Cor:rel]
+%
+% [121 words excluding fact comments.]
+
+% =============================================================================
+% D4 — AMBIGUITIES
+% Revised against commit 4b98061 (SYNC-6d), verified directly against the repo.
+% =============================================================================
+%
+% CLOSED — verified in the repo, no action, safe to cite
+%
+%   Ledger/output split on theta_A moments ....... T22 now carries n; S4.1 and
+%       S4.2 state the qualifying counts (4,120 treated, 15,683 placebo) in text.
+%   Six placebo counts ........................... INV-036 CLOSED; 17,200 frozen.
+%   T7 partial run / extrapolated seed ........... superseded by T24, demoted.
+%   Fabricated seed rows in T24 .................. removed; 11 rows.
+%   Anchor table did not exist ................... T23, single producer.
+%   0.39 / 0.46 in the Prop 3 remark ............. removed; arm-indexed 0.74/1.48.
+%   E[sigma^2] derived from the placebo SD ....... corrected to the mean:
+%       E[sigma^2]=1.364, sigma=1.168 [T25].
+%   [V1c] self-contradiction (r=0.75 in 0.47-0.73)  replaced by a parameter-free
+%       over-identification test: predicts 0.807 against 0.746 observed.
+%   cor:rhoop keyed to retired injection scenarios  replaced by the closed-form
+%       kappa ladder; kappa=1 reproduces arm A exactly [T25: PROP_TAU_K1].
+%   "roughly a third" / M1 sentence / R^2<1% ..... removed from main.tex.
+%   INV-027 citing superseded producers .......... now S24_arms_canonical.R.
+%   INV-027a stated backwards .................... now DECREASES, 0.74 -> ~1.0.
+%   INV-035 "Definition D" mislabel .............. now Definition B.
+%   Arm naming (C_hardened vs C_OOS) ............. harmonised to T21 identifiers.
+%   enforce.R never halted ....................... stopifnot(n_violations == 0).
+%   Appendix literals unchecked .................. rule (f) requires a resolving
+%       ID; rule (g) requires every \Prop* macro to resolve.
+%
+% OPEN — none. All items verified closed in the repo (main, post-SYNC-6e).
+%
+%   T2R sidecar warning ......... corrected; the file no longer asserts
+%       Var_theta_hat = Var(theta_D).
+%   SUPERSEDED.md ............... T7 entry added; INV split-register note added.
+%   PROP_V2_SHIFT ............... 0.0494 -> 0.0010 after the centering-midpoint
+%       fix; calendar invariance now genuinely tested.
+%   V4 mislabel ................. var_11plus_S18 -> var_11plus_N1b. The 1.23 is
+%       N1b's out-of-sample variance; S18's in-sample value is 0.159.
+%   T26 ......................... sidecar added, marked IN-SAMPLE PSEUDO NULL /
+%       NOT Arm C.
+%   PropTauKone ................. 1.4754, matching T21 SD_true_A exactly.
+%
+% CLOSED BY INVESTIGATION
+%
+% G2. RESOLVED — NOT A DEFECT. INV-027a recorded the 11+ horizon bin as carrying
+%     two irreconcilable values (0.159 against 1.230) and marked it BLOCKING.
+%     The two are different objects, correctly labelled only after the fact.
+%     S18 and V4 reuse S1R's fitted y_hat_0, which was estimated on the very
+%     late-pre cells they then evaluate: their null is IN-SAMPLE, and its
+%     weighted value is 0.389. N1_oos_null.R re-estimates the counterfactual on
+%     never-treated pairs plus switchers' early-pre cells only, under an assertion
+%     that no late cell enters the estimation sample, and evaluates the late
+%     cells out of sample: its weighted value at symmetric-window treated weights
+%     is 1.887. Arm C is defined as the out-of-sample drift null, so the
+%     out-of-sample construction is the correct object and 1.887 stands.
+%     SD_THETA_TRUE = [0.74, 1.48] is unchanged and no arm value moved.
+%     The residual defect was reproducibility, not correctness: 1.887 was
+%     assembled across two scripts with no single producer, which is why it could
+%     not be reproduced from either alone. S24_arms_canonical.R now computes it
+%     explicitly from T12_N1b_horizon.csv variances and symmetric-window weights
+%     under gate G4. Paragraph 11 states the out-of-sample construction as the
+%     conservative choice it is.
+%
+% G1. CLOSED BY DECISION (2026-07-27). The end-to-end injection certificate is
+%     not built and will not be. Paragraph 12 now describes one instrument
+%     rather than two, and paragraph 14 states the end-to-end test as the
+%     standard such corrections should be held to rather than one this paper
+%     meets. Nothing in the section claims it. The planted-truth element that
+%     remains is real: the Jensen and drift verifications each plant a parameter
+%     and recover it % [T25: PROP_MC_B, PROP_V2_SIM], and the cor:rhoop ladder
+%     shows the failure mode occurring at the derived magnitude.
+%
+% G2. The lower endpoint of the dispersion interval still depends on an open
+%     item. INV-027a records the V4-vs-S18 discrepancy in the 11+ horizon bin
+%     (0.1593 against 1.2300) as OPEN and BLOCKING for Sections 5 and 7, with
+%     the consequence that the endpoint would move from 0.74 toward 1.01. That
+%     bin carries 43.9 percent of the arm C weight. Paragraph 11 states the
+%     dependence in prose and cites INV-027a. This is correctly disclosed, not
+%     concealed, but Section 5 cannot be finalised until it is settled.
 
 
 \newpage
