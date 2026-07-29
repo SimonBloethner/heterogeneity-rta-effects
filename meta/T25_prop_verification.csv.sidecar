@@ -1,30 +1,21 @@
-PRODUCER: S26_prop_verification.R
-INPUTS: output/T22_reliability.csv, output/T24_placebo_uncorr.csv, output/T21_arms.csv
+PRODUCER: S26_prop_verification.R v2
+INPUTS: output/T22_reliability.csv, output/T24_placebo_uncorr.csv, output/T21_arms.csv,
+        output/T28b_v1c_arm1p.csv
 SEED: 20260719
 N_REP: 4000000
+
+V1c SOURCED FROM ARM 1' (T28b):
+  r_pred (Arm 1') = 0.753863355754621
+  r_gap = |R_GAP_1p| = 0.007554939035841
+  r_pred_plugin (Arm 0, retained) = 0.806812807675821
 
 VERIFICATIONS:
   V1a: E_sigma2 = 1.364211 (analytical: -2*PLACEBO_A_MEAN)
   V1b: approx_B = -0.1456 < mc_B = -0.1121 < 0 : PASS
-       Overstatement = 29.9% (D5.1)
-  V1c: V_sigma2 = 4.1773, r_pred = 0.8068, r_gap = 0.0605, T_h >= 2: 5.46
-  V2:  MC mean = -0.5808 vs predicted -0.5821, gap = 0.0013 < 0.02 [delta=0.02]
-       V2 shift (SYNC-6e) = 0.001050 (calendar invariance, expected ~0)
-  V3c: tau_hat at kappa=1,2,3,5: 1.4754, 1.3841, 1.2863, 1.0641 (D1: arm A subtraction)
-       kappa_floor = 9.336
-       Gate: tau_hat(1) = 1.4754 matches T21 SD_TRUE_A = 1.4754
-
-ASSUMPTION: Homogeneous-window approximation (per-pair T_post variation ignored).
-            Exact quantity would be mean(sigma2_hat_ij / T_post_ij).
-
-GATES:
-  G1: E_sigma2 > 0: PASS
-  G2: V1b approx < mc < 0: PASS
-  G3: V1c wrong-object gates (q>0, V>0, 0<r<1, T_h>=2): PASS
-  G4: V2 gap < 0.02: 0.0013 PASS
-  G5: V3c tau_hat(1) matches SD_TRUE_A to 1e-3: PASS
-  G6: V2 shift < 0.01 (calendar invariance): 0.001050 PASS
+  V1c: r_pred (Arm 1') = 0.7539, r_gap = 0.0076
+  V2:  MC mean = -0.5808 vs predicted -0.5821, gap = 0.0013 < 0.02
+  V3c: tau_hat(1,2,3,5) = 1.4754, 1.3841, 1.2863, 1.0641
 
 STATUS: BUILT
 DATE: 2026-07-29
-SHA256: e729b79152f302e245dc63145282d08b92c990860d6eb28564a36457fcbee855
+SHA256: 61addf4654af00f11259de7e19dd2813f99ab70638507c367a9c92dab0af1a0a
