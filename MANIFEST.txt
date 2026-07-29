@@ -1,45 +1,75 @@
 # MANIFEST.txt - Replication Package
-# Generated: 2026-07-26
+# Updated: 2026-07-29 (SYNC-8)
 # Repository: heterogeneity-rta-effects
 
 ## Directory Structure
 
-code/           R scripts (S1-S23, N1-N6, validation)
+code/           R scripts, live pipeline (S*, N*, enforce.R, gates_lib_v2.R)
+code/validation/ V1-V4 validation scripts
 data/           RDS data files
-output/         CSV output tables (T1-T20)
-meta/           Sidecars, FILE_REGISTRY.csv, canonical_facts.md
-audit/          Scripts superseded or under review (S13b, S14, S15)
-archive/        Retired exhibit pack (INV-021)
-article/        LaTeX source
+output/         Committed tables (T*)
+meta/           Sidecars, FILE_REGISTRY.csv, canonical_facts.md, SUPERSEDED.md
+audit/          Scripts and outputs under review, not cited
+archive/        Retired exhibit pack (INV-021), frozen
+article/        LaTeX source, bibliography, prop_constants.tex
 
 ## Key Outputs
 
 | File | Description | Status |
 |------|-------------|--------|
-| output/T19_pleq0_bracket.csv | P(theta<=0) bracket [0.369, 0.421] | BUILT |
-| output/T20_ge_bracket.csv | GE propagation arm-indexed | BUILT |
+| output/T19_pleq0_bracket.csv | P(theta<=0) bracket [0.370, 0.421] | BUILT |
+| output/T20_ge_bracket.csv | GE propagation, arm-indexed | BUILT |
+| output/T21_arms.csv | Noise arms, SD_true set, TW_MEAN | BUILT |
+| output/T22_reliability.csv | Split-half reliability | BUILT |
+| output/T22_theta_A_placebo.csv | Per-pair theta_A, placebo (n=17200) | BUILT |
+| output/T22_theta_A_treated.csv | Per-pair theta_A, treated (n=4182) | BUILT |
+| output/T25_prop_verification.csv | Proposition verification | BUILT |
+| output/T27_gradient_B.csv | Size gradient, Definitions B and D | BUILT |
+| output/T28_v1c_pairlevel.csv | V1c arms 0/1/2, diagnostic (G5 FAIL is the finding) | BUILT |
+| output/T28b_v1c_arm1p.csv | V1c, Arm 1' (canonical) | BUILT |
 | output/TD1R_population_census.csv | Population census (n=4182) | BUILT |
-| meta/canonical_facts.md | Canonical facts ledger | BUILT |
+| meta/canonical_facts.md | Canonical facts ledger, SOLE AUTHORITY | BUILT |
 
 ## Canonical Facts
 
 - N = 4182 (from S6R_population.R)
 - MEAN_THETA_D = 0.2473 (SE 0.0241)
+- SD(theta_D) observed = 1.5614
+- SD_THETA_TRUE = [0.74, 1.48] (INV-027, arm-indexed)
 - RAW_SHARE = 0.4211
-- P(theta <= 0) = [0.369, 0.421]
-- SD_THETA_TRUE = [0.74, 1.48] (INV-027)
+- TW_MEAN = 0.0898 (pre_trade weights, INV-034)
+- P(theta <= 0) = [0.370, 0.421]
+- GRADIENT (Q1-Q5, Definition D) = 0.9137 (SE 0.0809)
+- GRADIENT_B (Q1-Q5, Definition B) = 0.6827 (SE 0.0821)
+- V1c: R_PRED = 0.7539, R_GAP = 0.0076 (Arm 1', bound 0.05, never restated)
+
+The gradient profile is NOT monotone: Q4 lies below Q5 and the difference is
+not significant. See canonical_facts.md, Gradient section, shape note.
 
 ## Investigations
 
 | INV | Status | Summary |
 |-----|--------|---------|
+| INV-010 | REOPENED | README gate-table chimera; closed in error, README now rewritten |
 | INV-021 | CLOSED | Retired W1 exhibit pack |
 | INV-027 | CLOSED | SD_true identified set |
 | INV-028 | CLOSED | Wrong-object (raw share) |
 | INV-029 | CLOSED | Shape unidentified, P_HI capped |
 | INV-030 | CLOSED | theta_D location error |
 | INV-032 | CLOSED | Wrong-object (MEAN_THETA_D) |
-| INV-033 | OPEN | Pseudo-population unreconciled |
+| INV-033 | OPEN | Pseudo-population unreconciled (non-blocking) |
+| INV-034 | CLOSED | Trade-weighted mean, pre_trade canonical |
+| INV-036 | CLOSED | Placebo census reconciled |
+| INV-037 | CLOSED | T23/T22 nesting verified; per-pair files committed |
+
+## Residuals
+
+- 2 ORPHAN sidecars (meta/T26_null_stack.csv.sidecar,
+  meta/T7_placebo_validity.csv.sidecar): no corresponding output file.
+- 3 STRAY data files (C1_pseudo_corrected.rds, C2_corrected.rds,
+  STRAY_W1_COPY_DO_NOT_USE.rds): no sidecar, no producer, do not use.
+- T26 identifier is claimed by two producers (S18_null_stack.R and
+  S27_size_gradient.R); neither output is committed. Audit pending.
 
 ## QUARANTINED (INV-029)
 
@@ -49,3 +79,4 @@ L1-L5 scripts and T14-T18 outputs.
 
 Run: Rscript code/enforce.R
 Expected: Only L* QUARANTINE violations (no BUILT violations)
+Registry: meta/FILE_REGISTRY.csv, 249 rows, every tracked file registered

@@ -1,129 +1,123 @@
 # Replication Package: Heterogeneity in RTA Trade Effects
 
 ## Overview
-This package contains all code and data needed to replicate the analysis of heterogeneous regional trade agreement effects.
+
+Code and data for the estimation of heterogeneous regional trade agreement
+effects across country pairs. The live pipeline is the R-chain (`S*`, `N*`,
+`V*` scripts). An earlier exhibit pack was retired under INV-021 and is
+preserved unmodified under `archive/retired_pack/` for referee verification;
+nothing in it should be cited.
 
 ## Directory Structure
 
-- README.md - This file
-- MANIFEST.txt - SHA256 checksums of all files
-- code/ - R scripts (17 files)
-- data/ - Input and intermediate data (11 files)
-- output/ - Final exhibits (33 files)
-- docs/ - Documentation
+| Path | Contents |
+|------|----------|
+| `code/` | R scripts, live pipeline |
+| `code/validation/` | V1-V4 validation scripts |
+| `data/` | Input and intermediate `.rds` artifacts |
+| `output/` | Committed tables (T*) |
+| `meta/` | Sidecars, `FILE_REGISTRY.csv`, `canonical_facts.md`, `SUPERSEDED.md` |
+| `article/` | LaTeX source, bibliography, generated constants |
+| `audit/` | Scripts and outputs under review, not cited |
+| `archive/retired_pack/` | Retired exhibit pack (INV-021), frozen |
 
-### Code Directory
-- N0_setup.R - PPML gravity model estimation (creates N0_data.rds)
-- gates_lib_v2.R - Shared utility functions
-- G2c_placebo.R - Placebo test (Gate G2c)
-- O5_verdict.R - Deconvolution verdict
-- P4_injection.R - Injection test for volatility
-- Q4_exhibit_pack.R - Build exhibit tables
-- S1_population_reconciliation.R - Population reconciliation
-- T3_variance_identity.R - Variance identity check
-- N2_deconv.R - Deconvolution estimator
-- W4_ge_propagation.R - GE propagation analysis
-- X1_corrected_LN_anchor_v2.R - Corrected LN anchor
-- X2_residual_tail_v5.R - Residual tail analysis
-- X3_peryear_ratio.R - Per-year ratio analysis
-- X5_size_cohort.R - Size cohort analysis
-- PROP_NUM_v3.R - Proposition numerical verification
-- PROP_derivations_v4.R - Proposition derivations
-- build_exhibit_pack.R - Final exhibit generation
+`meta/canonical_facts.md` is the **sole authority** for every reported number.
+Where it disagrees with anything in `output/`, the ledger governs and the
+disagreement is logged in its Investigation Log.
 
-### Data Directory
-- ITPDE_total.rds - Raw trade panel data (16 MB) - PRIMARY INPUT
-- N0_data.rds - PPML gravity output (142 MB)
-- N0_pair_trade.rds - Pair-level trade data
-- N0_rta_pairs.rds - RTA pair identifiers
-- filtered_trade.rds - Filtered trade flows
-- W1_pop_canon.rds - Canonical population (4182 pairs)
-- G2c_results.RData - Placebo test results
-- O5_verdict.rds - Deconvolution results
-- X1_results.rds - Specification results
-- Q4_exhibits.rds - Pre-built exhibits
-- P4_results.rds - Volatility test results
+## Pipeline
 
-### Output Directory
-Contains the frozen exhibit pack:
-- canonical_facts.md - Headline statistics with ledger IDs
-- T1-T7 CSV tables with .meta.txt sidecars
-- A1-A5 CSV appendix tables with .meta.txt sidecars
-- F1-F3 figures (PDF + PNG at 300 DPI)
-- invalidation_register.md
-- MANIFEST.txt with SHA256 checksums
-
-## Requirements
-
-- R >= 4.3.0 (tested with R 4.5.3)
-- Required packages: fixest (0.13.2+), ggplot2, dplyr, tidyr, MASS
-
-## Quick Replication
-
-To regenerate exhibits from intermediate data:
+Stage 1 -- counterfactual and pair-level effects
 
 ```bash
-module load R
-cd replication_package
-Rscript code/build_exhibit_pack.R
+Rscript code/S1R_ppml_untreated.R    # PPML fit on untreated cells only
+Rscript code/S3R_theta.R             # pair-level log gaps
+Rscript code/S4_placebo.R            # never-treated pseudo-adoption set
+Rscript code/S5R_bhat_split.R        # 50/50 placebo split, b_hat, theta_D
+Rscript code/S6R_population.R        # canonical population, n = 4182
 ```
 
-To verify outputs:
+Stage 2 -- nulls, arms, and the identified set
 
 ```bash
-cd output
-sha256sum -c MANIFEST.txt
+Rscript code/N1_oos_null.R           # out-of-sample noise null (Arm A)
+Rscript code/N2_placebo_benchmark.R  # in-sample placebo null (Arm B)
+Rscript code/S18_null_stack.R        # in-sample pseudo null, NOT Arm C
+Rscript code/S24_arms_canonical.R    # Arm C and TW_MEAN -> T21_arms.csv
+Rscript code/S22_ladder_closed_form.R # P(theta <= 0) bracket -> T19
+Rscript code/S23_ge_bracket.R        # GE propagation by arm -> T20
 ```
 
-## Full Replication
-
-Execute scripts in order:
+Stage 3 -- distribution, gradient, reliability
 
 ```bash
-# Stage 0: Gravity estimation (from raw trade data)
-Rscript code/N0_setup.R   # Creates N0_data.rds from ITPDE_total.rds
-
-# Stage 1: Core estimation
-Rscript code/G2c_placebo.R
-Rscript code/S1_population_reconciliation.R
-
-# Stage 2: Validation gates
-Rscript code/O5_verdict.R
-Rscript code/P4_injection.R
-Rscript code/PROP_NUM_v3.R
-
-# Stage 3: Sensitivity analysis
-Rscript code/X1_corrected_LN_anchor_v2.R
-Rscript code/X2_residual_tail_v5.R
-Rscript code/X3_peryear_ratio.R
-Rscript code/X5_size_cohort.R
-
-# Stage 4: Generate exhibits
-Rscript code/Q4_exhibit_pack.R
-Rscript code/build_exhibit_pack.R
+Rscript code/N4_distribution.R       # effect distribution and size quintiles
+Rscript code/S28_gradient_B.R        # Definition-B gradient -> T27
+Rscript code/S24_reliability.R       # split-half, per-pair theta_A -> T22
+Rscript code/S24b_anchor_table.R     # anchor table -> T23
+Rscript code/S25_placebo_uncorrected.R # uncorrected placebo -> T24
 ```
+
+Stage 4 -- proposition verification
+
+```bash
+Rscript code/S29_v1c_pairlevel.R     # pair-level V1c arms -> T28 (diagnostic)
+Rscript code/S29b_v1c_arm1p.R        # Arm 1' (canonical V1c) -> T28b
+Rscript code/S26_prop_verification.R # T25 + article/prop_constants.tex
+```
+
+Stage 5 -- enforcement
+
+```bash
+Rscript code/enforce.R
+```
+
+`enforce.R` halts on any violation. The only expected violations are the
+`L*` QUARANTINE scripts (INV-029).
 
 ## Validation Gates
 
-All gates must pass for valid replication:
+Current values. All are ledgered in `meta/canonical_facts.md`; cite the
+ledger, not this table.
 
-| Gate | Criterion | Expected Value |
-|------|-----------|----------------|
-| Anchor | n pairs | 4182 |
-| Anchor | mean(theta_D) | 0.2138 +/- 0.002 |
-| Anchor | sd(theta_D) | 0.5950 +/- 0.005 |
-| T1 | naive mean | -0.52 +/- 0.01 |
-| T1 | placebo mean | -0.71 +/- 0.01 |
-| T4 | unweighted row | [1.402, 0.922, 0.411, 0.095] +/- 0.005 |
-| T5 | injection row | contains (0.40, 0.06) |
-| T6 | exp(IQR) | in [1.30, 1.42] |
+| Gate | Criterion | Expected |
+|------|-----------|----------|
+| Population | n pairs | 4182 |
+| Anchor | mean(theta_D) | 0.2473 +/- 0.002 (SE 0.0241) |
+| Anchor | SD(theta_D), observed | 1.5614 +/- 0.005 |
+| Anchor | SD(theta_true), identified set | [0.74, 1.48] |
+| Anchor | share theta_D <= 0 | 0.4211 |
+| Anchor | trade-weighted mean (pre_trade) | 0.0898 |
+| Bracket | P(theta_true <= 0) | [0.370, 0.421] |
+| Spec | published four | [1.402, 0.922, 0.411, 0.095] +/- 0.005 |
+| Gradient | Q1 - Q5, Definition D | 0.9137 +/- 0.08 |
+| Gradient | Q1 - Q5, Definition B | 0.6827 +/- 0.09 |
+| Reliability | split-half r, treated vs placebo | 0.9243 vs 0.7463 |
+| V1c | \|R_GAP\| for Arm 1' | < 0.05 (realized 0.0076) |
 
-## Expected Runtime
+The gradient profile is not monotone: Q4 lies below Q5 and the difference is
+not significant. See the shape note in the ledger's Gradient section before
+writing about it.
 
-On a standard compute node:
-- Quick replication (from intermediate data): ~5 minutes
-- Full replication (from gravity output): ~50 minutes
-- Complete replication (from raw trade data): ~60 minutes
+The retired gate table previously published here (mean 0.2138, SD 0.5950,
+naive mean -0.52) was a chimera with no R-chain provenance; see INV-010 in
+`meta/SUPERSEDED.md`.
+
+## Requirements
+
+- R >= 4.4.0 (tested with R 4.4.1)
+- `data.table`, `fixest` (0.13.2+), `dplyr`, `MASS`
+- Heavy stages are written for SLURM compute nodes; several scripts assert
+  they are not running on a login node.
+
+## Verification
+
+Every committed artifact carries a sidecar in `meta/` recording its producer,
+inputs, seed, gates, and SHA256, and a row in `meta/FILE_REGISTRY.csv`:
+
+```bash
+Rscript code/enforce.R
+```
 
 ## Contact
 
