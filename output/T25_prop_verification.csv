@@ -18,8 +18,8 @@
 "PROP_V2_PRED","V2 predicted mean (Prop 2a, delta=0.02)",-0.58210567525916
 "PROP_V2_SIM","V2 simulated mean",-0.58077494918274
 "PROP_V2_SHIFT","V2 shift under +5yr offset",0.00104986943833429
-"PROP_TAU_K1","tau_hat at kappa=1 (=SD_TRUE_A)",1.47552826635048
-"PROP_TAU_K2","tau_hat at kappa=2",1.3842104842831
-"PROP_TAU_K3","tau_hat at kappa=3",1.28642670401358
-"PROP_TAU_K5","tau_hat at kappa=5",1.06423853754657
-"PROP_KAPPA_FLOOR","kappa_floor (where tau_hat=0)",9.33706816059757
+"PROP_TAU_K1","tau_hat at kappa=1 (=SD_TRUE_A)",1.4754
+"PROP_TAU_K2","tau_hat at kappa=2",1.38407375526017
+"PROP_TAU_K3","tau_hat at kappa=3",1.2862795808066
+"PROP_TAU_K5","tau_hat at kappa=5",1.06406069375764
+"PROP_KAPPA_FLOOR","kappa_floor (where tau_hat=0)",9.3356187558636

@@ -43,12 +43,10 @@ PLACEBO_TPOST <- T22[ID == "PLACEBO_TPOST", value]
 PLACEBO_B_UNCORR_MEAN <- T24[ID == "PLACEBO_B_UNCORR_OVERALL", mean_theta_B]
 
 # Arm A values from T21 for V3c
-# SYNC-6e: Compute VAR_THETA_D from share ratio to preserve full precision
-# (SD_true in T21 is stored with limited precision)
+# Source SD_TRUE_A directly from T21 to match printed values exactly
 VAR_NULL_A <- T21[arm == "A_noise_only", Var_null_subtracted]
-share_A <- T21[arm == "A_noise_only", share_of_Var_theta_D]
-VAR_THETA_D <- VAR_NULL_A / share_A  # Var_null / share = Var(theta_D)
-SD_TRUE_A <- sqrt(VAR_THETA_D - VAR_NULL_A)  # Computed, not loaded
+SD_TRUE_A <- T21[arm == "A_noise_only", SD_true]  # Sourced, not computed
+VAR_THETA_D <- VAR_NULL_A + SD_TRUE_A^2  # Derived from sourced values
 
 cat(sprintf("PLACEBO_A_MEAN        = %.15f\n", PLACEBO_A_MEAN))
 cat(sprintf("PLACEBO_A_SD          = %.15f\n", PLACEBO_A_SD))

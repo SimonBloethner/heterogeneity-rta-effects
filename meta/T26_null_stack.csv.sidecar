@@ -1,0 +1,24 @@
+FILE:      T26_null_stack.csv
+SHA256:    ccfbc5897ef222c9b3f231ae9b6e4f25fb7c3909912de1d004bc3516605e3312
+PRODUCER:  code/S18_null_stack.R (SHA256: f19f00e26308f7fc606f2da11f6b69cfc5401177e6b925e190beb56cae83f0a9)
+INPUTS:    data/S1R_ppml.rds, data/S5R_bhat.rds
+SEED:      20260719
+
+DEFINITION: IN-SAMPLE PSEUDO NULL
+  This is NOT Arm C. S18 reuses S1R$y_hat_0, which was fitted on all pre-period
+  cells including the LATE cells used for pseudo_theta computation.
+
+COLUMNS:
+  horizon_bin:   Horizon bin (2-3, 4-5, 6-10, 11+, TOTAL)
+  n_pseudo:      Number of pseudo pairs in bin
+  var_pseudo_D:  Variance of pseudo_theta_D in bin (IN-SAMPLE)
+  weight_treated: Proportion of treated pairs in bin (SYMMETRIC window)
+  contribution:  weight_treated * var_pseudo_D (sums to Var_null_matched)
+
+TOTAL (in-sample): 0.389161
+
+ARM C (OOS): 1.8868 (from T12_N1b_horizon.csv × symmetric weights)
+  N1b refits PPML excluding LATE cells (true OOS).
+  Arm C is computed in S24_arms_canonical.R, not here.
+
+CREATED:   2026-07-29 13:20:02

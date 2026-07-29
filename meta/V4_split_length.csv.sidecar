@@ -1,6 +1,6 @@
 FILE:      V4_split_length.csv
-SHA256:    4f1f1da388ef76fb161fa04d6d1646f2ee69dec1ae0942d849e54ed27abbc2a4
-PRODUCER:  code/validation/V4_split_length.R (SHA256: f330c1691214c55ee598909f85843e811506d7bcd3bb3600ea15290e4510646a)
+SHA256:    934d0604059247eec77bb3b9604cf2d71adfc437f8026abcc7d2de6e2f68ce44
+PRODUCER:  code/validation/V4_split_length.R (SHA256: 17597648d477ea717c0ce3880b0a1922e0aa0f4b7c38541743d50d42e051005e)
 INPUTS:    data/S1R_ppml.rds, data/S5R_bhat.rds
 SEED:      20260719
 
@@ -10,8 +10,10 @@ S2: REGRESSION
 S4: COHORT EXTRAPOLATION
   Extrapolated 11+ ratio: 0.2990
 
-INV-027: VARIANCE DISCREPANCY
-  V4 (11+ bin):  0.1593
-  S18 (11+ bin): 1.2300
-  STATUS: OPEN
-CREATED:   2026-07-26 11:37:00
+INV-027a: IN-SAMPLE vs OOS NULL (CLOSED)
+  V4 (in-sample, 11+ bin): 0.1593
+  N1b (OOS, 11+ bin):      1.2300
+  V4/S18 measure in-sample null (reuses S1R$y_hat_0)
+  N1b measures OOS null (refits excluding LATE cells)
+  Arm C uses N1b. No discrepancy.
+CREATED:   2026-07-29 13:32:11

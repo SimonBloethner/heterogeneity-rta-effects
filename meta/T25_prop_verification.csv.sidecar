@@ -10,9 +10,9 @@ VERIFICATIONS:
   V1c: V_sigma2 = 4.1773, r_pred = 0.8068, r_gap = 0.0605, T_h >= 2: 5.46
   V2:  MC mean = -0.5808 vs predicted -0.5821, gap = 0.0013 < 0.02 [delta=0.02]
        V2 shift (SYNC-6e) = 0.001050 (calendar invariance, expected ~0)
-  V3c: tau_hat at kappa=1,2,3,5: 1.4755, 1.3842, 1.2864, 1.0642 (D1: arm A subtraction)
-       kappa_floor = 9.337
-       Gate: tau_hat(1) = 1.4755 matches T21 SD_TRUE_A = 1.4755
+  V3c: tau_hat at kappa=1,2,3,5: 1.4754, 1.3841, 1.2863, 1.0641 (D1: arm A subtraction)
+       kappa_floor = 9.336
+       Gate: tau_hat(1) = 1.4754 matches T21 SD_TRUE_A = 1.4754
 
 ASSUMPTION: Homogeneous-window approximation (per-pair T_post variation ignored).
             Exact quantity would be mean(sigma2_hat_ij / T_post_ij).
@@ -27,4 +27,4 @@ GATES:
 
 STATUS: BUILT
 DATE: 2026-07-29
-SHA256: c67b32845ba7ada89797cb5c7c31cc41f2123e06e5960b4bba1e9bf4ec124202
+SHA256: e729b79152f302e245dc63145282d08b92c990860d6eb28564a36457fcbee855
