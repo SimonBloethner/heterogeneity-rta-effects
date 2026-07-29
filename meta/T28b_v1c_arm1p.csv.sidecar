@@ -1,0 +1,30 @@
+FILE:      T28b_v1c_arm1p.csv
+SHA256:    7bd76254d80324c2c8189c906383ef9b462d000394c3bb19253aad0fd89dcc4c
+PRODUCER:  S29b_v1c_arm1p.R
+INPUTS:
+  output/T28_v1c_pairlevel.csv:     06047099424126dc10b3c3239c2b90055403857ed2148bc06bc6d98d557f797c
+  output/T25_prop_verification.csv: e729b79152f302e245dc63145282d08b92c990860d6eb28564a36457fcbee855
+  output/T22_theta_A_placebo.csv:   aeaa1148c90507e089216c4474ef8f0301805c232949e79bd3a3b3bbd0edde18
+SEED:      NONE
+
+ARM 1' SPECIFICATION:
+  Uses ESIGMA2 throughout (not mean(sigma2_i))
+  Jensen-corrects on BOTH windows:
+    - T_post for variance decomposition: A1p = var_thA - ES * m_inv_Tp
+    - T_h for split-half: r1p = A1p / (A1p + ES * m_inv_Th)
+
+FOUR ARMS:
+  Arm 0 (plug-in):            r0  = 0.806812807675821, R_GAP_0  = 0.060504390957041
+  Arm 1 (Jensen 1/T_h only):  r1  = 0.740034720241086, R_GAP_1  = -0.006273696477694
+  Arm 1' (Jensen both):       r1p = 0.753863355754621, R_GAP_1p = 0.007554939035841
+  Arm 2 (full pair-level):    r2  = 0.665280170612825, R_GAP_2  = -0.081028246105955
+
+DRIFT_INFLATION_RATIO = mean(sigma2_i)/ESIGMA2 = 1.346031875229608
+
+GATES:
+  G1: |2*m_inv_Tp - m_inv_Th| = 0.00e+00 < 1e-12: PASS
+  G2: |A1p - 1.005256| = 3.15e-07 < 1e-5: PASS
+  G3: |r1p - 0.753863| = 3.56e-07 < 1e-5: PASS
+  G4: |R_GAP_1p| = 0.007555 < 0.05: PASS
+
+CREATED: 2026-07-29 16:52:19
