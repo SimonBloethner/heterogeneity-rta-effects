@@ -1,6 +1,6 @@
 # SUPERSEDED Files Registry
 
-Generated: 2026-07-25, Updated: 2026-07-26
+Generated: 2026-07-25, Updated: 2026-07-29 (SYNC-8)
 Pipeline: REBUILD_V2 (manifest-first rebuild + PATCH + SE-CF)
 
 Files marked SUPERSEDED are retained per R9 for audit trail but should not be used
@@ -63,16 +63,18 @@ for analysis. Each entry documents what was wrong and what supersedes it.
   S2_pairs.rds, S3_theta.rds all retired by INV-017; the seed-12345 row was
   extrapolated rather than computed. Its sidecar's Branch C2 verdict ("placebo
   design INVALID") is superseded by INV-015 RESOLVED and was never updated.
-- **Status:** SUPERSEDED — moved to audit/
+- **Status:** SUPERSEDED — moved to audit/. Note: meta/T7_placebo_validity.csv.sidecar
+  remains in the tree with no corresponding output file and is registered ORPHAN
+  in FILE_REGISTRY.csv.
 
 ## Invalidation Register
 
 NOTE: The INV series is split across two files. INV-001 to INV-026 are recorded
-here. INV-027 to INV-036 are recorded in the Investigation Log of
+here. INV-027 to INV-037 are recorded in the Investigation Log of
 meta/canonical_facts.md. There is no INV-027 entry in this file by design.
 
 ### INV-010: README Gate Table Chimera
-- **Location:** replication_package/README.md, Validation Gates table
+- **Location:** README.md, Validation Gates table
 - **Original values:**
   - T1 naive mean: -0.52 +/- 0.01
   - mean(theta_D): 0.2138 +/- 0.002
@@ -82,8 +84,19 @@ meta/canonical_facts.md. There is no INV-027 entry in this file by design.
   - T1 mean(theta_A): -0.284 +/- 0.03
   - mean(theta_D): 0.247 +/- 0.024
   - SD(theta_D): 1.561 +/- 0.027
-- **Status:** CLOSED - README updated with R-chain values
-- **Date:** 2026-07-26
+- **Status:** CLOSED (2026-07-29). CLOSED IN ERROR on 2026-07-26: the entry
+  was marked "README updated with R-chain values" but no such edit was ever
+  made. Verified still present at commit 3acc9c6 on 2026-07-29, three days
+  after the claimed closure. The README was actually rewritten at commit
+  da95f8b, which also replaced the stale pipeline listing (it named
+  N0_setup.R, G2c_placebo.R, O5_verdict.R, Q4_exhibit_pack.R,
+  build_exhibit_pack.R and X1-X5, all of which live under
+  archive/retired_pack/) and removed hard file counts that were wrong in
+  both directions.
+- **Lesson:** a register entry asserting that a file was edited is not
+  evidence that it was. Closure claims that reference an artifact should be
+  verified against that artifact.
+- **Date:** 2026-07-26 (closed in error); 2026-07-29 (actually closed)
 
 ### INV-015: Placebo Validity Gate Never Invoked
 - **Detected by:** code/S14_placebo_diagnostic.R
@@ -129,7 +142,7 @@ meta/canonical_facts.md. There is no INV-027 entry in this file by design.
 - **Date:** 2026-07-26
 
 ### INV-020: T1 Window-Mixing Defect (README)
-- **Location:** replication_package/README.md, original gate table
+- **Location:** README.md, original gate table
 - **Defect:** The original "T1 naive mean: -0.52" mixed anticipation windows
   or populations in a way that produced a value not reproducible from any
   single R-chain configuration. A careful reader using this gate would
@@ -138,8 +151,10 @@ meta/canonical_facts.md. There is no INV-027 entry in this file by design.
 - **Consequence:** Could mislead replicator into wrong inference about
   validity of their reproduction
 - **Resolution:** README gate table replaced with R-chain sourced values
-- **Status:** CLOSED
-- **Date:** 2026-07-26
+- **Status:** CLOSED (2026-07-29). Like INV-010, this entry was marked CLOSED
+  on 2026-07-26 on the strength of a README edit that had not been made. The
+  edit landed at commit da95f8b.
+- **Date:** 2026-07-26 (closed in error); 2026-07-29 (actually closed)
 
 ### INV-021: Pack theta_D Lineage Retired
 - **Issue:** Pack theta_D used pooled counterfactual (S1) + W0 window convention
@@ -167,7 +182,10 @@ meta/canonical_facts.md. There is no INV-027 entry in this file by design.
 - **Impact:** SD_true_A = 1.48 (noise-only) vs SD_true_C = 0.95 (OOS drift null)
 - **Resolution:** Identified set [0.95, 1.48] replaces point estimate;
   Arm C (OOS drift) is preferred
-- **Status:** DOCUMENTED — three-arm deconvolution in N3
+- **Status:** DOCUMENTED — three-arm deconvolution in N3. NOTE: the bracket
+  quoted here is the INV-023-era one; the canonical identified set is
+  [0.74, 1.48] per INV-027 in meta/canonical_facts.md, and no arm preference
+  is established. Cite the ledger, not this entry.
 - **Date:** 2026-07-26
 
 ### INV-024: OOS Null Gate Applied to Uncorrected Object
@@ -181,7 +199,8 @@ meta/canonical_facts.md. There is no INV-027 entry in this file by design.
   - New Var_null_matched (pseudo_theta_D): 1.509
   - Old SD_true_C: 0.948
   - New SD_true_C: 0.964 [0.870, 1.041]
-- **Status:** CORRECTED — C1/C2 analysis
+- **Status:** CORRECTED — C1/C2 analysis. Superseded by INV-026: the
+  symmetric-window value is 1.887, not 1.509.
 - **Date:** 2026-07-26
 
 ### INV-025: Horizon-Cohort Disjunction in 11+ Bin
@@ -248,6 +267,19 @@ meta/canonical_facts.md. There is no INV-027 entry in this file by design.
 - **Status:** DOCUMENTED — result valid, different source object
 - **Date:** 2026-07-26
 
+### CAV-003: Unresolved Tree Residuals (SYNC-8)
+- **ORPHAN sidecars** (registered ORPHAN in FILE_REGISTRY.csv, no output file):
+  meta/T26_null_stack.csv.sidecar, meta/T7_placebo_validity.csv.sidecar
+- **STRAY data files** (no sidecar, no producer, do not use):
+  data/C1_pseudo_corrected.rds, data/C2_corrected.rds,
+  data/STRAY_W1_COPY_DO_NOT_USE.rds
+- **T26 identifier collision:** claimed by both code/S18_null_stack.R
+  (T26_null_stack.csv) and code/S27_size_gradient.R (T26_size_gradient.csv).
+  Neither output is committed. Audit pending.
+- **Status:** DOCUMENTED — none blocking; all three are recorded so that a
+  later pass does not rediscover them as new findings.
+- **Date:** 2026-07-29
+
 ## Disambiguated Producers
 
 | Superseded | Canonical | Reason |
@@ -257,6 +289,7 @@ meta/canonical_facts.md. There is no INV-027 entry in this file by design.
 | N3_deconv_arms.R | S19_deconv_arms.R | S19 is canonical producer; cited in canonical_facts.md |
 | S17_secf_bootstrap.R | S17_se_cf.R | S17_se_cf.R cited in canonical_facts.md |
 | S13b_matching_sensitivity.R | (none) | Bug produced spurious seed swings; analysis not replicated |
+| S26_jensen_params.R | S26_prop_verification.R | Registered SUPERSEDED in FILE_REGISTRY.csv (SYNC-8) |
 
 ## Audit Trail (Tier C)
 
