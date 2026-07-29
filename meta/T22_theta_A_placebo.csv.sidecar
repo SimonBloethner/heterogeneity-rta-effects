@@ -1,0 +1,26 @@
+FILE:      T22_theta_A_placebo.csv
+SHA256:    aeaa1148c90507e089216c4474ef8f0301805c232949e79bd3a3b3bbd0edde18
+PRODUCER:  S24_PROV.R (provenance verification)
+INPUTS:
+  data/S5R_bhat.rds: d46910ef55f0a22018baf8bd218dac5548bde98150d798ad85aa1914af8d12d8
+  data/S1R_ppml.rds: 45c937cd78805d7b13b4c43f4bc4888e93a2ff15e787ad4fb41d77b51f837d89
+SEED:      20260719
+
+DEFINITION: A (mean of log gaps)
+  theta_A = mean over post cells of [log(trade) - log(y_hat_0)]
+
+COLUMNS:
+  pair:         Pair identifier
+  theta_A:      Definition A effect estimate (NA if no post cells)
+  n_post_cells: Number of qualifying post cells
+  qualifies:    TRUE if >= 2 cells in each split half
+
+TOTAL_PAIRS: 17200
+QUALIFYING:  15683
+
+NESTING VERIFICATION:
+  Full population mean (n=17200):     -0.687984245233330
+  Qualifying subset mean (n=15683): -0.682105675259160
+  T23 uses full population; T22 uses qualifying subset.
+
+CREATED: 2026-07-29 16:22:10
