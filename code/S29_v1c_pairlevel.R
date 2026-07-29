@@ -1,0 +1,422 @@
+#!/usr/bin/env Rscript
+# =============================================================================
+# S29_v1c_pairlevel.R - V1c Reliability with Pair-Level Noise Terms
+# =============================================================================
+# OUTPUTS: T28_v1c_pairlevel.csv, T28_v1c_pairlevel.csv.sidecar
+# INPUTS:  data/S5R_bhat.rds, data/S1R_ppml.rds,
+#          output/T25_prop_verification.csv, output/T22_theta_A_placebo.csv
+# SEED:    NONE
+# SCRATCH: /scratch/bt307958/V1C_PAIRLEVEL/
+# =============================================================================
+
+# Login node guard
+stopifnot(!grepl("login", Sys.info()[["nodename"]]))
+
+cat("=============================================================================\n")
+cat("S29_v1c_pairlevel.R - V1c Reliability with Pair-Level Noise Terms\n")
+cat(sprintf("Start: %s\n", format(Sys.time())))
+cat(sprintf("Node: %s\n", Sys.info()[["nodename"]]))
+cat("=============================================================================\n\n")
+
+suppressPackageStartupMessages(library(data.table))
+
+# Paths
+REBUILD_DIR <- "/scratch/bt307958/REBUILD_V2"
+SCRATCH_DIR <- "/scratch/bt307958/V1C_PAIRLEVEL"
+
+# SHA256 verification function
+get_sha256 <- function(p) {
+  strsplit(system2("sha256sum", args = shQuote(p), stdout = TRUE), " ")[[1]][1]
+}
+
+# =============================================================================
+# VERIFY INPUT SHA256
+# =============================================================================
+cat("=== VERIFYING INPUT SHA256 ===\n")
+
+sha_S5R <- get_sha256(file.path(REBUILD_DIR, "data/S5R_bhat.rds"))
+sha_S1R <- get_sha256(file.path(REBUILD_DIR, "data/S1R_ppml.rds"))
+sha_T25 <- get_sha256(file.path(SCRATCH_DIR, "T25_prop_verification.csv"))
+sha_T22 <- get_sha256(file.path(SCRATCH_DIR, "T22_theta_A_placebo.csv"))
+
+expected_sha_S5R <- "d46910ef55f0a22018baf8bd218dac5548bde98150d798ad85aa1914af8d12d8"
+expected_sha_S1R <- "45c937cd78805d7b13b4c43f4bc4888e93a2ff15e787ad4fb41d77b51f837d89"
+expected_sha_T25 <- "e729b79152f302e245dc63145282d08b92c990860d6eb28564a36457fcbee855"
+expected_sha_T22 <- "aeaa1148c90507e089216c4474ef8f0301805c232949e79bd3a3b3bbd0edde18"
+
+cat(sprintf("S5R_bhat.rds:              %s\n", sha_S5R))
+cat(sprintf("  Expected:                %s\n", expected_sha_S5R))
+cat(sprintf("  Match: %s\n", ifelse(sha_S5R == expected_sha_S5R, "YES", "HALT")))
+
+cat(sprintf("S1R_ppml.rds:              %s\n", sha_S1R))
+cat(sprintf("  Expected:                %s\n", expected_sha_S1R))
+cat(sprintf("  Match: %s\n", ifelse(sha_S1R == expected_sha_S1R, "YES", "HALT")))
+
+cat(sprintf("T25_prop_verification.csv: %s\n", sha_T25))
+cat(sprintf("  Expected:                %s\n", expected_sha_T25))
+cat(sprintf("  Match: %s\n", ifelse(sha_T25 == expected_sha_T25, "YES", "HALT")))
+
+cat(sprintf("T22_theta_A_placebo.csv:   %s\n", sha_T22))
+cat(sprintf("  Expected:                %s\n", expected_sha_T22))
+cat(sprintf("  Match: %s\n", ifelse(sha_T22 == expected_sha_T22, "YES", "HALT")))
+
+stopifnot(sha_S5R == expected_sha_S5R)
+stopifnot(sha_S1R == expected_sha_S1R)
+stopifnot(sha_T25 == expected_sha_T25)
+stopifnot(sha_T22 == expected_sha_T22)
+
+cat("All input SHA256 verified: PASS\n\n")
+
+# =============================================================================
+# LOAD DATA
+# =============================================================================
+cat("=== LOADING DATA ===\n")
+
+S5R <- readRDS(file.path(REBUILD_DIR, "data/S5R_bhat.rds"))
+placebo_meta <- as.data.table(S5R[["placebo"]])
+cat(sprintf("Placebo pairs in S5R: %d\n", nrow(placebo_meta)))
+
+ppml <- readRDS(file.path(REBUILD_DIR, "data/S1R_ppml.rds"))
+setDT(ppml)
+cat(sprintf("PPML rows: %d\n", nrow(ppml)))
+
+T22 <- fread(file.path(SCRATCH_DIR, "T22_theta_A_placebo.csv"))
+cat(sprintf("T22 rows: %d\n", nrow(T22)))
+cat(sprintf("T22 columns: %s\n", paste(names(T22), collapse = ", ")))
+
+T25 <- fread(file.path(SCRATCH_DIR, "T25_prop_verification.csv"))
+cat(sprintf("T25 rows: %d\n", nrow(T25)))
+
+# =============================================================================
+# FILTER TO QUALIFYING PAIRS
+# =============================================================================
+cat("\n=== FILTERING TO QUALIFYING PAIRS ===\n")
+
+qualifying <- T22[qualifies == TRUE]
+n_qualifying <- nrow(qualifying)
+cat(sprintf("Qualifying pairs (qualifies == TRUE): %d\n", n_qualifying))
+
+# G1: n used == 15683
+cat(sprintf("\nG1: n used = %d, expected 15683\n", n_qualifying))
+stopifnot(n_qualifying == 15683)
+cat("G1 PASS\n")
+
+# =============================================================================
+# COMPUTE PER-PAIR QUANTITIES
+# =============================================================================
+cat("\n=== COMPUTING PER-PAIR QUANTITIES ===\n")
+
+# Get pseudo-adoption years from placebo_meta
+pseudo_years <- setNames(placebo_meta$pseudo, placebo_meta$pair)
+
+# Pre-allocate results
+results <- data.table(
+  pair = qualifying$pair,
+  theta_A = qualifying$theta_A,
+  sigma2_i = NA_real_,
+  T_post_i = NA_integer_,
+  T_h_i = NA_real_
+)
+
+cat("Processing pairs...\n")
+pb_interval <- 1000
+
+for (idx in seq_len(nrow(results))) {
+  p <- results$pair[idx]
+  pseudo <- pseudo_years[p]
+
+  # Get post cells: year > pseudo + 1 & trade > 0 & y_hat_0 > 0
+  # (exactly as in S24_reliability.R line 64)
+  ppml_pair <- ppml[pair == p]
+  post_cells <- ppml_pair[year > pseudo + 1 & trade > 0 & y_hat_0 > 0]
+
+  if (nrow(post_cells) < 2) {
+    # Should not happen for qualifying pairs, but guard
+    next
+  }
+
+  # Compute g_ijt = log(trade) - log(y_hat_0)
+  g_ijt <- log(post_cells$trade) - log(post_cells$y_hat_0)
+
+  # sigma2_i = var(g_ijt), R default uses n-1 denominator
+  results$sigma2_i[idx] <- var(g_ijt)
+  results$T_post_i[idx] <- length(g_ijt)
+  results$T_h_i[idx] <- length(g_ijt) / 2
+
+  if (idx %% pb_interval == 0) {
+    cat(sprintf("  Processed %d / %d pairs\n", idx, nrow(results)))
+  }
+}
+
+cat(sprintf("Processed %d pairs\n", nrow(results)))
+
+# Check no NAs
+n_complete <- sum(complete.cases(results))
+cat(sprintf("Complete cases: %d\n", n_complete))
+stopifnot(n_complete == n_qualifying)
+
+# =============================================================================
+# LOAD T25 COMMITTED VALUES
+# =============================================================================
+cat("\n=== LOADING T25 COMMITTED VALUES ===\n")
+
+ESIGMA2 <- T25[ID == "PROP_ESIGMA2", value]
+V_SIGMA2_T25 <- T25[ID == "PROP_V_SIGMA2", value]
+T_H_BAR <- T25[ID == "PROP_TH", value]
+T_POST_BAR <- T25[ID == "PROP_TPOST", value]
+R_PRED_T25 <- T25[ID == "PROP_R_PRED", value]
+PLACEBO_A_R <- T25[ID == "PROP_PLACEBO_R", value]
+
+# A0 = q = V_sigma2 / 4
+A0 <- V_SIGMA2_T25 / 4
+
+cat(sprintf("ESIGMA2 (from T25):    %.15f\n", ESIGMA2))
+cat(sprintf("V_SIGMA2 (from T25):   %.15f\n", V_SIGMA2_T25))
+cat(sprintf("A0 = V_SIGMA2/4:       %.15f\n", A0))
+cat(sprintf("T_H_BAR (from T25):    %.15f\n", T_H_BAR))
+cat(sprintf("T_POST_BAR (from T25): %.15f\n", T_POST_BAR))
+cat(sprintf("R_PRED (from T25):     %.15f\n", R_PRED_T25))
+cat(sprintf("PLACEBO_A_R (from T25):%.15f\n", PLACEBO_A_R))
+
+# =============================================================================
+# COMPUTE PAIR-LEVEL QUANTITIES
+# =============================================================================
+cat("\n=== COMPUTING PAIR-LEVEL QUANTITIES ===\n")
+
+# Variance of theta_A across pairs
+var_theta_A <- var(results$theta_A)
+cat(sprintf("var(theta_A):          %.15f\n", var_theta_A))
+
+# Mean of sigma2_i / T_post,i
+mean_sigma2_over_Tpost <- mean(results$sigma2_i / results$T_post_i)
+cat(sprintf("mean(sigma2_i/T_post,i): %.15f\n", mean_sigma2_over_Tpost))
+
+# VarSig2 from decomposition (spec formula)
+VarSig2 <- 4 * (var_theta_A - mean_sigma2_over_Tpost)
+A <- VarSig2 / 4  # = var_theta_A - mean_sigma2_over_Tpost
+cat(sprintf("VarSig2 = 4*(var - mean): %.15f\n", VarSig2))
+cat(sprintf("A = VarSig2/4:           %.15f\n", A))
+
+# Mean of 1/T_h,i
+mean_inv_Th <- mean(1 / results$T_h_i)
+cat(sprintf("mean(1/T_h,i):         %.15f\n", mean_inv_Th))
+
+# Mean of sigma2_i / T_h,i
+mean_sigma2_over_Th <- mean(results$sigma2_i / results$T_h_i)
+cat(sprintf("mean(sigma2_i/T_h,i):  %.15f\n", mean_sigma2_over_Th))
+
+# Arithmetic and harmonic mean of T_h,i
+arith_mean_Th <- mean(results$T_h_i)
+harm_mean_Th <- 1 / mean(1 / results$T_h_i)
+cat(sprintf("Arithmetic mean T_h,i: %.15f\n", arith_mean_Th))
+cat(sprintf("Harmonic mean T_h,i:   %.15f\n", harm_mean_Th))
+
+# Mean of sigma2_i
+mean_sigma2 <- mean(results$sigma2_i)
+cat(sprintf("mean(sigma2_i):        %.15f\n", mean_sigma2))
+cat(sprintf("ESIGMA2 (committed):   %.15f\n", ESIGMA2))
+
+# Spearman correlation of sigma2_i with T_h,i
+spearman_rho <- cor(results$sigma2_i, results$T_h_i, method = "spearman")
+cat(sprintf("Spearman(sigma2_i, T_h,i): %.15f\n", spearman_rho))
+
+# =============================================================================
+# COMPUTE THREE ARMS
+# =============================================================================
+cat("\n=== COMPUTING THREE ARMS ===\n")
+
+# Arm 0 (plug-in, current): r0 = A0 / (A0 + ESIGMA2 / T_h_bar)
+r0 <- A0 / (A0 + ESIGMA2 / T_H_BAR)
+cat(sprintf("Arm 0: r0 = %.15f\n", r0))
+cat(sprintf("       A0 / (A0 + ESIGMA2/T_h_bar) = %.6f / (%.6f + %.6f/%.6f)\n",
+            A0, A0, ESIGMA2, T_H_BAR))
+
+# Arm 1 (Jensen on 1/T only): r1 = A / (A + ESIGMA2 * mean_i(1/T_h,i))
+r1 <- A / (A + ESIGMA2 * mean_inv_Th)
+cat(sprintf("Arm 1: r1 = %.15f\n", r1))
+cat(sprintf("       A / (A + ESIGMA2 * mean(1/T_h)) = %.6f / (%.6f + %.6f * %.6f)\n",
+            A, A, ESIGMA2, mean_inv_Th))
+
+# Arm 2 (full pair-level): r2 = A / (A + mean_i(sigma2_i / T_h,i))
+r2 <- A / (A + mean_sigma2_over_Th)
+cat(sprintf("Arm 2: r2 = %.15f\n", r2))
+cat(sprintf("       A / (A + mean(sigma2/T_h)) = %.6f / (%.6f + %.6f)\n",
+            A, A, mean_sigma2_over_Th))
+
+# R_GAP for each arm
+R_GAP_0 <- r0 - PLACEBO_A_R
+R_GAP_1 <- r1 - PLACEBO_A_R
+R_GAP_2 <- r2 - PLACEBO_A_R
+
+cat(sprintf("\nR_GAP_0 = r0 - %.15f = %.15f\n", PLACEBO_A_R, R_GAP_0))
+cat(sprintf("R_GAP_1 = r1 - %.15f = %.15f\n", PLACEBO_A_R, R_GAP_1))
+cat(sprintf("R_GAP_2 = r2 - %.15f = %.15f\n", PLACEBO_A_R, R_GAP_2))
+
+# =============================================================================
+# GATES G2-G4
+# =============================================================================
+cat("\n=== GATES G2-G4 ===\n")
+
+# G2: abs(r0 - 0.806812807675821) < 1e-4 (Arm 0 reproduces T25)
+g2_diff <- abs(r0 - 0.806812807675821)
+cat(sprintf("G2: |r0 - 0.806812807675821| = %.15e, expected < 1e-4\n", g2_diff))
+stopifnot(g2_diff < 1e-4)
+cat("G2 PASS\n")
+
+# G3: harmonic_mean(T_h,i) < arithmetic_mean(T_h,i)
+cat(sprintf("G3: harmonic %.6f < arithmetic %.6f\n", harm_mean_Th, arith_mean_Th))
+stopifnot(harm_mean_Th < arith_mean_Th)
+cat("G3 PASS\n")
+
+# G4: r2 <= r0 (correction must move reliability DOWN)
+cat(sprintf("G4: r2 = %.6f <= r0 = %.6f\n", r2, r0))
+stopifnot(r2 <= r0)
+cat("G4 PASS\n")
+
+# =============================================================================
+# OUTPUT FILES (write BEFORE terminal gate)
+# =============================================================================
+cat("\n=== WRITING OUTPUT FILES ===\n")
+
+# T28_v1c_pairlevel.csv
+out <- data.frame(
+  quantity = c(
+    "n_qualifying",
+    "var_theta_A",
+    "mean_sigma2_over_Tpost",
+    "VarSig2",
+    "A",
+    "A0_T25",
+    "ESIGMA2",
+    "T_h_bar_T25",
+    "mean_inv_Th",
+    "mean_sigma2_over_Th",
+    "arith_mean_Th",
+    "harm_mean_Th",
+    "mean_sigma2",
+    "spearman_sigma2_Th",
+    "r0",
+    "r1",
+    "r2",
+    "R_GAP_0",
+    "R_GAP_1",
+    "R_GAP_2",
+    "PLACEBO_A_R"
+  ),
+  value = c(
+    n_qualifying,
+    var_theta_A,
+    mean_sigma2_over_Tpost,
+    VarSig2,
+    A,
+    A0,
+    ESIGMA2,
+    T_H_BAR,
+    mean_inv_Th,
+    mean_sigma2_over_Th,
+    arith_mean_Th,
+    harm_mean_Th,
+    mean_sigma2,
+    spearman_rho,
+    r0,
+    r1,
+    r2,
+    R_GAP_0,
+    R_GAP_1,
+    R_GAP_2,
+    PLACEBO_A_R
+  ),
+  stringsAsFactors = FALSE
+)
+
+write.csv(out, file.path(SCRATCH_DIR, "T28_v1c_pairlevel.csv"), row.names = FALSE)
+cat(sprintf("Wrote: %s/T28_v1c_pairlevel.csv\n", SCRATCH_DIR))
+
+# SHA256 of output
+sha_T28 <- get_sha256(file.path(SCRATCH_DIR, "T28_v1c_pairlevel.csv"))
+
+# Sidecar
+sidecar_lines <- c(
+  "FILE:      T28_v1c_pairlevel.csv",
+  sprintf("SHA256:    %s", sha_T28),
+  "PRODUCER:  S29_v1c_pairlevel.R",
+  "INPUTS:",
+  sprintf("  data/S5R_bhat.rds:              %s", sha_S5R),
+  sprintf("  data/S1R_ppml.rds:              %s", sha_S1R),
+  sprintf("  output/T25_prop_verification.csv: %s", sha_T25),
+  sprintf("  output/T22_theta_A_placebo.csv: %s", sha_T22),
+  "SEED:      NONE",
+  "",
+  "POPULATION: Split-half qualifying placebo pairs (qualifies == TRUE)",
+  sprintf("  n = %d", n_qualifying),
+  "",
+  "PAIR-LEVEL QUANTITIES:",
+  sprintf("  var(theta_A):            %.15f", var_theta_A),
+  sprintf("  mean(sigma2_i/T_post,i): %.15f", mean_sigma2_over_Tpost),
+  sprintf("  VarSig2 = 4*(var - mean): %.15f", VarSig2),
+  sprintf("  A = VarSig2/4:           %.15f", A),
+  "",
+  "T_h STATISTICS:",
+  sprintf("  Arithmetic mean:         %.15f", arith_mean_Th),
+  sprintf("  Harmonic mean:           %.15f", harm_mean_Th),
+  sprintf("  mean(1/T_h,i):           %.15f", mean_inv_Th),
+  "",
+  "SIGMA2 STATISTICS:",
+  sprintf("  mean(sigma2_i):          %.15f", mean_sigma2),
+  sprintf("  ESIGMA2 (committed):     %.15f", ESIGMA2),
+  sprintf("  Spearman(sigma2, T_h):   %.15f", spearman_rho),
+  "",
+  "THREE ARMS:",
+  sprintf("  Arm 0 (plug-in):         r0 = %.15f", r0),
+  sprintf("  Arm 1 (Jensen 1/T):      r1 = %.15f", r1),
+  sprintf("  Arm 2 (full pair-level): r2 = %.15f", r2),
+  "",
+  "R_GAP (r - 0.74630841671878):",
+  sprintf("  R_GAP_0 = %.15f", R_GAP_0),
+  sprintf("  R_GAP_1 = %.15f", R_GAP_1),
+  sprintf("  R_GAP_2 = %.15f", R_GAP_2),
+  "",
+  "GATES:",
+  sprintf("  G1: n = %d == 15683: PASS", n_qualifying),
+  sprintf("  G2: |r0 - 0.8068| = %.2e < 1e-4: PASS", g2_diff),
+  sprintf("  G3: harm(%.4f) < arith(%.4f): PASS", harm_mean_Th, arith_mean_Th),
+  sprintf("  G4: r2(%.6f) <= r0(%.6f): PASS", r2, r0),
+  sprintf("  G5: |R_GAP_2| = %.6f < 0.05: %s", abs(R_GAP_2), ifelse(abs(R_GAP_2) < 0.05, "PASS", "FAIL")),
+  "",
+  sprintf("CREATED: %s", format(Sys.time()))
+)
+
+writeLines(sidecar_lines, file.path(SCRATCH_DIR, "T28_v1c_pairlevel.csv.sidecar"))
+cat(sprintf("Wrote: %s/T28_v1c_pairlevel.csv.sidecar\n", SCRATCH_DIR))
+
+# =============================================================================
+# TERMINAL GATE G5
+# =============================================================================
+cat("\n=== TERMINAL GATE G5 ===\n")
+cat(sprintf("G5: |R_GAP_2| = %.15f, bound = 0.05\n", abs(R_GAP_2)))
+
+if (abs(R_GAP_2) < 0.05) {
+  cat("G5 PASS\n")
+} else {
+  cat("G5 FAIL - This is the FINDING\n")
+  cat(sprintf("  r2 = %.15f\n", r2))
+  cat(sprintf("  PLACEBO_A_R = %.15f\n", PLACEBO_A_R))
+  cat(sprintf("  |R_GAP_2| = %.15f >= 0.05\n", abs(R_GAP_2)))
+}
+
+# The stopifnot is the terminal gate - failure is the finding
+stopifnot(abs(R_GAP_2) < 0.05)
+
+# =============================================================================
+# SUMMARY
+# =============================================================================
+cat("\n=============================================================================\n")
+cat("SUMMARY: ALL GATES PASSED\n")
+cat("=============================================================================\n")
+cat(sprintf("G1: n = %d: PASS\n", n_qualifying))
+cat(sprintf("G2: |r0 - 0.8068| < 1e-4: PASS\n"))
+cat(sprintf("G3: harmonic < arithmetic: PASS\n"))
+cat(sprintf("G4: r2 <= r0: PASS\n"))
+cat(sprintf("G5: |R_GAP_2| < 0.05: PASS\n"))
+cat("=============================================================================\n")
+cat(sprintf("Done: %s\n", format(Sys.time())))

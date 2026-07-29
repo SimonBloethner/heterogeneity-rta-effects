@@ -1,0 +1,47 @@
+FILE:      T28_v1c_pairlevel.csv
+SHA256:    06047099424126dc10b3c3239c2b90055403857ed2148bc06bc6d98d557f797c
+PRODUCER:  S29_v1c_pairlevel.R
+INPUTS:
+  data/S5R_bhat.rds:              d46910ef55f0a22018baf8bd218dac5548bde98150d798ad85aa1914af8d12d8
+  data/S1R_ppml.rds:              45c937cd78805d7b13b4c43f4bc4888e93a2ff15e787ad4fb41d77b51f837d89
+  output/T25_prop_verification.csv: e729b79152f302e245dc63145282d08b92c990860d6eb28564a36457fcbee855
+  output/T22_theta_A_placebo.csv: aeaa1148c90507e089216c4474ef8f0301805c232949e79bd3a3b3bbd0edde18
+SEED:      NONE
+
+POPULATION: Split-half qualifying placebo pairs (qualifies == TRUE)
+  n = 15683
+
+PAIR-LEVEL QUANTITIES:
+  var(theta_A):            1.169364580531139
+  mean(sigma2_i/T_post,i): 0.235041237981444
+  VarSig2 = 4*(var - mean): 3.737293370198782
+  A = VarSig2/4:           0.934323342549696
+
+T_h STATISTICS:
+  Arithmetic mean:         5.455525090862718
+  Harmonic mean:           4.156437044543638
+  mean(1/T_h,i):           0.240590676409438
+
+SIGMA2 STATISTICS:
+  mean(sigma2_i):          1.836271962347688
+  ESIGMA2 (committed):     1.364211350518320
+  Spearman(sigma2, T_h):   -0.037087864158760
+
+THREE ARMS:
+  Arm 0 (plug-in):         r0 = 0.806812807675821
+  Arm 1 (Jensen 1/T):      r1 = 0.740034720241086
+  Arm 2 (full pair-level): r2 = 0.665280170612825
+
+R_GAP (r - 0.74630841671878):
+  R_GAP_0 = 0.060504390957041
+  R_GAP_1 = -0.006273696477694
+  R_GAP_2 = -0.081028246105955
+
+GATES:
+  G1: n = 15683 == 15683: PASS
+  G2: |r0 - 0.8068| = 3.33e-16 < 1e-4: PASS
+  G3: harm(4.1564) < arith(5.4555): PASS
+  G4: r2(0.665280) <= r0(0.806813): PASS
+  G5: |R_GAP_2| = 0.081028 < 0.05: FAIL
+
+CREATED: 2026-07-29 16:35:47
