@@ -1,7 +1,8 @@
 # Canonical Facts Ledger
 
 Generated: 2026-07-27 (SYNC-6)
-Status: CLOSED
+Amended: 2026-07-29 (SYNC-7: gradient producer + Definition-B gradient, Jensen/reliability refresh, TW_MEAN rounding, anchor-table correction, INV-037 opened)
+Status: OPEN (INV-033, INV-037; V1c adjudication pending)
 
 ## Population
 
@@ -16,7 +17,9 @@ Status: CLOSED
 | MEAN_THETA_D | Mean theta_D | 0.2473 | 0.0241 | data/S5R_bhat.rds$baseline (n=4182) |
 | SD_THETA_TRUE | SD(theta_true) | [0.74, 1.48] | - | INV-027 |
 | RAW_SHARE | Share theta_D <= 0 | 0.4211 | - | data/S5R_bhat.rds$baseline (n=4182) |
-| TW_MEAN | Trade-weighted mean theta_D | 0.0897 | - | code/S24_arms_canonical.R |
+| TW_MEAN | Trade-weighted mean theta_D | 0.0898 | - | code/S24_arms_canonical.R -> output/T21_arms.csv |
+
+Note: TW_MEAN raw value is 0.0897566731583432 (T21_arms.csv, row TW_MEAN); 0.0898 is that value at 4 d.p. The earlier ledger entry 0.0897 was a truncation, not a rounding, and is superseded.
 
 Note: TW_MEAN uses pre_trade weights (INV-034). total_trade weights yield 0.304; retired pack yielded 0.141. pre_trade is canonical because total_trade is endogenous to the effect.
 
@@ -39,7 +42,17 @@ Note: TW_MEAN uses pre_trade weights (INV-034). total_trade weights yield 0.304;
 
 | ID | Quantity | Value | SE | Producer |
 |----|----------|-------|-----|----------|
-| GRADIENT | Cohort gradient | 0.9137 | 0.0809 | gates/X5_size_cohort.R -> gates/T3_gradient_cohorts.csv |
+| GRADIENT | Q1-Q5 spread, Definition D | 0.9137 | 0.0809 | code/S28_gradient_B.R -> output/T27_gradient_B_spread.csv |
+| GRADIENT_Q1 | Mean theta_D, quintile 1 (smallest pre-trade) | 0.8554 | 0.0760 | code/S28_gradient_B.R -> output/T27_gradient_B.csv |
+| GRADIENT_Q5 | Mean theta_D, quintile 5 (largest pre-trade) | -0.0583 | 0.0277 | code/S28_gradient_B.R -> output/T27_gradient_B.csv |
+| GRADIENT_B | Q1-Q5 spread, Definition B (pre-correction) | 0.6827 | 0.0821 | code/S28_gradient_B.R -> output/T27_gradient_B_spread.csv |
+| GRADIENT_B_SHARE | GRADIENT_B / GRADIENT | 0.7472 | NA | code/S28_gradient_B.R -> output/T27_gradient_B_spread.csv |
+
+Note (producer): the previous entry cited gates/X5_size_cohort.R -> gates/T3_gradient_cohorts.csv. No gates/ directory exists in this tree; the path was dangling. The value was also obtainable from output/T12_N4_gradient.csv, but that file is SUPERSEDED in FILE_REGISTRY.csv (SYNC-4) and a BUILT ledger entry must not depend on it. T27_gradient_B.csv reproduces every T12_N4_gradient column byte-identically under gates G3-G5 and is BUILT; it is the canonical producer for all five IDs above.
+
+Note (partition): quintiles are as.integer(cut(rank(pre_trade), breaks = 5, labels = FALSE)); n = 837/836/836/836/837. Per-quintile SE is sd/sqrt(n); spread SE is sqrt(se_Q1^2 + se_Q5^2), the convention that reproduces T10R_reconciliation.csv Q1_Q5_spread se_fixed exactly (gate G7). GRADIENT_B_SHARE carries no SE: it is a ratio of two spreads and its sampling distribution is not established.
+
+Note (shape - binding on prose): the profile is NOT monotone. Q4 = -0.0664 (SE 0.0369) lies below Q5 = -0.0583 (SE 0.0277); the Q4-Q5 difference is -0.0081 (SE 0.0462, t = -0.18). Q5 differs from zero at the 5 percent level (t = -2.11); Q4 does not (t = -1.80). Prose must state fall-then-floor, not monotone decline, and must not describe the largest pairs as statistically indistinguishable from zero. This is the shape Prop (iii) of the theory section predicts; a smoothly monotone negative profile would falsify it.
 
 ## Reliability
 
@@ -64,13 +77,15 @@ Derived from Proposition 1 using placebo moments. SYNC-6 correction: E[sigma^2] 
 |----|----------|-------|---------|----------|
 | ESIGMA2 | E[sigma^2] | 1.3642 | -2 * PLACEBO_A_MEAN | code/S26_prop_verification.R -> output/T25_prop_verification.csv |
 | SIGMA | sigma | 1.1680 | sqrt(ESIGMA2) | code/S26_prop_verification.R |
-| VAR_SIGMA2 | Var(sigma^2) | 3.6772 | 4*(Var(theta_A) - ESIGMA2/T_h) | code/S26_prop_verification.R |
+| VAR_SIGMA2 | Var(sigma^2) | 4.1773 | 4*(Var(theta_A) - ESIGMA2/T_post) | code/S26_prop_verification.R |
 | T_H_PLACEBO | Mean half-length (placebo) | 5.46 | Measured from split-half | code/S24_reliability.R (PLACEBO_TH) |
-| R_PRED | Predicted reliability | 0.7862 | (V/4)/((V/4) + ESIGMA2/T_h) | code/S26_prop_verification.R |
-| R_GAP | R_pred - R_observed | 0.0398 | R_PRED - PLACEBO_A_R | code/S26_prop_verification.R |
+| R_PRED | Predicted reliability | 0.8068 | (V/4)/((V/4) + ESIGMA2/T_h) | code/S26_prop_verification.R |
+| R_GAP | R_pred - R_observed | 0.0605 | R_PRED - PLACEBO_A_R | code/S26_prop_verification.R |
 | VAR_ETA | Var(eta) | 2.9126 | exp(ESIGMA2) - 1 | code/S26_prop_verification.R |
 
-Note: V1c consistency check: |R_GAP| = 0.0398 < 0.05. The proposition predicts observed reliability to within 4 hundredths with no fitted parameter.
+Note: values above are sourced from output/T25_prop_verification.csv and match article/prop_constants.tex (\PropRpred, \PropRgap, \PropVsigmasq). The earlier entries 0.7862 / 0.0398 / 3.6772 were stale and are superseded; they predate the S26 correction that sources Var(sigma^2) from T_post rather than T_h.
+
+Note: V1c consistency check: |R_GAP| = 0.0605, which EXCEEDS the 0.05 bound recorded in earlier versions of this note. This is recorded as a documented miss, not a pass, and the bound has not been restated. The proposition predicts observed reliability to within six hundredths with no fitted parameter; main.tex section 4 already reports it that way ("predicts a reliability of 0.81 against the 0.75 observed"). ADJUDICATION PENDING (author): either restate the V1c bound with a stated rationale, or carry the miss as reported.
 
 ## Placebo (Definition B, Uncorrected)
 
@@ -90,11 +105,13 @@ Note: Gate G2 |mean|>0.05 FAILS (bias documented, not a validity failure). Decil
 
 | Definition | Treated Mean | Treated n | Placebo Mean | Placebo n | Producer |
 |------------|--------------|-----------|--------------|-----------|----------|
-| A | -0.2837 | 4182 | -0.6821 | 15683 | code/S24b_anchor_table.R v2 -> output/T23_anchor.csv |
+| A | -0.2837 | 4182 | -0.6880 | 17200 | code/S24b_anchor_table.R v2 -> output/T23_anchor.csv |
 | B | 0.0758 | 4182 | -0.2072 | 17200 | code/S24b_anchor_table.R v2 -> output/T23_anchor.csv |
 | D | 0.2473 | 4182 | NA | NA | code/S24b_anchor_table.R v2 -> output/T23_anchor.csv |
 
-Note: Definition A placebo from T22 (split-half qualifying n=15683); Definition B placebo from S5R$placebo (fixed pseudo year, n=17200).
+Note: this table now reports what output/T23_anchor.csv contains. The previous Definition-A placebo entry (-0.6821, n=15683) is the T22 split-half qualifying figure and was attributed here to T23, which does not contain it. Two producers report Definition-A placebo on two populations: T23 on the full S5R$placebo set (n=17200, mean -0.68798, SD 1.11867) and T22 on the split-half qualifying subset (n=15683, mean -0.6821, SD 1.0814). PLACEBO_A_MEAN in the Reliability section above remains the T22 figure and is unchanged. See INV-037.
+
+Note: Definition B placebo from S5R$placebo (fixed pseudo year, n=17200).
 
 ## Superseded Entries
 
@@ -137,7 +154,7 @@ The true-effect SD is identified only up to an interval [0.74, 1.48], indexed by
 |-----|------|----------|---------|----------|
 | A | Noise-only | 0.261 | 1.475 | code/N1_oos_null.R (horizon-matched) |
 | B | Placebo | 0.680 | 1.326 | code/N2_placebo_benchmark.R (in-sample) |
-| C | OOS drift | 1.887 | 0.742 | code/S24_arms_canonical.R (N1b variances × symmetric weights) |
+| C | OOS drift | 1.887 | 0.742 | code/S24_arms_canonical.R (N1b variances x symmetric weights) |
 
 **Var(theta_D) = 2.438** (canonical, from S5R_bhat.rds$baseline)
 **SD_true = sqrt(Var(theta_D) - Var_null)**
@@ -150,7 +167,7 @@ The true-effect SD is identified only up to an interval [0.74, 1.48], indexed by
 - N1b_oos_null.R (out-of-sample): 1.230 for 11+ bin
 
 Arm C correctly uses N1b's out-of-sample variances with symmetric-window treated weights per INV-026:
-- Var_null_C = Σ (weight_b × var_N1b_b) = 1.8868
+- Var_null_C = sum over b of (weight_b x var_N1b_b) = 1.8868
 
 The label `var_11plus_S18` in V4_split_length.csv was mislabelled; that value is from N1b, not S18. Corrected to `var_11plus_N1b`.
 
@@ -191,7 +208,7 @@ Status: OPEN.
 
 ### INV-034: Trade-weighted mean reconciliation (CLOSED)
 TW_MEAN values diverge by weighting scheme:
-- pre_trade weights: 0.0897 (canonical, C4 adjudication)
+- pre_trade weights: 0.0898 (canonical, C4 adjudication; raw 0.0897566731583432)
 - total_trade weights: 0.304 (T10R)
 - retired pack: 0.141 (unknown weights)
 
@@ -213,6 +230,19 @@ Resolution: S5R$placebo (n=17200) is the single canonical placebo population. Ot
 Supersedes placebo portion of INV-033.
 
 Status: CLOSED.
+
+### INV-037: T23 vs T22 Definition-A placebo, dual producer (OPEN)
+Two committed producers report Definition-A placebo moments on two different populations:
+- T23_anchor.csv: n=17200, mean -0.68798, SD 1.11867 (full S5R$placebo)
+- T22_reliability.csv: n=15683, mean -0.6821, SD 1.0814 (split-half qualifying subset)
+
+Both are correct for their stated population; the defect was that the Anchor Table above quoted the T22 figure under a T23 attribution. That is corrected. What remains open is which population the anchor table should report, and whether T23's placebo cells need a STALE/DO-NOT-CITE header.
+
+Section 4 of main.tex handles this correctly in prose: paragraph 2 uses the T22 figures with n=15683 stated, paragraph 6 and Table tab:correction use the T23 figures with n=17200 stated. No article edit is required by this entry.
+
+Section 5 must not cite T23 placebo columns.
+
+Status: OPEN. Blocked on author decision (recompute T23 placebo from T22's per-pair file, or mark T23 placebo cells stale).
 
 ### INV-035: Placebo reliability reported under wrong definition (CLOSED)
 S24_reliability.R v1 reported placebo mean -0.2072, SD 0.8244, which match T12_N2 exactly. These are Definition D values (theta_B from S5R$placebo), not Definition A as specified.
