@@ -1378,18 +1378,21 @@ conservative at this scale. The R-chain $B$-placebo mean $\PropPlaceboBUncorr$
 additionally contains drift (Proposition~\ref{prop:drift}).
 Consistency check [V1c]: part~(c) is over-identified here, and the check is
 parameter-free. The cross-pair variance of $\theta^A$ on the zero-effect
-population decomposes as $\Var(\sigma^2)/4+\E[\sigma^2]/T_{\mathrm{post}}$,
-which at the observed mean post-window length $T_{\mathrm{post}}=\PropTpost$
-yields $\Var(\sigma^2)=\PropVsigmasq$, a coefficient of variation of
-$\sigma^2_{ij}$ of $\PropCVsigsq$. Substituting that into the split-half formula
-at the observed mean half-length $T_h=\PropTh$ \emph{predicts} a placebo
-reliability of $\PropRpred$, against the observed $\PropPlaceboR$
+population decomposes as $\Var(\sigma^2)/4+\E[\sigma^2_{ij}/T^{\mathrm{post}}_{ij}]$,
+and the second term must be evaluated pair by pair rather than at the mean
+window length: post windows differ across pairs, $1/T$ is convex, and the
+reciprocal of the mean understates the mean of the reciprocals. Evaluated
+pair-wise, the decomposition yields $\Var(\sigma^2)=\PropVsigmasq$, a
+coefficient of variation of $\sigma^2_{ij}$ of $\PropCVsigsq$. Substituting
+that into the split-half formula, again pair-wise, \emph{predicts} a placebo
+reliability of $\PropRpred$ against the observed $\PropPlaceboR$
 % [PLACEBO_A_R]
-. The formula reproduces the observed reliability to within $\PropRgap$,
-over-predicting slightly, with no parameter fitted to it; the residual is
-consistent with the homogeneous-window approximation the decomposition makes.
-This is consistent with, though not an independent measurement of, the observed
-reliability.
+--- a discrepancy of $\PropRgap$, over-predicting slightly, with no parameter
+fitted to it. Evaluating the same decomposition at the mean window length
+instead returns $\Var(\sigma^2)=\PropVsigmasqPlugin$ and a reliability whose
+error is roughly eight times larger, in the direction convexity requires. The
+pair-wise evaluation is therefore not a refinement of the proposition but the
+correct reading of it.
 \end{remark}
 
 %------------------------------------------------------------
