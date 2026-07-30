@@ -5,6 +5,7 @@
 # OUTPUTS: output/T12_N4_distribution.csv, output/T12_N4_mixture.csv,
 #          output/T12_N4_gradient.csv
 # INPUTS:  data/S5R_bhat.rds, data/N3_deconv.rds, data/S17_se_cf.rds
+# EXPECTED_N: 4182
 # SEED:    20260719
 # =============================================================================
 
@@ -28,6 +29,7 @@ say("================================================================")
 # Load inputs
 S5R <- readRDS("data/S5R_bhat.rds")
 baseline <- S5R$baseline
+stopifnot(nrow(baseline) == 4182)
 N3 <- readRDS("data/N3_deconv.rds")
 
 say("Baseline pairs: %d", nrow(baseline))

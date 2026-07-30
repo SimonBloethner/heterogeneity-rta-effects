@@ -6,6 +6,7 @@
 # INPUTS:  data/S5R_bhat.rds, S7R_deconv.rds, S8R_ge.rds, S9R_spec.rds
 # NOTE:    Uses dplyr (no data.table) for Festus compatibility.
 # =============================================================================
+# EXPECTED_N: 4182
 
 .libPaths(c("/groups/m-larch/bt307958/Rlibs", .libPaths()))
 suppressPackageStartupMessages(library(dplyr))
@@ -119,6 +120,7 @@ say("=== T5R: Theta Summary ===")
 
 S5R <- readRDS("data/S5R_bhat.rds")
 base <- S5R$baseline
+stopifnot(nrow(base) == 4182)
 
 T5R <- data.frame(
   Population = "BASELINE",

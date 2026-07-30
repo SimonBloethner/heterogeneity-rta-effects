@@ -4,6 +4,7 @@
 # =============================================================================
 # OUTPUTS: data/S7R_deconv.rds
 # INPUTS:  data/S5R_bhat.rds, data/S3R_theta.rds, data/S6R_population.rds
+# EXPECTED_N: 4182
 # SEED:    20260719
 # NOTE: Uses dplyr (no data.table) for Festus compatibility.
 # =============================================================================
@@ -32,6 +33,7 @@ theta_raw <- readRDS("data/S3R_theta.rds")
 popn <- readRDS("data/S6R_population.rds")
 
 base <- S5R$baseline
+stopifnot(nrow(base) == 4182)
 say("BASELINE population: %d", nrow(base))
 
 # =============================================================================

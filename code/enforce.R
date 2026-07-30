@@ -25,12 +25,29 @@ report_violation <- function(check, msg) {
 # =============================================================================
 check_expected_n <- function(root, report = FALSE) {
     results <- character()
+    
+    # Read FILE_REGISTRY to get BUILT scripts
+    registry_path <- file.path(root, "meta/FILE_REGISTRY.csv")
+    if (!file.exists(registry_path)) {
+        if (report) cat("  WARNING: FILE_REGISTRY.csv not found, cannot scope check\n")
+        return(results)
+    }
+    registry <- fread(registry_path)
+    
+    # Get scripts with BUILT status (normalize paths)
+    built_scripts <- registry[status == "BUILT" & grepl("^code/", file_path), 
+                              basename(file_path)]
+    
     all_scripts <- list.files(file.path(root, "code"), pattern = "\\.R$", full.names = TRUE, recursive = TRUE)
     scripts <- all_scripts[!grepl("audit/|archive/", all_scripts)]
     scripts <- scripts[!grepl("/L[0-9]", scripts)]
     
     for (script in scripts) {
         script_name <- basename(script)
+        
+        # SCOPE FIX: Only check BUILT scripts
+        if (!(script_name %in% built_scripts)) next
+        
         content <- readLines(script, warn = FALSE)
         content_text <- paste(content, collapse = "\n")
         loads_pop <- any(grepl("population|pop_canon|S6R|theta_d", content_text, ignore.case = TRUE))

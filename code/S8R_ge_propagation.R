@@ -4,6 +4,7 @@
 # =============================================================================
 # OUTPUTS: data/S8R_ge.rds
 # INPUTS:  data/S5R_bhat.rds (theta_D values), gravity_functions.R, ITPDE_total.rds
+# EXPECTED_N: 4182
 # SEED:    20260719
 # GATES:   A (plumbing), B (market clearing), C (convergence)
 # NOTE:    Uses dplyr (no data.table) for Festus compatibility.
@@ -50,6 +51,7 @@ say("")
 say("=== LOAD THETA_D ===")
 S5R <- readRDS("data/S5R_bhat.rds")
 base <- S5R$baseline
+stopifnot(nrow(base) == 4182)
 theta_D <- base$theta_D
 say("BASELINE theta_D: n=%d, mean=%.4f, sd=%.4f", length(theta_D), mean(theta_D), sd(theta_D))
 

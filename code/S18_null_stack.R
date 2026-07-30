@@ -5,6 +5,7 @@
 # OUTPUTS: output/T12_N1_oos_null.csv, output/T12_N2_placebo.csv,
 #          data/S18_null_stack.rds
 # INPUTS:  data/S1R_ppml.rds, data/S5R_bhat.rds
+# EXPECTED_N: 4182
 # SEED:    20260719
 # METHOD:  N1 - Split switcher pre-periods at midpoint, refit PPML on EARLY,
 #               predict y_hat_0 for LATE, compute pseudo_theta
@@ -33,6 +34,7 @@ say("================================================================")
 S1R <- readRDS("data/S1R_ppml.rds")
 S5R <- readRDS("data/S5R_bhat.rds")
 baseline <- S5R$baseline
+stopifnot(nrow(baseline) == 4182)
 
 say("Baseline pairs: %d", nrow(baseline))
 
