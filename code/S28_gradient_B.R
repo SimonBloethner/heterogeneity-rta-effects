@@ -4,6 +4,7 @@
 # =============================================================================
 # OUTPUTS: T27_gradient_B.csv, T27_gradient_B_spread.csv, T27_gradient_B.csv.sidecar
 # INPUTS:  data/S5R_bhat.rds, output/T12_N4_gradient.csv, output/T5R_theta_summary.csv
+# EXPECTED_N: 4182
 # SEED:    NONE
 # SCRATCH: /scratch/bt307958/S28_gradient_B/
 # =============================================================================

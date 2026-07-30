@@ -5,6 +5,7 @@
 # OUTPUTS: T28_v1c_pairlevel.csv, T28_v1c_pairlevel.csv.sidecar
 # INPUTS:  data/S5R_bhat.rds, data/S1R_ppml.rds,
 #          output/T25_prop_verification.csv, output/T22_theta_A_placebo.csv
+# EXPECTED_N: 15683
 # SEED:    NONE
 # SCRATCH: /scratch/bt307958/V1C_PAIRLEVEL/
 # =============================================================================

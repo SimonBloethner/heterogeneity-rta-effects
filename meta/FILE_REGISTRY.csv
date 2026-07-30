@@ -27,7 +27,6 @@ archive/retired_2026-07-29/data/C1_pseudo_corrected.rds,data,NEEDS_SIDECAR,UNKNO
 archive/retired_2026-07-29/data/C2_corrected.rds,data,NEEDS_SIDECAR,UNKNOWN,NONE,NONE,NONE,ARCHIVED
 archive/retired_2026-07-29/data/N4_distribution.rds,data,code/N4_distribution.R,data/S5R_bhat.rds;data/N3_deconv.rds,20260719,exists,10,ARCHIVED
 archive/retired_2026-07-29/data/N5_ge.rds,data,code/N5_ge_propagation.R,data/N4_distribution.rds;data/N3_deconv.rds,20260719,full_ge,10,ARCHIVED
-archive/retired_2026-07-29/data/S18_null_stack.rds,data,code/S18_null_stack.R,data/S1R_ppml.rds;data/S5R_bhat.rds,20260719,G3_PASS,11,ARCHIVED
 archive/retired_2026-07-29/data/S19_deconv.rds,data,code/S19_deconv_arms.R,data/S5R_bhat.rds;data/S18_null_stack.rds,20260719,three_arms,11,ARCHIVED
 archive/retired_2026-07-29/data/S1_ppml.rds,data,code/S1_ppml.R,data/ITPDE_total.rds,NONE,nrow==794720;year_range==1988-2019;no_NA_yhat,1,ARCHIVED
 archive/retired_2026-07-29/data/S2_pairs.rds,data,code/S2_pairs.R,data/S1_ppml.rds,NONE,classifications_sum_to_total,2,ARCHIVED
@@ -182,6 +181,7 @@ data/N2_placebo.rds,data,code/N2_placebo_benchmark.R,data/S5R_bhat.rds,20260719,
 data/N3_deconv.rds,data,code/N3_deconv_arms.R,data/S5R_bhat.rds;data/N1_oos_null.rds;data/N2_placebo.rds,20260719,three_arms,10,ANCHOR
 data/S11_baseline_comparison.rds,data,code/S11_baseline_fix.R,data/S6_population.rds;data/S5_bhat.rds,NONE,exists,8,BUILT
 data/S17_se_cf.rds,data,code/S17_se_cf.R,data/S1R_ppml.rds;data/S5R_bhat.rds,20260719,cf_immaterial,9,BUILT
+data/S18_null_stack.rds,data,code/S18_null_stack.R,data/S1R_ppml.rds;data/S5R_bhat.rds,20260719,G3_PASS,11,ANCHOR
 data/S1R_ppml.rds,data,code/S1R_ppml_untreated.R,data/ITPDE_total.rds,NONE,nrow==794720,1,BUILT
 data/S3R_theta.rds,data,code/S3R_theta.R,data/S1R_ppml.rds,NONE,no_NA_theta_B,2,BUILT
 data/S5R_bhat.rds,data,code/S5R_bhat_split.R,data/S3R_theta.rds,20260719,G4_PARTIAL,3,BUILT
