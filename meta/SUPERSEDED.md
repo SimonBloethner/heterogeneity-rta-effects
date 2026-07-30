@@ -1,6 +1,6 @@
 # SUPERSEDED Files Registry
 
-Generated: 2026-07-25, Updated: 2026-07-30 (SYNC-9)
+Generated: 2026-07-25, Updated: 2026-07-30 (SYNC-11)
 Pipeline: REBUILD_V2 (manifest-first rebuild + PATCH + SE-CF)
 
 Files marked SUPERSEDED are retained per R9 for audit trail but should not be used
@@ -78,8 +78,9 @@ ANCHOR.
 ## Invalidation Register
 
 NOTE: The INV series is split across two files. INV-001 to INV-026 are recorded
-here. INV-027 to INV-038 are recorded in the Investigation Log of
-meta/canonical_facts.md. There is no INV-027 entry in this file by design.
+here. INV-027 to INV-039 are recorded in the Investigation Log of
+meta/canonical_facts.md. There is no INV-027 entry in this file by design. One
+identifier, INV-023, is used in both files for different findings; see CAV-005.
 
 ### INV-010: README Gate Table Chimera
 - **Location:** README.md, Validation Gates table
@@ -170,7 +171,9 @@ meta/canonical_facts.md. There is no INV-027 entry in this file by design.
   a different theta_D than the S*R chain produces
 - **Resolution:** S*R chain with untreated-only counterfactual (S1R) + symmetric
   +/-1 window is now canonical; pack lineage retired
-- **Status:** Pack theta_D lineage RETIRED; N3/N4/N5 results are authoritative
+- **Status:** Pack theta_D lineage RETIRED; N3/N4/N5 results are authoritative.
+  The pack itself is preserved at archive/retired_pack/ and is unregistered;
+  see INV-039 in meta/canonical_facts.md.
 - **Date:** 2026-07-26
 
 ### INV-022: se_B Omitted Counterfactual Uncertainty
@@ -193,7 +196,9 @@ meta/canonical_facts.md. There is no INV-027 entry in this file by design.
 - **Status:** DOCUMENTED -- three-arm deconvolution in N3. NOTE: the bracket
   quoted here is the INV-023-era one; the canonical identified set is
   [0.74, 1.48] per INV-027 in meta/canonical_facts.md, and no arm preference
-  is established. Cite the ledger, not this entry.
+  is established. Cite the ledger, not this entry. NOTE (SYNC-11): this
+  identifier is also used by a different entry, "INV-023: Arm preference", in
+  meta/canonical_facts.md, which is the governing one. See CAV-005.
 - **Date:** 2026-07-26
 
 ### INV-024: OOS Null Gate Applied to Uncorrected Object
@@ -283,7 +288,9 @@ meta/canonical_facts.md. There is no INV-027 entry in this file by design.
   data/STRAY_W1_COPY_DO_NOT_USE.rds
 - **T26 identifier collision:** claimed by both code/S18_null_stack.R
   (T26_null_stack.csv) and code/S27_size_gradient.R (T26_size_gradient.csv).
-  Neither output is committed. Audit pending.
+  Neither output is committed. Audit pending. NOTE (SYNC-11):
+  code/S27_size_gradient.R is not present in code/ in this tree, so the
+  collision may already be moot; verify before auditing.
 - **Status:** DOCUMENTED -- none blocking; all three are recorded so that a
   later pass does not rediscover them as new findings.
 - **Date:** 2026-07-29
@@ -312,6 +319,30 @@ meta/canonical_facts.md. There is no INV-027 entry in this file by design.
 - **Status:** DOCUMENTED -- recorded so a later pass does not rediscover it.
   Closing it means keying the trigger to a property of populations rather
   than to a variable-name convention of five scripts.
+- **Date:** 2026-07-30
+
+### CAV-005: Register Hygiene (SYNC-11)
+Three defects of identification rather than of measurement. None changes a
+reported number; all three make a citation ambiguous.
+- **INV-023 identifier collision.** Two distinct entries carry the ID INV-023.
+  This file has "INV-023: Drift Heterogeneity Omitted from Deconvolution"
+  (2026-07-26), whose body states Arm C is preferred and whose bracket is the
+  INV-023-era [0.95, 1.48]. meta/canonical_facts.md has "INV-023: Arm preference
+  (CLOSED)", which establishes that no arm preference holds and the interval is
+  [0.74, 1.48]. Both entries now carry a NOTE deferring to the ledger, so no
+  wrong value is reachable, but a reference to "INV-023" alone does not identify
+  which entry governs. The ledger entry is the governing one.
+- **Split INV numbering.** INV-010 through INV-026 live in this file; INV-027
+  through INV-039 live in meta/canonical_facts.md. The Invalidation Register
+  header now states this; before SYNC-11 neither file did, so a reader looking
+  up a mid-range ID could conclude it did not exist.
+- **Lone SUPERSEDED registry row.** INV-038 declared the status vocabulary
+  three-valued (BUILT / ANCHOR / ARCHIVED). One row was never migrated:
+  code/S13b_matching_sensitivity.R still carries status SUPERSEDED in
+  FILE_REGISTRY.csv. Check (d) tests ARCHIVED and QUARANTINE only, so that row
+  sits in a status no check examines. Recoding it changes enforce output and is
+  deferred to an explicit decision rather than taken here.
+- **Status:** DOCUMENTED -- recorded so a later pass does not rediscover them.
 - **Date:** 2026-07-30
 
 ## Disambiguated Producers
