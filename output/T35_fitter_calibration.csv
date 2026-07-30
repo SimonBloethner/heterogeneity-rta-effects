@@ -1,0 +1,7 @@
+"test","true_param","recovered_param","abs_error","status"
+"Pareto_alpha1",1,NA,NA,"failed:0"
+"Pareto_alpha1.5",0.666666666666667,0.638048280253298,0.0286183864133691,"converged"
+"Pareto_alpha2",0.5,0.504179968517552,0.0041799685175522,"converged"
+"Pareto_alpha3",0.333333333333333,0.343076112569796,0.00974277923646311,"converged"
+"LN_mu",5,5.11680977682331,0.116809776823307,"converged"
+"LN_sigma",1.5,1.47089208499524,0.0291079150047551,"converged"
