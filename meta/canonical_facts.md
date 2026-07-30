@@ -393,3 +393,14 @@ moment match and no KS statistic, so the equivalence verification that conventio
 was thought to point at does not exist in either the live chain or the pack.
 
 Status: OPEN.
+
+## Higher-Moment Separation (S30)
+
+Power of pooled excess kurtosis to distinguish World T (transitory effect variation) from World V (volatility change) under non-normal multiplicative shocks.
+
+| ID | Quantity | Value | Producer |
+|----|----------|-------|----------|
+| MOMPOW_KAPPA0_DELTA | Mean delta at kappa_u=0 (normal case) | -0.000485 | code/S30_moment_power.R -> output/T29_moment_power.csv |
+| MOMPOW_KAPPA1_W50_Z | z at kappa_u=1.0, w/E[sigma^2]=0.50 | 116.5 | code/S30_moment_power.R -> output/T29_moment_power.csv |
+| MOMPOW_MAX_Z | Maximum z across grid | 228.89 | code/S30_moment_power.R -> output/T29_moment_power.csv |
+| MOMPOW_DEFF50_MAX_Z | Maximum z at design effect 50 | 32.37 | code/S30_moment_power.R -> output/T29_moment_power.csv |

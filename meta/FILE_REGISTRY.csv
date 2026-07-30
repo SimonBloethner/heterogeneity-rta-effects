@@ -251,3 +251,7 @@ output/V2_coverage.csv,output,code/validation/V2_coverage.R,data/S1R_ppml.rds;da
 output/V3_horizon_cohort.csv,output,code/validation/V3_horizon_cohort.R,data/S18_null_stack.rds;data/S5R_bhat.rds,20260719,INV025_DOC,11,ANCHOR
 output/V4_split_length.csv,output,code/validation/V4_split_length.R,data/S1R_ppml.rds;data/S5R_bhat.rds,20260719,INV027_OPEN,11,ANCHOR
 output/canonical_facts.md,output,code/build_facts.R,all,NONE,all_ids_sourced,9,BUILT
+code/S30_moment_power.R,code,manual,meta/canonical_facts.md;output/T22_theta_A_treated.csv,20260719,G1_G2_G4_PASS,12,BUILT
+output/T29_moment_power.csv,output,code/S30_moment_power.R,meta/canonical_facts.md;output/T22_theta_A_treated.csv,20260719,G1_G2_G4_PASS,12,BUILT
+meta/T29_moment_power.csv.sidecar,sidecar,code/S30_moment_power.R,output/T29_moment_power.csv,NONE,sha256_match,12,BUILT
+prompts/S30_moment_power.md,prompt,manual,NONE,NONE,executed,12,BUILT

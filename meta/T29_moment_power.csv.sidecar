@@ -1,0 +1,36 @@
+FILE:      T29_moment_power.csv
+SHA256:    8bed5f08f287a94aee351fef1862b66190efbae14355f8c66f179a356d0d3cc2
+PRODUCER:  code/S30_moment_power.R
+INPUTS:
+  meta/canonical_facts.md:        a1dc51ea75313b5ee099137b89972726b6d6f689e2eb0faff369f70a7c226cc3
+  output/T22_theta_A_treated.csv: 2ec840c06917d45dea4ac19efaadb9010e07f83dec6cb38638275ab6117217a7
+SEED:      20260719
+
+SPECIFICATION:
+  Measures power of pooled excess kurtosis to distinguish World T (transitory
+  effect variation, rho=1, omega^2=w) from World V (volatility change, omega^2=0,
+  rho^2=(sigma^2+w)/sigma^2) under non-normal multiplicative shocks.
+
+  sigma^2 distribution: Gamma(shape=0.463, rate=0.339), matched to ESIGMA2=1.3642
+  and VAR_SIGMA2=4.021 from canonical_facts.md.
+
+  T_post: Per-pair post-window cell count from T22_theta_A_treated.csv column
+  n_post_cells (n=4182, range=[3,26], median=10).
+
+  theta_ij: Drawn from N(0,1); differenced out by the statistic.
+
+  Design-effect sensitivity: z_deff10 and z_deff50 assume design effects of 10
+  and 50 respectively. Cross-pair dependence has never been estimated in this
+  repository, so no design effect is measured here.
+
+GATES:
+  G1: |delta| at kappa_u=0 < 3*mc_se (normal identification): PASS
+      w=0.10: |delta|=0.0025 < 0.0050
+      w=0.25: |delta|=0.0014 < 0.0052
+      w=0.50: |delta|=0.0000 < 0.0049
+      w=1.00: |delta|=0.0008 < 0.0053
+  G2: max|Var_V - Var_T| = 8.88e-16 < 1e-10: PASS
+  G3: Monotonicity violations recorded: 2 (at kappa_u=0, expected noise)
+  G4: mc_se < 0.10*|delta| for all kappa_u > 0: PASS
+
+CREATED: 2026-07-30 11:35:00
