@@ -1,5 +1,5 @@
 # MANIFEST.txt - Replication Package
-# Updated: 2026-07-29 (SYNC-8)
+# Updated: 2026-07-30 (SYNC-9)
 # Repository: heterogeneity-rta-effects
 
 ## Directory Structure
@@ -39,6 +39,7 @@ article/        LaTeX source, bibliography, prop_constants.tex
 - RAW_SHARE = 0.4211
 - TW_MEAN = 0.0898 (pre_trade weights, INV-034)
 - P(theta <= 0) = [0.370, 0.421]
+- SPEC_SPREAD = [1.402, 0.922, 0.411, 0.095]
 - GRADIENT (Q1-Q5, Definition D) = 0.9137 (SE 0.0809)
 - GRADIENT_B (Q1-Q5, Definition B) = 0.6827 (SE 0.0821)
 - V1c: R_PRED = 0.7539, R_GAP = 0.0076 (Arm 1', bound 0.05, never restated)
@@ -50,7 +51,8 @@ not significant. See canonical_facts.md, Gradient section, shape note.
 
 | INV | Status | Summary |
 |-----|--------|---------|
-| INV-010 | REOPENED | README gate-table chimera; closed in error, README now rewritten |
+| INV-010 | CLOSED | README gate-table chimera; closed in error 2026-07-26, actually fixed 2026-07-29 |
+| INV-020 | CLOSED | T1 window-mixing in README; same false closure as INV-010 |
 | INV-021 | CLOSED | Retired W1 exhibit pack |
 | INV-027 | CLOSED | SD_true identified set |
 | INV-028 | CLOSED | Wrong-object (raw share) |
@@ -61,6 +63,7 @@ not significant. See canonical_facts.md, Gradient section, shape note.
 | INV-034 | CLOSED | Trade-weighted mean, pre_trade canonical |
 | INV-036 | CLOSED | Placebo census reconciled |
 | INV-037 | CLOSED | T23/T22 nesting verified; per-pair files committed |
+| INV-038 | CLOSED | Check (d) never fired; SUPERSEDED carried two meanings |
 
 ## Residuals
 
@@ -77,6 +80,10 @@ L1-L5 scripts and T14-T18 outputs.
 
 ## Verification
 
-Run: Rscript code/enforce.R
-Expected: Only L* QUARANTINE violations (no BUILT violations)
-Registry: meta/FILE_REGISTRY.csv, 249 rows, every tracked file registered
+Run: Rscript code/enforce.R  (from the repository root)
+Pass condition: ZERO violations. No expected-violation list -- see INV-038.
+Registry: meta/FILE_REGISTRY.csv, 252 rows, statuses BUILT / ANCHOR / ARCHIVED
+          / AUDIT / QUARANTINE, every tracked file registered.
+Open: 11 EXPECTED_N violations on scripts that load population data without
+      asserting its row count. Not a correctness defect in any reported
+      number; a missing assertion. Values must be derived, never guessed.
