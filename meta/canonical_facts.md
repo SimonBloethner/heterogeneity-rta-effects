@@ -5,7 +5,8 @@ Amended: 2026-07-29 (SYNC-7: gradient producer + Definition-B gradient, TW_MEAN 
 Amended: 2026-07-29 (SYNC-8: V1c moved onto the Arm 1' pair-level decomposition; INV-037 CLOSED)
 Amended: 2026-07-30 (SYNC-9: SPEC_SPREAD ledgered; INV-038 opened and closed)
 Amended: 2026-07-30 (SYNC-10: INV-033 CLOSED; Arm C reproduced end to end)
-Status: CLOSED. No open investigations.
+Amended: 2026-07-30 (SYNC-11: treated-population nesting note; INV-039 opened)
+Status: ONE OPEN INVESTIGATION -- INV-039 (registry coverage). No reported number is affected by it.
 
 ## Population
 
@@ -131,6 +132,19 @@ Note: this table reports what output/T23_anchor.csv contains, which is Definitio
 
 Note: Definition B placebo from S5R$placebo (fixed pseudo year, n=17200).
 
+Note (treated nesting, symmetric to the placebo note above): the ledger documented
+the nesting on the placebo side only. Definition-A treated moments appear at two
+counts, and both are correct. Over the full canonical population (n=4182) the mean
+is -0.2837 and the SD 1.6630; these are the values in this table and in
+output/T5R_theta_summary.csv (BASELINE row), and they are what Section 4 cites for
+the correction path's dispersion. Over the 4120 pairs satisfying the split-half rule
+(>=2 cells per half) the mean is -0.2548 and the SD 1.6318, ledgered as THETA_A_MEAN
+and THETA_A_SD in the Reliability section, because a reliability statistic must be
+computed on the population that supports a split. One estimator, nested populations,
+exactly as INV-037 established for the placebo side; the 62-pair difference is the
+split-half qualification rule and nothing else. Neither figure supersedes the other,
+and no producer disagreement is to be inferred from the gap.
+
 ## Superseded Entries
 
 | Old Entry | Old Value | Cause | INV |
@@ -162,7 +176,7 @@ Preference among arms A/B/C for headline reporting suspended pending INV-027a re
 
 Resolution: INV-027a closed. No arm preference established; SD_true reported as interval [0.74, 1.48].
 
-Status: CLOSED. This remains the governing entry on arm preference. INV-033's closure establishes that the C endpoint is reproducible, not that it is preferred.
+Status: CLOSED. This remains the governing entry on arm preference. INV-033's closure establishes that the C endpoint is reproducible, not that it is preferred. Note: a second entry also numbered INV-023 exists in meta/SUPERSEDED.md on a related subject with a superseded bracket; see CAV-005. This entry governs.
 
 ### INV-027: SD_true identified set (PARTIAL)
 The true-effect SD is identified only up to an interval [0.74, 1.48], indexed by noise-subtraction arm.
@@ -290,6 +304,8 @@ Discriminating test, both gates PASS on the regenerated per-pair file:
 
 One estimator, nested populations. No producer disagreement, no recomputation of T23 warranted, no article edit required.
 
+The treated population nests the same way (4182 vs 4120); see the treated-nesting note under Anchor Table (D2), added at SYNC-11.
+
 Status: CLOSED.
 
 ### INV-038: Check (d) never fired; SUPERSEDED carried two meanings (CLOSED)
@@ -307,7 +323,7 @@ Also corrected: README.md and MANIFEST.txt published "Expected: only L* QUARANTI
 
 No number in the paper was affected. All 55 sidecars carrying a FILE and SHA256 field were verified against file bytes at commit bb8d9e86: 54 matched and one was a known orphan (T26_null_stack.csv). Every defect was in the verification layer.
 
-Residual coverage limit recorded separately as CAV-004 in SUPERSEDED.md.
+Residual coverage limit recorded separately as CAV-004 in SUPERSEDED.md. A second, larger coverage limit in the same check is recorded as INV-039.
 
 Status: CLOSED.
 
@@ -324,3 +340,56 @@ Corrected values under Definition A (S24_reliability.R v2):
 Wrong-object class, instance 8.
 
 Status: CLOSED.
+
+### INV-039: archive/retired_pack/ is outside FILE_REGISTRY.csv (OPEN)
+The directory itself is intentional and documented: README.md describes
+archive/retired_pack/ as the retired exhibit pack (INV-021), preserved unmodified
+for referee verification, with nothing in it to be cited, and MANIFEST.txt lists it
+as frozen. The intent is correct. The defect is that the intent is nowhere
+enforced, because the directory was never enrolled in the registry that the
+enforcement instrument reads.
+
+archive/retired_pack/ contains code/, data/, docs/ and output/ plus its own
+MANIFEST.txt (generated 2026-07-25 by Z0_assemble_package.R). Its output/ directory
+holds A0_anchor_table.csv, A1_vuong.csv, A2_residual_tails.csv,
+A3_kappa_convergence.csv, A4_per_year_anchor.csv, A5_proposition_verification.csv,
+F1-F4 in both formats, T1-T7, the pack's own canonical_facts.md and
+invalidation_register.md, gate_report.csv/.rds, and fifteen sidecars.
+
+FILE_REGISTRY.csv contains ZERO rows matching archive/retired_pack. Its only
+archive prefix is archive/retired_2026-07-29/ (125 rows).
+
+Consequence, and it is the operative defect. enforce.R check (d) builds its
+forbidden-input set from registry rows carrying status ARCHIVED or QUARANTINE.
+Files absent from the registry are absent from that set. A live script could
+therefore read archive/retired_pack/output/A0_anchor_table.csv, or the pack's own
+canonical_facts.md, and check (d) would report nothing. MANIFEST.txt asserted
+"every tracked file registered", which was false; that line is corrected in the
+same commit as this entry.
+
+This is the INV-038 class: a verification instrument trusted beyond its coverage.
+INV-038 fixed a check that could not fire because it read the wrong column. This
+entry records a check that cannot fire because the objects it would forbid were
+never enrolled.
+
+Two fixes, and they are not alternatives:
+1. Enumerate archive/retired_pack/ into FILE_REGISTRY.csv with status ARCHIVED,
+   one row per committed file. Mechanical; must be done from a local checkout so
+   the enumeration is complete rather than sampled.
+2. Make check (d) structural rather than enrolment-dependent: any path under
+   archive/ is a forbidden input to a BUILT output, whether or not it appears in
+   the registry. This closes the class; (1) closes only the instance. Per the
+   standing rule that every check carries a known-pass and known-fail fixture,
+   (2) requires a fixture pair before it is merged.
+
+Both are executor tasks and neither is performed by this entry.
+
+Related: the values in archive/retired_pack/output/A5_proposition_verification.csv
+are the retired-pack anchors (0.2138, 0.5950, -0.7121, 1.1165) and are forbidden.
+That file is also the referent of the "[A5:row]" citation convention used in some
+drafting specifications; the live proposition-verification table is
+output/T25_prop_verification.csv and A5 must not be cited. A5 contains no two-world
+moment match and no KS statistic, so the equivalence verification that convention
+was thought to point at does not exist in either the live chain or the pack.
+
+Status: OPEN.
