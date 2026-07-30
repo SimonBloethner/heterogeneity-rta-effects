@@ -1,6 +1,6 @@
 FILE:      T22_theta_A_placebo.csv
 SHA256:    aeaa1148c90507e089216c4474ef8f0301805c232949e79bd3a3b3bbd0edde18
-PRODUCER:  S24_PROV.R (provenance verification)
+PRODUCER:  S24_reliability.R
 INPUTS:
   data/S5R_bhat.rds: d46910ef55f0a22018baf8bd218dac5548bde98150d798ad85aa1914af8d12d8
   data/S1R_ppml.rds: 45c937cd78805d7b13b4c43f4bc4888e93a2ff15e787ad4fb41d77b51f837d89
@@ -23,4 +23,13 @@ NESTING VERIFICATION:
   Qualifying subset mean (n=15683): -0.682105675259160
   T23 uses full population; T22 uses qualifying subset.
 
+PRODUCER NOTE (2026-07-30):
+  This field previously read "S24_PROV.R (provenance verification)", which is
+  not a producer. S24_PROV.R was the task wrapper used to regenerate this file
+  on 2026-07-29; it writes to SCRATCH_DIR and is not part of the pipeline.
+  The canonical producer is code/S24_reliability.R, whose OUTPUTS header
+  declares output/T22_reliability.csv, output/T22_theta_A_treated.csv and
+  output/T22_theta_A_placebo.csv. Content unchanged; SHA256 above still holds.
+
 CREATED: 2026-07-29 16:22:10
+AMENDED: 2026-07-30 (producer corrected)
