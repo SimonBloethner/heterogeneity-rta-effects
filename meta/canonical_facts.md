@@ -6,7 +6,8 @@ Amended: 2026-07-29 (SYNC-8: V1c moved onto the Arm 1' pair-level decomposition;
 Amended: 2026-07-30 (SYNC-9: SPEC_SPREAD ledgered; INV-038 opened and closed)
 Amended: 2026-07-30 (SYNC-10: INV-033 CLOSED; Arm C reproduced end to end)
 Amended: 2026-07-30 (SYNC-11: treated-population nesting note; INV-039 opened)
-Status: ONE OPEN INVESTIGATION -- INV-039 (registry coverage). No reported number is affected by it.
+Amended: 2026-07-30 (SYNC-12: S30 ledgered; INV-040 opened -- three S30 IDs superseded)
+Status: TWO OPEN INVESTIGATIONS -- INV-039 (registry coverage) and INV-040 (S30 z definition). Neither affects a number reported in the article as of SYNC-12.
 
 ## Population
 
@@ -396,11 +397,94 @@ Status: OPEN.
 
 ## Higher-Moment Separation (S30)
 
-Power of pooled excess kurtosis to distinguish World T (transitory effect variation) from World V (volatility change) under non-normal multiplicative shocks.
+Power of a pooled excess-kurtosis statistic to distinguish World T (transitory
+effect variation, rho=1, omega^2=w) from World V (treatment-coincident volatility
+change, omega^2=0, rho^2=(sigma^2+w)/sigma^2) -- the two parameterizations
+Proposition 3(b) proves observationally equivalent under normality. Under
+normality the difference is zero by construction and gate G1 confirms it; the
+grid therefore measures what non-normality buys.
+
+BINDING NOTE ON THE z COLUMN (SYNC-12). output/T29_moment_power.csv computes
+mc_se = sd(delta_vec)/sqrt(reps) and z = |delta|/mc_se. That mc_se is the Monte
+Carlo precision of the simulation's estimate of the mean difference. It is NOT
+the identification-relevant standard error. An econometrician holds one dataset,
+so the operative quantity is the sampling SD of the statistic in a single
+dataset, which equals mc_se * sqrt(reps). The tabulated z therefore overstates
+the identification-relevant z by exactly sqrt(reps) = 20 at reps = 400.
+Correction requires no re-run: z_ident = z_tabulated / sqrt(reps), derivable from
+the committed table. Cite the MOMPOW_IDENT_* IDs below. Never cite the T29 z
+column in any statement about what these data permit. The defect originated in
+the drafting prompt, which asked for "the Monte Carlo standard error of delta";
+the script computed exactly what was asked. See INV-040.
 
 | ID | Quantity | Value | Producer |
 |----|----------|-------|----------|
-| MOMPOW_KAPPA0_DELTA | Mean delta at kappa_u=0 (normal case) | -0.000485 | code/S30_moment_power.R -> output/T29_moment_power.csv |
-| MOMPOW_KAPPA1_W50_Z | z at kappa_u=1.0, w/E[sigma^2]=0.50 | 116.5 | code/S30_moment_power.R -> output/T29_moment_power.csv |
-| MOMPOW_MAX_Z | Maximum z across grid | 228.89 | code/S30_moment_power.R -> output/T29_moment_power.csv |
-| MOMPOW_DEFF50_MAX_Z | Maximum z at design effect 50 | 32.37 | code/S30_moment_power.R -> output/T29_moment_power.csv |
+| MOMPOW_KAPPA0_DELTA | Mean delta at kappa_u=0, averaged over the four w cells | -0.000485 | code/S30_moment_power.R -> output/T29_moment_power.csv |
+| MOMPOW_IDENT_MIN_Z | Identification z, min over kappa_u>0 cells (kappa_u=0.75, w/E=0.10) | 2.96 | code/S30_moment_power.R -> output/T29_moment_power.csv |
+| MOMPOW_IDENT_KAPPA1_W50_Z | Identification z at kappa_u=1.0, w/E[sigma^2]=0.50 | 5.83 | code/S30_moment_power.R -> output/T29_moment_power.csv |
+| MOMPOW_IDENT_MAX_Z | Identification z, max over grid (kappa_u=3.0, w/E=1.00) | 11.44 | code/S30_moment_power.R -> output/T29_moment_power.csv |
+| MOMPOW_IDENT_DEFF10_MAX_Z | Identification z at the max cell, assumed design effect 10 | 3.62 | code/S30_moment_power.R -> output/T29_moment_power.csv |
+| MOMPOW_IDENT_DEFF50_MAX_Z | Identification z at the max cell, assumed design effect 50 | 1.62 | code/S30_moment_power.R -> output/T29_moment_power.csv |
+
+Note (calibration): sigma^2 ~ Gamma(shape 0.463, rate 0.339), matched to ESIGMA2
+and VAR_SIGMA2. Per-pair post-window length is the empirical distribution from
+output/T22_theta_A_treated.csv, column n_post_cells, range [3, 26], median 10 --
+not the mean, for the convexity reason recorded in the V1c notes. Seed 20260719,
+400 replications per cell. sigma^2 and theta are shared across the two worlds
+within a replication; the shocks are drawn independently, so this is a partially
+paired design and no variance reduction from common random numbers is claimed.
+
+Note (binding on prose): the finding is conditional and must not be reported as
+a clean negative or a clean positive. Under cross-pair independence the
+higher-moment route is available: z runs from 2.96 to 11.44 across the grid, so
+mild non-normality suffices. Under an assumed design effect of 10 it is marginal
+(0.94 to 3.62) and under 50 it is unavailable (0.42 to 1.62). Cross-pair
+dependence has never been estimated in this repository. Prose must therefore
+state that the route is open under independence and that its status under
+dependence is unmeasured. It must not state that the route is closed, which was
+the appendix's pre-SYNC-12 claim, and it must not state that it is open
+unconditionally.
+
+## Superseded Entries (S30, SYNC-12)
+
+| Old ID | Old Value | Cause | INV |
+|--------|-----------|-------|-----|
+| MOMPOW_KAPPA1_W50_Z | 116.5 | Monte Carlo precision ledgered as identification z | INV-040 |
+| MOMPOW_MAX_Z | 228.89 | Monte Carlo precision ledgered as identification z | INV-040 |
+| MOMPOW_DEFF50_MAX_Z | 32.37 | Monte Carlo precision ledgered as identification z | INV-040 |
+
+### INV-040: T29 z column answers the wrong question (OPEN)
+The S30 drafting prompt specified "mc_se = the Monte Carlo standard error of
+delta" and "z = |delta| / mc_se". The script implemented that specification
+exactly: sd(delta_vec)/sqrt(reps). The specification was wrong. The Monte Carlo
+standard error measures how precisely 400 replications pin down the expected
+difference between the two worlds. The question the paper asks is whether a
+researcher holding one realization of 4,182 pairs can distinguish them, and the
+answer to that turns on the sampling SD of the statistic within a single
+dataset, which is larger by sqrt(reps).
+
+Consequence: every z in output/T29_moment_power.csv is inflated by a factor of
+exactly 20, and three ledger IDs were entered on the inflated definition. The
+substantive direction is unchanged -- the higher-moment route is open under
+independence -- but the margin is 3 to 11, not 59 to 229, and under a moderate
+design effect it becomes marginal rather than overwhelming. The appendix sentence
+that this task was commissioned to replace must be replaced by a conditional
+statement, not by an unconditional one.
+
+No re-run is required to obtain the corrected figures; the relation is exact
+arithmetic on the committed table. A re-run is nonetheless desirable so that the
+artifact carries the right column rather than a ledger note, and so that both
+definitions appear side by side. S30's only inputs are meta/canonical_facts.md
+and output/T22_theta_A_treated.csv, both repository-resident, so the re-run needs
+R but not the cluster and not the trade panel.
+
+Closing this entry requires: (1) T29 regenerated with both columns, mc_se_mc and
+sd_single_dataset, and z on the second; (2) the sidecar reissued with the
+producer script's own SHA256 recorded, which the first issue omitted; (3) this
+section's MOMPOW_IDENT_* values re-derived from the regenerated table and
+confirmed identical to the arithmetic above.
+
+Class: wrong-object, instance 9. Unlike instances 1-8 the wrong object was
+specified rather than substituted, and the executor is not at fault.
+
+Status: OPEN.
