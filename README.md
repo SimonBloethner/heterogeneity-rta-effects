@@ -20,6 +20,7 @@ nothing in it should be cited.
 | `article/` | LaTeX source, bibliography, generated constants |
 | `audit/` | Scripts and outputs under review, not cited |
 | `archive/retired_pack/` | Retired exhibit pack (INV-021), frozen |
+| `archive/retired_2026-07-29/` | Files outside the paper's dependency closure |
 
 `meta/canonical_facts.md` is the **sole authority** for every reported number.
 Where it disagrees with anything in `output/`, the ledger governs and the
@@ -56,6 +57,7 @@ Rscript code/S28_gradient_B.R        # Definition-B gradient -> T27
 Rscript code/S24_reliability.R       # split-half, per-pair theta_A -> T22
 Rscript code/S24b_anchor_table.R     # anchor table -> T23
 Rscript code/S25_placebo_uncorrected.R # uncorrected placebo -> T24
+Rscript code/S9R_spec_spread.R       # specification spread -> T1R
 ```
 
 Stage 4 -- proposition verification
@@ -72,8 +74,10 @@ Stage 5 -- enforcement
 Rscript code/enforce.R
 ```
 
-`enforce.R` halts on any violation. The only expected violations are the
-`L*` QUARANTINE scripts (INV-029).
+`enforce.R` halts on any violation. **The pass condition is zero.** There is no
+expected-violation list; an earlier version of this file published one that had
+never been measured against the repository (see INV-038). All ten checks carry a
+known-pass and known-fail fixture and provably discriminate.
 
 ## Validation Gates
 
@@ -113,7 +117,9 @@ naive mean -0.52) was a chimera with no R-chain provenance; see INV-010 in
 ## Verification
 
 Every committed artifact carries a sidecar in `meta/` recording its producer,
-inputs, seed, gates, and SHA256, and a row in `meta/FILE_REGISTRY.csv`:
+inputs, seed, gates, and SHA256, and a row in `meta/FILE_REGISTRY.csv` with one
+of three statuses: `BUILT` (live and citable as a source), `ANCHOR` (live
+dependency, not citable), `ARCHIVED` (dead, moved under `archive/`).
 
 ```bash
 Rscript code/enforce.R
