@@ -77,7 +77,19 @@ Rscript code/enforce.R
 `enforce.R` halts on any violation. **The pass condition is zero.** There is no
 expected-violation list; an earlier version of this file published one that had
 never been measured against the repository (see INV-038). All ten checks carry a
-known-pass and known-fail fixture and provably discriminate.
+known-pass and known-fail fixture and provably discriminate. As last measured, 11
+EXPECTED_N violations remain, on scripts that load population data without
+asserting its row count: the pass condition is unmet. That figure is a measured
+residual and not a tolerated exception; it is recorded identically in
+`MANIFEST.txt`, and both statements are removed together once the count reaches
+zero.
+
+Check coverage has its own open gap. `archive/retired_pack/` is absent from
+`meta/FILE_REGISTRY.csv`, and check (d) builds its forbidden-input set from
+registry rows, so nothing in that directory is currently forbidden as a
+dependency even though this file states it must not be cited. See INV-039 in
+`meta/canonical_facts.md`, and CAV-005 in `meta/SUPERSEDED.md` for the related
+register-hygiene items.
 
 ## Validation Gates
 
@@ -119,7 +131,8 @@ naive mean -0.52) was a chimera with no R-chain provenance; see INV-010 in
 Every committed artifact carries a sidecar in `meta/` recording its producer,
 inputs, seed, gates, and SHA256, and a row in `meta/FILE_REGISTRY.csv` with one
 of three statuses: `BUILT` (live and citable as a source), `ANCHOR` (live
-dependency, not citable), `ARCHIVED` (dead, moved under `archive/`).
+dependency, not citable), `ARCHIVED` (dead, moved under `archive/`). Registry
+coverage is not yet complete; see INV-039.
 
 ```bash
 Rscript code/enforce.R
