@@ -4,7 +4,8 @@ Generated: 2026-07-27 (SYNC-6)
 Amended: 2026-07-29 (SYNC-7: gradient producer + Definition-B gradient, TW_MEAN rounding, anchor-table correction)
 Amended: 2026-07-29 (SYNC-8: V1c moved onto the Arm 1' pair-level decomposition; INV-037 CLOSED)
 Amended: 2026-07-30 (SYNC-9: SPEC_SPREAD ledgered; INV-038 opened and closed)
-Status: OPEN (INV-033 only)
+Amended: 2026-07-30 (SYNC-10: INV-033 CLOSED; Arm C reproduced end to end)
+Status: CLOSED. No open investigations.
 
 ## Population
 
@@ -161,7 +162,7 @@ Preference among arms A/B/C for headline reporting suspended pending INV-027a re
 
 Resolution: INV-027a closed. No arm preference established; SD_true reported as interval [0.74, 1.48].
 
-Status: CLOSED.
+Status: CLOSED. This remains the governing entry on arm preference. INV-033's closure establishes that the C endpoint is reproducible, not that it is preferred.
 
 ### INV-027: SD_true identified set (PARTIAL)
 The true-effect SD is identified only up to an interval [0.74, 1.48], indexed by noise-subtraction arm.
@@ -175,6 +176,8 @@ The true-effect SD is identified only up to an interval [0.74, 1.48], indexed by
 
 **Var(theta_D) = 2.438** (canonical, from S5R_bhat.rds$baseline)
 **SD_true = sqrt(Var(theta_D) - Var_null)**
+
+Arm C is reproduced bin by bin in INV-033.
 
 **Sub-item INV-027a (CLOSED): V4 vs S18 null for 11+ bin**
 
@@ -220,12 +223,34 @@ This is the substitution that motivates enforce.R check (a). See CAV-004 in SUPE
 
 Status: CLOSED.
 
-### INV-033: Pseudo-population definition unreconciled (OPEN)
-Three pseudo-population counts exist: 5,169 / 4,244 / 3,387. Arm C null variance depends on which definition is used. Non-blocking: SD_true is reported as an interval [0.74, 1.48], and both endpoints are reported with their arm logic named, so no reported quantity depends on resolving this.
+### INV-033: Pseudo-population census (CLOSED)
+Three counts had been recorded as competing definitions of "the" pseudo-population, with the concern that Arm C's null variance depends on which is used: 5,169 / 4,244 / 3,387. The premise is false. They are three different objects with three different roles, and Arm C depends on exactly one of them.
 
-Consequence if resolved: the lower endpoint of SD_THETA_TRUE, and therefore the C_hardened row of the GE propagation table, would move. The upper endpoint (noise-only arm) is unaffected. Any section reporting the interval must continue to report both endpoints with assumptions labelled rather than preferring an arm.
+**Arm C reproduced end to end (2026-07-30).** Var_null_C is the sum over horizon bins of N1b's out-of-sample pseudo variance times the treated pairs' symmetric-window share. Variances from output/T12_N1b_horizon.csv, weights from output/T12_N1_oos_null.csv rows weight_2-3 ... weight_11+:
 
-Status: OPEN. This is the only open item in the ledger.
+| bin | N1b var_pseudo | symmetric weight | contribution |
+|-----|----------------|------------------|--------------|
+| 2-3 | 4.41864153922999 | 0.0148254423720708 | 0.065508 |
+| 4-5 | 2.83206266645286 | 0.20492587278814 | 0.580363 |
+| 6-10 | 2.05298265088461 | 0.341702534672406 | 0.701509 |
+| 11+ | 1.22990583720527 | 0.438546150167384 | 0.539370 |
+| | | sum = 1.0000000000 | **1.8867510746** |
+
+Agreement with the ledgered 1.8868 is 5e-5. Gate G4 in S24_arms_canonical.R asserts this to three decimals.
+
+**Adjudication of the three counts:**
+- **4,244** is N1b's MATCHED pseudo set, the sole pseudo-population entering Arm C. INV-026 R1 already declared it correct.
+- **4,182** is the treated population supplying the weights. n_treated in T12_N1b_horizon.csv sums to exactly 4182 across the four bins, which is the canonical population N. The weights are therefore not a pseudo quantity at all.
+- **5,169** is N1's raw pseudo count, before horizon matching. It belongs to Arm A. It appears in the Arm C code path only because T12_N1_oos_null.csv also stores the treated weights, and it contributes nothing to Var_null_C. N1's own matched variance is 0.389, the in-sample figure that must never be cited as Arm C.
+- **3,387** is not a definition. It is the H1/H2 defect, baseline-only filtering of the pseudo sample, identified and corrected by INV-026.
+
+**Consequence.** The lower endpoint of SD_THETA_TRUE is pinned. SD_true_C = sqrt(2.4379 - 1.8868) = 0.7424, ledgered as 0.7423; the fourth-decimal difference is the rounding of Var_null to 1.887 in T21_arms.csv and does not propagate to the reported interval, which is quoted to two decimals. The identified set [0.74, 1.48] stands on both endpoints, and both remain indexed by their noise-subtraction assumption. No arm preference is established or implied by this closure -- what is settled is that the C endpoint is reproducible, not that it is preferred.
+
+Sections reporting the interval or the GE bracket must continue to report both endpoints with assumptions labelled. INV-023 remains the governing entry on arm preference.
+
+Closes by the same logic as INV-036, which reconciled six placebo counts to filtering rules and superseded the placebo portion of this entry.
+
+Status: CLOSED.
 
 ### INV-034: Trade-weighted mean reconciliation (CLOSED)
 TW_MEAN values diverge by weighting scheme:
@@ -248,7 +273,7 @@ Six placebo counts encountered in R-chain:
 
 Resolution: S5R$placebo (n=17200) is the single canonical placebo population. Other counts arise from filtering rules (decile matching, split-half qualification). See T23_anchor.csv sidecar.
 
-Supersedes placebo portion of INV-033.
+Supersedes placebo portion of INV-033; the remainder of INV-033 is closed by the same census logic.
 
 Status: CLOSED.
 
