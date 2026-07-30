@@ -50,7 +50,14 @@ check_expected_n <- function(root, report = FALSE) {
         
         content <- readLines(script, warn = FALSE)
         content_text <- paste(content, collapse = "\n")
-        loads_pop <- any(grepl("population|pop_canon|S6R|theta_d", content_text, ignore.case = TRUE))
+        # NARROWED TRIGGER: Script must actually load from data/ AND use baseline/population
+        # This excludes:
+        #   - S26 which loads CSV outputs only (fread("T22_...csv"))
+        #   - S9R which loads from external path and only mentions theta_D in a comment
+        loads_data_rds <- any(grepl('readRDS.*"data/', content_text))
+        uses_baseline <- any(grepl("\\$baseline", content_text))
+        uses_population_obj <- any(grepl('S6R_population|popn.*<-.*readRDS', content_text))
+        loads_pop <- loads_data_rds && (uses_baseline || uses_population_obj)
         
         if (loads_pop) {
             is_producer <- script_name %in% POPULATION_PRODUCERS
