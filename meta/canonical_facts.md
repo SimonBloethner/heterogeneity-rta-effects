@@ -3,6 +3,7 @@
 Generated: 2026-07-27 (SYNC-6)
 Amended: 2026-07-29 (SYNC-7: gradient producer + Definition-B gradient, TW_MEAN rounding, anchor-table correction)
 Amended: 2026-07-29 (SYNC-8: V1c moved onto the Arm 1' pair-level decomposition; INV-037 CLOSED)
+Amended: 2026-07-30 (SYNC-9: SPEC_SPREAD ledgered; INV-038 opened and closed)
 Status: OPEN (INV-033 only)
 
 ## Population
@@ -49,11 +50,19 @@ Note: TW_MEAN uses pre_trade weights (INV-034). total_trade weights yield 0.304;
 | GRADIENT_B | Q1-Q5 spread, Definition B (pre-correction) | 0.6827 | 0.0821 | code/S28_gradient_B.R -> output/T27_gradient_B_spread.csv |
 | GRADIENT_B_SHARE | GRADIENT_B / GRADIENT | 0.7472 | NA | code/S28_gradient_B.R -> output/T27_gradient_B_spread.csv |
 
-Note (producer): the previous entry cited gates/X5_size_cohort.R -> gates/T3_gradient_cohorts.csv. No gates/ directory exists in this tree; the path was dangling. The value was also obtainable from output/T12_N4_gradient.csv, but that file is SUPERSEDED in FILE_REGISTRY.csv (SYNC-4) and a BUILT ledger entry must not depend on it. T27_gradient_B.csv reproduces every T12_N4_gradient column byte-identically under gates G3-G5 and is BUILT; it is the canonical producer for all five IDs above.
+Note (producer): the previous entry cited gates/X5_size_cohort.R -> gates/T3_gradient_cohorts.csv. No gates/ directory exists in this tree; the path was dangling. The value was also obtainable from output/T12_N4_gradient.csv, but that file is ANCHOR in FILE_REGISTRY.csv and a BUILT ledger entry must not cite it as a source. T27_gradient_B.csv reproduces every T12_N4_gradient column byte-identically under gates G3-G5 and is BUILT; it is the canonical producer for all five IDs above.
 
 Note (partition): quintiles are as.integer(cut(rank(pre_trade), breaks = 5, labels = FALSE)); n = 837/836/836/836/837. Per-quintile SE is sd/sqrt(n); spread SE is sqrt(se_Q1^2 + se_Q5^2), the convention that reproduces T10R_reconciliation.csv Q1_Q5_spread se_fixed exactly (gate G7). GRADIENT_B_SHARE carries no SE: it is a ratio of two spreads and its sampling distribution is not established.
 
 Note (shape - binding on prose): the profile is NOT monotone. Q4 = -0.0664 (SE 0.0369) lies below Q5 = -0.0583 (SE 0.0277); the Q4-Q5 difference is -0.0081 (SE 0.0462, t = -0.18). Q5 differs from zero at the 5 percent level (t = -2.11); Q4 does not (t = -1.80). Prose must state fall-then-floor, not monotone decline, and must not describe the largest pairs as statistically indistinguishable from zero. This is the shape Prop (iii) of the theory section predicts; a smoothly monotone negative profile would falsify it.
+
+## Specification Spread
+
+| ID | Quantity | Value | Producer |
+|----|----------|-------|----------|
+| SPEC_SPREAD | Published four specification estimates | [1.402, 0.922, 0.411, 0.095] | code/S9R_spec_spread.R -> output/T1R_spec_spread.csv |
+
+Note: the four are, in order, (B) bilateral only, (C) country fixed effects, (CY) country-year fixed effects, (FULL) country-year plus pair fixed effects. T1R_spec_spread.csv reproduces all four to within 3e-4 of the published values and carries their standard errors (0.0596, 0.0553, 0.0536, 0.0299). Specifications (B) and (C) omit multilateral resistance and their deviation is bias; the substantive contrast is (CY) 0.411 against (FULL) 0.095. Section 5 cites this ID for the spread it resolves. Before SYNC-9 the four numbers were cited directly from T1R_spec_spread.csv with no ledger row, which put them outside the dependency closure computed on 2026-07-29.
 
 ## Reliability
 
@@ -207,12 +216,16 @@ During a provenance fix, the retired pack value 0.2138 was written over the R-ch
 
 Stray file renamed: data/STRAY_W1_COPY_DO_NOT_USE.rds
 
+This is the substitution that motivates enforce.R check (a). See CAV-004 in SUPERSEDED.md for that check's current coverage limits.
+
 Status: CLOSED.
 
 ### INV-033: Pseudo-population definition unreconciled (OPEN)
-Three pseudo-population counts exist: 5,169 / 4,244 / 3,387. Arm C null variance depends on which definition is used. Non-blocking: SD_true is reported as an interval [0.74, 1.48].
+Three pseudo-population counts exist: 5,169 / 4,244 / 3,387. Arm C null variance depends on which definition is used. Non-blocking: SD_true is reported as an interval [0.74, 1.48], and both endpoints are reported with their arm logic named, so no reported quantity depends on resolving this.
 
-Status: OPEN.
+Consequence if resolved: the lower endpoint of SD_THETA_TRUE, and therefore the C_hardened row of the GE propagation table, would move. The upper endpoint (noise-only arm) is unaffected. Any section reporting the interval must continue to report both endpoints with assumptions labelled rather than preferring an arm.
+
+Status: OPEN. This is the only open item in the ledger.
 
 ### INV-034: Trade-weighted mean reconciliation (CLOSED)
 TW_MEAN values diverge by weighting scheme:
@@ -250,7 +263,26 @@ Discriminating test, both gates PASS on the regenerated per-pair file:
 - mean over all 17200 placebo pairs = -0.68798424523333 (T23_anchor.csv)
 - mean over the 15683 qualifying subset = -0.68210567525916 (T22 / PLACEBO_A_MEAN)
 
-One estimator, nested populations. No producer disagreement, no recomputation of T23 warranted, no article edit required. The Anchor Table above correctly reports the full-population figure and the Reliability section correctly reports the qualifying-subset figure.
+One estimator, nested populations. No producer disagreement, no recomputation of T23 warranted, no article edit required.
+
+Status: CLOSED.
+
+### INV-038: Check (d) never fired; SUPERSEDED carried two meanings (CLOSED)
+enforce.R check (d) enforces "no BUILT output may depend on a QUARANTINE, SUPERSEDED or RETIRED input". It subset FILE_REGISTRY.csv on a column named `file`. That column does not exist; the column is `file_path`. The check therefore compared every output against an empty set of forbidden inputs and reported zero violations from the day it was written until 2026-07-29.
+
+Two further defects in the same instrument were found the same day:
+- enforce.R hardcoded setwd() into /groups/m-larch/bt307958/REBUILD_V2, a stale partial mirror. Every enforce result ever produced described that directory, not the repository.
+- Check (b) resolved sidecar producers with file.path("code", producer). 50 sidecars write "code/X.R" and 13 write "X.R", so the 50 resolved to code/code/X.R and were reported missing though the files existed. This inflated the violation count by 46.
+
+Root cause of all three: no check had ever been tested. None had a known-pass and known-fail case. A fixture suite now exists under tests/fixtures/ and all ten checks provably discriminate.
+
+Underlying conceptual defect: the single `status` column carried two incompatible claims -- "do not cite this as the source of a number" and "nothing depends on this". Files were marked SUPERSEDED under the first meaning while check (d) was written to enforce the second. Because check (d) could not fire, the contradiction stayed invisible: at the time it was found, fifteen SUPERSEDED files were live dependencies of numbers in the paper. The vocabulary is now three-valued -- BUILT (live, citable), ANCHOR (live dependency, not citable), ARCHIVED (dead, moved to archive/) -- and check (d) tests the second meaning only.
+
+Also corrected: README.md and MANIFEST.txt published "Expected: only L* QUARANTINE violations" as the enforce baseline. That figure had never been measured on the repository. The pass condition is now zero violations and no expected-violation list exists.
+
+No number in the paper was affected. All 55 sidecars carrying a FILE and SHA256 field were verified against file bytes at commit bb8d9e86: 54 matched and one was a known orphan (T26_null_stack.csv). Every defect was in the verification layer.
+
+Residual coverage limit recorded separately as CAV-004 in SUPERSEDED.md.
 
 Status: CLOSED.
 
