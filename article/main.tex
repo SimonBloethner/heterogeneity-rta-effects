@@ -1130,10 +1130,12 @@ reported with them is a statement about which assumption would have to be true
 for which endpoint to hold, and it tells a reader who disagrees with one of the
 assumptions exactly which number to take. Proposition~\ref{prop:ident}(b) is the
 model case, because it establishes that a particular decomposition is
-unavailable at any sample size
-% [Prop3]
-: no amount of additional data moves that boundary, and reporting a point inside
-it would represent as measured what is in fact chosen.
+unavailable in exact terms under the model's normality assumption, and only
+conditionally recoverable outside it
+% [Prop3] % [see Remark 4]
+: no weakening of the assumption that a reader is likely to grant moves that
+boundary far, and reporting a point inside it would represent as measured what is
+in fact chosen.
 
 % ¶18 — Item five: content-pinning assertions, framed prospectively as the
 % general defense against a general failure class.
@@ -1913,10 +1915,13 @@ likelihood only through the composite $\sigma^2\rho^2+\omega^2$. Any two
 parameterizations with equal composites generate \emph{identical} data
 distributions; the split between transitory effect heterogeneity and
 treatment-coincident volatility change is a modeling label, not an estimable
-quantity. Absent normality, separation requires within-pair moments of order
-$\ge3$, whose sampling noise at $T_{\mathrm{post}}\approx10$
-($\mathrm{SD}$ of sample excess kurtosis $\approx\sqrt{24/T}\approx1.5$)
-dominates plausible population differences.
+quantity. The equivalence is exact under the stated normality, and is claimed at
+that strength and no further. Absent normality the composite no longer exhausts
+the likelihood, and separation becomes possible in principle through within-pair
+moments of order $\ge3$; the sampling noise of any \emph{per-pair} such moment
+overwhelms it at $T_{\mathrm{post}}\approx10$, but the operative statistic pools
+across pairs and its noise falls with the number of pairs, not the window length.
+Remark~\ref{rem:moments} reports what that pooled route delivers at this sample.
 \end{proposition}
 
 \begin{corollary}[Operational variance ratios over-subtract]\label{cor:rhoop}
@@ -1949,8 +1954,49 @@ and $\PropTauKfive$, reaching zero at $\kappa_{\mathrm{floor}}=\PropKappaFloor$
 . A null calibrated on a window shorter than the estimation window therefore
 absorbs true heterogeneity at a computable rate, and at
 $\kappa_{\mathrm{floor}}$ absorbs all of it.
-The transitory slice $\omega^2/T$ remains, by part~(b), inseparable from volatility
-change at any sample size --- the boundary of what these data permit anyone to learn.
+The transitory slice $\omega^2/T$ is, by part~(b), exactly inseparable from
+volatility change under normality; Remark~\ref{rem:moments} bounds what
+departures from normality recover.
+\end{remark}
+
+% REMARK 4: the pooled higher-moment route (S30 power calculation + S34 measurement)
+% LEDGER: MOMPOW_IDENT_* (INV-040 corrected definition); A2_EXKURT, A2_EXKURT_CONTROL
+\begin{remark}[What departures from normality recover]\label{rem:moments}
+Part~(b)'s equivalence is exact under normality and silent outside it. The
+question outside it is quantitative: pooled across pairs, does a higher-order
+within-pair moment separate the two parameterizations at this sample? A
+calibrated simulation answers it. Drawing $\sigma^2_{ij}$ to match the ledgered
+first two moments and using the empirical distribution of post-window lengths,
+the two worlds are constructed with equal composites and compared on the pooled
+mean of per-pair sample excess kurtosis. Under normality the difference is zero
+to simulation precision, as part~(b) requires
+% [MOMPOW_KAPPA0_DELTA]
+. Away from it, and expressed as the ratio of the difference to the sampling
+standard deviation of the statistic in a \emph{single} realization of $4{,}182$
+pairs, separation runs from $2.96$ to $11.44$ across excess kurtosis in
+$[0.75,\,3.0]$ and transitory shares in $[0.10,\,1.00]$
+% [MOMPOW_IDENT_MIN_Z, MOMPOW_IDENT_MAX_Z]
+. The relevant departure is measured rather than assumed: the standardized log
+gaps carry an excess kurtosis of $0.784$ against $-0.269$ for a matched normal
+control passed through identical code, a net departure near unity that falls
+inside the simulated grid
+% [A2_EXKURT, A2_EXKURT_CONTROL]
+.
+
+Two qualifications bound the reading, and both are material. The simulation
+treats pairs as independent; cross-pair dependence is not estimated anywhere in
+this paper, and at assumed variance inflations of ten and fifty the same
+separation falls to $3.62$ and $1.62$ at the most favorable cell
+% [MOMPOW_IDENT_DEFF10_MAX_Z, MOMPOW_IDENT_DEFF50_MAX_Z]
+. And the route requires committing to a shape for the multiplicative shock that
+treatment does not alter; if treatment may change the shape as well as the scale,
+the separation closes again. The honest statement is therefore conditional. The
+split between transitory effect heterogeneity and treatment-coincident volatility
+change is exactly unidentified under normality; outside normality it is
+recoverable at this sample under cross-pair independence and shape invariance,
+and its status without those two conditions is not established here. Nothing in
+this paper's reported interval depends on which way that resolves, since the
+interval concerns the persistent component identified by part~(a).
 \end{remark}
 
 \end{document}
