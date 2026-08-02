@@ -77,13 +77,12 @@ Rscript code/enforce.R
 `enforce.R` halts on any violation. **The pass condition is zero.** There is no
 expected-violation list; an earlier version of this file published one that had
 never been measured against the repository (see INV-038). All ten checks carry a
-known-pass and known-fail fixture and provably discriminate. As last measured, 7
-violations remain: 5 under check (d) (BUILT scripts loading ARCHIVED file
-ITPDE_total.rds) and 2 under check (e) (SHA256 mismatches for S1R_ppml.rds and
-T39_a2_jensen_identity.csv). The pass condition is unmet. That figure is a
-measured residual and not a tolerated exception; it is recorded identically in
-`MANIFEST.txt`, and both statements are removed together once the count reaches
-zero.
+known-pass and known-fail fixture and provably discriminate. As last measured at
+commit `b2d0edf`, 2 violations remain under check (f): appendix numeric literals
+on main.tex lines 2017 and 2021 without resolving ledger IDs. The pass condition
+is unmet. That figure is a measured residual and not a tolerated exception; it is
+recorded identically in `MANIFEST.txt`, and both statements are removed together
+once the count reaches zero.
 
 Check coverage has its own open gap. `archive/retired_pack/` is absent from
 `meta/FILE_REGISTRY.csv`, and check (d) builds its forbidden-input set from

@@ -94,9 +94,8 @@ Registry: meta/FILE_REGISTRY.csv, 252 rows. Statuses present: BUILT / ANCHOR /
           registry rows and is therefore invisible to check (d). See INV-039.
           An earlier version of this line claimed every tracked file was
           registered; that claim had not been verified and was false.
-Measured state, NOT an allowance: 7 violations remain: 5 under check (d) (BUILT
-      scripts loading ARCHIVED file ITPDE_total.rds) and 2 under check (e)
-      (SHA256 mismatches for S1R_ppml.rds and T39_a2_jensen_identity.csv). The
-      pass condition above is therefore unmet. README.md publishes the same
-      figure; the two must be updated together, and both lines are removed when
-      the count reaches zero.
+Measured state, NOT an allowance: 2 violations remain under check (f) at commit
+      b2d0edf: appendix numeric literals on main.tex lines 2017 and 2021 without
+      resolving ledger IDs. The pass condition above is therefore unmet. README.md
+      publishes the same figure; the two must be updated together, and both lines
+      are removed when the count reaches zero.
