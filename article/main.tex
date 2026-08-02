@@ -1049,10 +1049,16 @@ window-geometry prediction
 with nothing fitted to it: the cross-pair variance of the estimator on the
 zero-effect population implies a dispersion of pair volatilities, and
 substituting that into the split-half formula \emph{predicts} a reliability of
-$0.81$ against the $0.75$ observed
-% [T25: PROP_R_PRED, PROP_PLACEBO_R]
-. The formula reproduces the observed figure to within six hundredths,
-over-predicting slightly, with no parameter chosen to make it do so.
+$0.754$ against the $0.746$ observed
+% [R_PRED, PLACEBO_A_R]
+. The formula reproduces the observed figure to within eight thousandths, with no
+parameter chosen to make it do so. The prediction is evaluated pair by pair,
+which the convexity of $1/T$ requires: post windows differ across pairs, the
+reciprocal of the mean window length is not the mean of the reciprocals, and a
+plug-in evaluation at the mean over-predicts, returning $0.807$ and a gap eight
+times larger
+% [T25: PROP_R_PRED_PLUGIN]
+.
 
 % ¶13a — The variant that fails, which is the sharper half of the certificate.
 
@@ -1074,8 +1080,43 @@ occurs at the magnitude the derivation predicts is a stronger statement than a
 variant that succeeds, and it is the reason the null used above is matched to the
 treated design rather than to convenience.
 
+% ¶13b — The maintained distributional assumption, tested against a matched
+% control rather than against a theoretical normal.
+% LEDGER: A2_* (SYNC-13); INV-041 records the location-restriction residual.
+
+One further check bears on the premise rather than the arithmetic. The
+propositions are derived under a distributional assumption --- that the log gaps
+are normal within a pair --- and an assumption of that kind is testable on the
+untreated cells, where the effect is zero by construction. It is tested here
+against a matched normal control rather than against a theoretical one, because
+centering and scaling within a pair over a short window deforms the distribution
+even when the underlying data are exactly normal; the control is drawn pair by
+pair with identical cell counts and passed through identical code, so any
+deformation the procedure introduces appears on both sides and cancels. On
+$27{,}782$ pairs the assumption is rejected: $32.8$ percent of pairs reject
+normality at the five percent level against $5.0$ percent for the control
+% [A2_N_PAIRS, A2_REJECT_REAL, A2_REJECT_CONTROL]
+. The direction matters more than the rejection. The departure is left-skewed and
+leptokurtic --- skewness $-0.476$, excess kurtosis $0.784$ against the control's
+$-0.269$ --- while the \emph{upper} tail is thinner than the control's at the
+ninety-fifth, ninety-ninth and ninety-nine-and-a-half percentiles
+% [A2_SKEW, A2_EXKURT, A2_EXKURT_CONTROL, A2_TAIL_RATIO_P99]
+. What the data carry is not an excess of extreme gains but an excess of
+collapses: trade falling far below its counterfactual more often than a normal
+law allows.
+
+The consequence for what precedes it is smaller than the rejection suggests, and
+worth stating in those terms rather than defended. The reliability prediction
+above is derived exactly under normality, and it lands within eight thousandths
+on the same data in which normality is rejected at a third of pairs. A prediction
+that survives the failure of its own premise is evidence about the mechanism it
+describes rather than about the premise, which is the reason this section reports
+the departure alongside the check instead of in place of it. Where the assumption
+does bind is on the identification boundary rather than on any quantity reported
+here; Remark~\ref{rem:moments} states what the measured departure recovers there,
+and the section on the boundary of learnability carries it forward.
+
 % ¶14 — States the limit of the certificate honestly, and names the stronger
-% test that these results do not supply.
 
 What this does not establish should be stated with equal clarity. Verifying the
 arithmetic of a correction is weaker than verifying the pipeline that applies
