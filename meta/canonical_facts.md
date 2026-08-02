@@ -7,7 +7,8 @@ Amended: 2026-07-30 (SYNC-9: SPEC_SPREAD ledgered; INV-038 opened and closed)
 Amended: 2026-07-30 (SYNC-10: INV-033 CLOSED; Arm C reproduced end to end)
 Amended: 2026-07-30 (SYNC-11: treated-population nesting note; INV-039 opened)
 Amended: 2026-07-30 (SYNC-12: S30 ledgered; INV-040 opened -- three S30 IDs superseded)
-Status: TWO OPEN INVESTIGATIONS -- INV-039 (registry coverage) and INV-040 (S30 z definition). Neither affects a number reported in the article as of SYNC-12.
+Amended: 2026-08-02 (SYNC-13: (A2) diagnostics ledgered from S34/S35; INV-041 opened)
+Status: THREE OPEN INVESTIGATIONS -- INV-039 (registry coverage), INV-040 (S30 z definition), INV-041 ((A2) normality). None affects a number reported in the article as of SYNC-13.
 
 ## Population
 
@@ -103,7 +104,7 @@ Note: V1c is evaluated pair-wise (Arm 1'). The noise terms are E[sigma^2_i/T_h,i
 
 Note: V1c consistency check: |R_GAP| = 0.0076 < 0.05. PASS. The 0.05 bound was NEVER RESTATED; the earlier miss (0.0605) was an estimator defect, not a tolerance problem, and removing it improved the prediction by a factor of eight in the direction convexity requires. Arms recorded in T28/T28b: Arm 0 (plug-in) +0.0605; Arm 1 (Jensen on 1/T_h only, internally inconsistent, DO NOT CITE) -0.0063; Arm 1' (canonical, ESIGMA2 throughout) +0.0076; Arm 2 (within-window sigma2_hat throughout) -0.0810.
 
-Note: Arm 2 is rejected on wrong-object grounds, not on its gap. sigma2_hat_i is the within-post-window sample variance of the log gaps; under Prop 2 that variance converges to sigma^2_i + delta_i^2 Var(t | post) and so absorbs drift. ESIGMA2 is the quantity Prop 1(a) identifies, and is what the proposition's own formula refers to.
+Note: Arm 2 is rejected on wrong-object grounds, not on its gap. sigma2_hat_i is the within-post-window sample variance of the log gaps; under Prop 2 that variance converges to sigma^2_i + delta_i^2 Var(t | post) and so absorbs drift. ESIGMA2 is the quantity Prop 1(a) identifies, and is what the proposition's own formula refers to. SYNC-13 note: S34/S35 provide independent support for this rejection on a much larger untreated sample; see INV-041, where the same contamination appears at a factor of 1.937 over windows averaging 21.5 cells.
 
 Note: DRIFT_WEDGE = 1.3460 is the excess of mean(sigma2_hat_i) over ESIGMA2. It has the sign and rough magnitude Prop 2 predicts, but it is NOT separately identified from departures from A2 (non-lognormal gaps, E[eta] != 1). Do not describe it as a measurement of the drift term. Related: mean(sigma2_hat_i/T_post,i) exceeds ESIGMA2*E[1/T_post,i] by 1.432 against a ratio of means of 1.346, implying positive covariance between sigma2_hat_i and 1/T_post,i.
 
@@ -445,6 +446,11 @@ dependence is unmeasured. It must not state that the route is closed, which was
 the appendix's pre-SYNC-12 claim, and it must not state that it is open
 unconditionally.
 
+SYNC-13 note: S34 measures the relevant excess kurtosis at about 1.05 net of its
+control, which lies between this grid's kappa_u = 1.0 and 1.5 cells. The
+conditional above is therefore no longer hypothetical on the kurtosis axis; it
+remains hypothetical on the dependence axis. See the (A2) Diagnostics section.
+
 ## Superseded Entries (S30, SYNC-12)
 
 | Old ID | Old Value | Cause | INV |
@@ -486,5 +492,111 @@ confirmed identical to the arithmetic above.
 
 Class: wrong-object, instance 9. Unlike instances 1-8 the wrong object was
 specified rather than substituted, and the executor is not at fault.
+
+Status: OPEN.
+
+## (A2) Diagnostics (S34 / S35)
+
+Assumption (A2) states log eta_ijt = -sigma^2_ij/2 + u_ijt with u normal, where
+eta is observed trade over the fitted counterfactual. Two implications are tested
+separately: normality of the within-pair log gaps, and the location identity that
+a pair's mean log gap equals minus half its variance. Sample: untreated cells
+only, pairs with >= 8 cells, n = 27,782 pairs and 570,791 cells, mean window 21.5
+cells.
+
+Every statistic is reported against a normal control matched pair by pair and
+passed through identical code. Within-pair centring and scaling on short windows
+deforms even exactly normal data, so the control -- not a theoretical normal -- is
+the reference. Gate G1 (control rejection rate within 0.02 of 0.05) realized
+0.0503 and PASSED, which is what makes the real-panel readings admissible.
+
+| ID | Quantity | Value | Producer |
+|----|----------|-------|----------|
+| A2_N_PAIRS | Pairs in the (A2) diagnostic | 27782 | code/S34_a2_normality.R -> output/T38_a2_normality.csv |
+| A2_REJECT_REAL | Per-pair normality rejection rate, real (Shapiro-Wilk, 5 pct) | 0.3277 | code/S34_a2_normality.R -> output/T38_a2_normality.csv |
+| A2_REJECT_CONTROL | Per-pair rejection rate, matched normal control | 0.0503 | code/S34_a2_normality.R -> output/T38_a2_normality.csv |
+| A2_SKEW | Pooled skewness of standardized log gaps, real | -0.4755 | code/S34_a2_normality.R -> output/T38_a2_normality.csv |
+| A2_EXKURT | Pooled excess kurtosis, real | 0.7840 | code/S34_a2_normality.R -> output/T38_a2_normality.csv |
+| A2_EXKURT_CONTROL | Pooled excess kurtosis, control | -0.2693 | code/S34_a2_normality.R -> output/T38_a2_normality.csv |
+| A2_TAIL_RATIO_P99 | Upper-tail quantile ratio at p0.99, real/control | 0.9431 | code/S34_a2_normality.R -> output/T38_a2_normality.csv |
+| A2_JENSEN_SLOPE | Slope of mean_i on var_i, real | -0.1966 (SE 0.0010) | code/S35_jensen_control.R -> output/T40_jensen_control.csv |
+| A2_JENSEN_SLOPE_CTRLC | Same slope, Control C (identity imposed exactly) | -0.3351 (SE 0.0014) | code/S35_jensen_control.R -> output/T40_jensen_control.csv |
+| A2_VAR_RELIABILITY | Split-half reliability of var_i as a regressor, real | 0.7575 | code/S35_jensen_control.R -> output/T40_jensen_control.csv |
+| A2_VAR_RELIABILITY_CTRLC | Same, Control C | 0.6144 | code/S35_jensen_control.R -> output/T40_jensen_control.csv |
+
+Note (normality is rejected, and in which direction): the real rejection rate
+exceeds the control's by 0.2774 (SE 0.0031). The departure is left-skewed and
+leptokurtic: excess kurtosis is 0.7840 against the control's -0.2693, a net
+departure of about 1.05. The UPPER tail is thinner than the control at p0.95,
+p0.99 and p0.995 (ratios 0.899, 0.943, 0.964), matching only at p0.999 (1.020).
+Prose must not describe the log gaps as heavy-tailed on the right. The excess
+kurtosis is a left-tail phenomenon: occasional collapses of trade far below the
+counterfactual, more often than normal allows.
+
+Note (binding on Section 6): the net excess kurtosis of about 1.05 lies inside the
+grid of the S30 higher-moment power calculation, between its kappa_u = 1.0 and 1.5
+cells. Section 6 must therefore state the equivalence boundary as a measured
+conditional rather than a wall. See MOMPOW_IDENT_* and INV-040.
+
+Note (intercept is uninformative in both panels): Control C returns an intercept
+of -0.5883 although the location identity is imposed exactly in its generating
+parameters, which is further from zero than the real panel's -0.2201. No reading
+of the intercept is admissible in either panel.
+
+### INV-041: (A2) normality rejected; location identity survives (OPEN)
+S34 rejects normality of the within-pair log gaps: 32.77 percent of pairs reject
+against a matched-control rate of 5.03 percent.
+
+S35 was commissioned to decide whether the accompanying slope departure
+(-0.1966 against the -0.5 that (A2) predicts) reflects a failed location identity
+or an attenuated estimator. Control C -- same pairs, same counts, each pair's
+realized variance, mean fixed at exactly -v_i/2, shape matched to the measured
+skewness and excess kurtosis (G1 realized 0.032 and 0.031 against tolerances of
+0.10 and 0.15) -- returns -0.3351. Disattenuating by the split-half reliability of
+var_i recovers -0.5454 against a true -0.5000, so the correction is validated on a
+panel whose answer is known; applied to the real panel it gives -0.2595.
+
+DERIVED, NOT GATED -- the following is arithmetic performed on committed artifacts
+during drafting, not the output of a gated script, and is entered here so that it
+is not rediscovered. It requires verification in a gated script before any of it
+is cited in the article.
+
+Over the same pairs, output/T39_a2_jensen_identity.csv gives E[mean_i] = -0.9229
+and E[var_i] = 3.5748. Under (A2) these must satisfy -2*E[mean] = E[var]; they
+give 1.8458 against 3.5748, so the variance side exceeds the mean side by a factor
+of 1.937. A single multiplicative inflation of var_i by w reconciles both
+departures: the level gap implies w = 1.937, and the slope implies
+w = 0.5/0.2595 = 1.927, agreeing to 0.5 percent. Predicted slope at w = 1.937 is
+-0.2582 against the observed -0.2595.
+
+That inflation is the drift wedge of Proposition 2: the within-window variance
+converges to sigma^2_i plus a drift term, so var_i measured over a long window
+estimates sigma^2 plus drift rather than sigma^2. DRIFT_WEDGE is already ledgered
+at 1.3460 on post windows of roughly ten cells; these untreated windows average
+21.5 cells, and a longer window accumulates more drift, so the larger factor has
+the direction and rough magnitude the proposition predicts.
+
+Consequence, and it is the reason this entry matters: var_i is the wrong regressor
+for the location identity, and it is the same wrong object the ledger already
+rejected when Arm 2 was set aside on wrong-object grounds. ESIGMA2 = 1.3642 is
+derived as minus twice the placebo mean, which is the drift-immune route. It
+stands unqualified and requires no caveat in the article.
+
+The residual finding is therefore narrower than it first appeared: normality
+fails, the location identity does not, and the propositions' predictions hold on
+data that violates their normality premise -- R_PRED = 0.7539 against
+PLACEBO_A_R = 0.7463, a prediction derived exactly under (A2) landing within eight
+thousandths where (A2) is rejected at a third of pairs.
+
+Closing this entry requires: (1) the drift-inflation arithmetic above reproduced
+in a gated script with the level and slope routes as separate assertions; (2)
+sidecars and FILE_REGISTRY.csv rows for code/S34_a2_normality.R,
+code/S35_jensen_control.R, output/T38, T39, T40 and output/F5, none of which were
+in scope for S34 or S35 and none of which exist; (3) an article passage in the
+data or diagnostics section reporting the rejection with its control, since (A2)
+is currently maintained without evidence either way.
+
+Superseded by this entry: no ledgered value. Nothing in the article cited any (A2)
+diagnostic before SYNC-13, because none existed.
 
 Status: OPEN.
