@@ -1,9 +1,54 @@
 #!/usr/bin/env Rscript
 # enforce.R - Gate Consistency Check (REPAIRED)
 # Each check is individually callable while preserving exact original output format
-# REPAIRS: R1 (sidecar path), R2 (appendix following-line), R3 (macro split), R4 (ARCHIVED vocab)
+# REPAIRS: R1 (sidecar path), R2 (appendix following-line), R3 (macro split), R4 (ARCHIVED vocab), R5 (full path match)
 
 stopifnot(!grepl("login", Sys.info()[["nodename"]]))
+
+# =============================================================================
+# PREFLIGHT: Refuse to measure an unknown tree
+# =============================================================================
+args <- commandArgs(trailingOnly = TRUE)
+ALLOW_DIRTY <- "--allow-dirty" %in% args
+
+preflight_check <- function(root) {
+    old_wd <- getwd()
+    setwd(root)
+    on.exit(setwd(old_wd))
+
+    head_sha <- system("git rev-parse HEAD", intern = TRUE)
+    origin_sha <- system("git rev-parse origin/main 2>/dev/null || echo 'NO_REMOTE'", intern = TRUE)
+    # Exclude data/ from porcelain check (gitignored, symlinked)
+    porcelain <- system("git status --porcelain | grep -v '^.. data/' || true", intern = TRUE)
+    dirty_count <- length(porcelain[porcelain != ""])
+
+    if (ALLOW_DIRTY) {
+        cat("================================================================\n")
+        cat("WARNING: --allow-dirty specified\n")
+        cat("This result does NOT describe origin/main and MUST NOT be published.\n")
+        cat(sprintf("HEAD: %s\n", head_sha))
+        cat(sprintf("origin/main: %s\n", origin_sha))
+        cat(sprintf("Dirty files (excluding data/): %d\n", dirty_count))
+        cat("================================================================\n\n")
+        return(TRUE)
+    }
+
+    if (origin_sha == "NO_REMOTE") {
+        stop(sprintf(
+            "PREFLIGHT HALT: No origin/main ref found.\nHEAD: %s\nDirty files: %d\nCannot verify tree matches repository.",
+            head_sha, dirty_count
+        ))
+    }
+
+    if (head_sha != origin_sha || dirty_count > 0) {
+        stop(sprintf(
+            "PREFLIGHT HALT: Tree does not match origin/main.\nHEAD: %s\norigin/main: %s\nDirty files (excluding data/): %d\nRefuse to measure an unknown tree. Use --allow-dirty to override (result must not be published).",
+            head_sha, origin_sha, dirty_count
+        ))
+    }
+
+    return(TRUE)
+}
 
 library(data.table)
 
@@ -180,21 +225,21 @@ check_built_deps <- function(root, report = FALSE) {
             }
         }
         
-        # R4 FIX: Check ARCHIVED dependencies
+        # R5 FIX: Check ARCHIVED dependencies using full path, not basename
+        # This prevents false positives when an archived file shares a basename with a live file
+        # (e.g., archive/retired_pack/data/ITPDE_total.rds vs data/ITPDE_total.rds)
         for (arch in archived) {
-            arch_base <- basename(arch)
-            if (any(grepl(arch_base, load_lines, fixed = TRUE))) {
-                msg <- sprintf("%s loads ARCHIVED file %s", script_name, arch_base)
+            if (any(grepl(arch, load_lines, fixed = TRUE))) {
+                msg <- sprintf("%s loads ARCHIVED file %s", script_name, arch)
                 if (report) report_violation("ARCHIVED", msg)
                 results <- c(results, paste0("ARCHIVED|", msg))
             }
         }
-        
-        # Check QUARANTINE dependencies
+
+        # R5 FIX: Check QUARANTINE dependencies using full path, not basename
         for (qfile in quarantined) {
-            qbase <- basename(qfile)
-            if (any(grepl(qbase, load_lines, fixed = TRUE))) {
-                msg <- sprintf("%s loads QUARANTINE file %s", script_name, qbase)
+            if (any(grepl(qfile, load_lines, fixed = TRUE))) {
+                msg <- sprintf("%s loads QUARANTINE file %s", script_name, qfile)
                 if (report) report_violation("QUARANTINE", msg)
                 results <- c(results, paste0("QUARANTINE|", msg))
             }
@@ -435,12 +480,15 @@ check_cf_producer <- function(root, report = FALSE) {
 # =============================================================================
 run_all_checks <- function(root = getwd()) {
     violations <<- list(); n_violations <<- 0
-    
+
+    # R6: Preflight check - refuse to measure unknown tree
+    preflight_check(root)
+
     cat("================================================================\n")
     cat("ENFORCE.R - GATE CONSISTENCY CHECK (REPAIRED)\n")
     cat("Run:", format(Sys.time()), "\n")
     cat("================================================================\n\n")
-    
+
     cat("Working directory:", root, "\n")
     old_wd <- getwd(); setwd(root)
     cat("Git HEAD:", system("git rev-parse HEAD", intern = TRUE), "\n")
