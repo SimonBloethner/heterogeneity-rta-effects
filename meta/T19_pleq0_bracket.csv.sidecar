@@ -1,0 +1,21 @@
+FILE:      T19_pleq0_bracket.csv
+SHA256:    37bcbe6900359aeee5e0b0189705b4c7d8ee1d4c808dfcedae2f77440c4a4766
+PRODUCER:  code/S22_ladder_closed_form.R
+PRODUCER_SHA256: 6a87c8d39dcc098810181de8c011a2e0394dbbd46b1a7b7a2aeb028ef52cf7aa
+INPUTS:
+  data/S5R_bhat.rds: NOT_IN_REPO
+SEED:      NONE
+
+SPECIFICATION:
+  P(theta_true <= 0) bracket at two SD_true endpoints
+  Normal-form lower bound, capped upper bound at raw share
+  Arms: C_hardened (SD=0.74), A_noise_only (SD=1.48)
+
+GATES:
+  G1: n == 4182: PASS
+  G2: theta_D present in data: PASS
+  G3: mean(theta_D) matches ledger 0.2473: PASS
+  G4: normal form at noise-only arm vs raw share: EXCEEDS (documented)
+  G5: bracket strictly ordered 0 < P_LO < P_HI < 1: PASS
+
+CREATED: 2026-08-02 08:26:32

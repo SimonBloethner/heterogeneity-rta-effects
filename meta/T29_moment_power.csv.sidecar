@@ -1,6 +1,7 @@
 FILE:      T29_moment_power.csv
 SHA256:    8bed5f08f287a94aee351fef1862b66190efbae14355f8c66f179a356d0d3cc2
 PRODUCER:  code/S30_moment_power.R
+PRODUCER_SHA256: d266b5d1a951bc53c7de7092d68e4b823db69a8bc0195e83ed77a7efa1624e25
 INPUTS:
   meta/canonical_facts.md:        a1dc51ea75313b5ee099137b89972726b6d6f689e2eb0faff369f70a7c226cc3
   output/T22_theta_A_treated.csv: 2ec840c06917d45dea4ac19efaadb9010e07f83dec6cb38638275ab6117217a7

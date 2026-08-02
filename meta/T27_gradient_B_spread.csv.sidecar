@@ -1,0 +1,25 @@
+FILE:      T27_gradient_B_spread.csv
+SHA256:    872152a314bf6e76968f15a73cdf790122495e94789d3352836bc3c022f40f6c
+PRODUCER:  code/S28_gradient_B.R
+PRODUCER_SHA256: 80dbb54026a443cb96e94a151b4f5307464b3c277b477a788e7ee661cbc5cb7b
+INPUTS:
+  data/S5R_bhat.rds: NOT_IN_REPO
+SEED:      NONE
+
+SPECIFICATION:
+  Definition B size-gradient exhibit
+  Quintile breakdown of theta_D and theta_B
+  Spread statistics for gradient verification
+
+GATES:
+  G1: Population n == 4182: PASS
+  G2: Input SHA256 verified (S5R_bhat.rds): PASS
+  G3: Input SHA256 verified (T12_N4_gradient.csv): PASS
+  G4: Input SHA256 verified (T5R_theta_summary.csv): PASS
+  G5: Quintile counts match expected: PASS
+  G6: diff_D < 1e-9: PASS
+  G7: diff_B < 1e-9: PASS
+  G8: diff_se < 1e-9: PASS
+  G9: diff_anchor < 1e-9: PASS
+
+CREATED: 2026-08-02 08:26:32

@@ -1,0 +1,21 @@
+FILE:      T22_reliability.csv
+SHA256:    7fbd8fdcdec11ffdbf1ffa960f32a0f1d7f62430f425efca3f9102f492acc3ab
+PRODUCER:  code/S24_reliability.R
+PRODUCER_SHA256: fa1499c9bf15f68df2c3fca1dfded9e85b8210033a4982dc5849caa422c1a372
+INPUTS:
+  data/S5R_bhat.rds: NOT_IN_REPO
+  data/S1R_ppml.rds: NOT_IN_REPO
+SEED:      20260719
+
+SPECIFICATION:
+  Split-half reliability table (Definition A)
+  Treated and placebo statistics
+  Includes SPLITHALF_A_R, PLACEBO_A_R, T_h values
+
+GATES:
+  G1: n == 4182 (treated pairs): PASS
+  G2: split-half n == 4120: PASS
+  G3: placebo n == 15683 (qualifying): PASS
+  G4: T_h >= 2 for treated and placebo: PASS
+
+CREATED: 2026-08-02 08:26:32

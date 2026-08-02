@@ -1,0 +1,21 @@
+FILE:      T9_placebo_holdout.csv
+SHA256:    169b03e9ca1feabfdaae6e0a0033f1c12b5a7bd9ffbb69a39671539effbe36dd
+PRODUCER:  code/S5R_bhat_split.R
+PRODUCER_SHA256: fe8f1c552e1921625d40f4fbe1443b08a805a0595eafa2ea166e79051062b14f
+INPUTS:
+  data/S3R_theta.rds: NOT_IN_REPO
+SEED:      20260719
+
+SPECIFICATION:
+  50/50 placebo split validation table
+  Held-out corrected placebo means by size decile
+  Gate: overall |mean| < 0.05
+
+GATES:
+  G1: no placebo pair is treated (all never$rta == 0): PASS
+  G2: CAL/VAL disjoint (no pair in both halves): PASS
+  G3: held-out corrected mean < 0.05: PASS
+  G4: held-out per-decile gate (three-state): PARTIAL
+  G5: identity theta_D = theta_B - b_hat: PASS
+
+CREATED: 2026-08-02 08:26:32

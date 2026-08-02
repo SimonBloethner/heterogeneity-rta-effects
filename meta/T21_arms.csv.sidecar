@@ -1,0 +1,21 @@
+FILE:      T21_arms.csv
+SHA256:    f1722fafc9fd80560e4c088cd087d8c4f21f1b2e547f3ff02bc02494fc293d1c
+PRODUCER:  code/S24_arms_canonical.R
+PRODUCER_SHA256: 8b048d1a6a1b638eb31fc163b9902c8db165b68f6bec1c21901cd225dde2b95a
+INPUTS:
+  data/S5R_bhat.rds: NOT_IN_REPO
+SEED:      NONE
+
+SPECIFICATION:
+  Canonical arms table (INV-027)
+  Three arms: A_noise_only, B_placebo, C_OOS
+  SD_true identified set [0.74, 1.48]
+
+GATES:
+  G1: Var(theta_D) = 2.438 (canonical): PASS
+  G2: shares computed correctly: PASS
+  G2b: SD_true values match register: PASS
+  G3: TW_MEAN = 0.0897 (pre_trade weights): PASS
+  G4: Var_null_C = 1.8868 (from N1b x symmetric weights): PASS
+
+CREATED: 2026-08-02 08:26:32

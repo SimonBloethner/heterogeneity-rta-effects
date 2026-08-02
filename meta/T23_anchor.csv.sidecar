@@ -1,0 +1,19 @@
+FILE:      T23_anchor.csv
+SHA256:    1377515bbf7d42bbf933b0ef4a54ff976763b62b0946136df693f99dc29491db
+PRODUCER:  code/S24b_anchor_table.R
+PRODUCER_SHA256: 57e72a426548dc269219bd08418eb5549fdd4f97fa41931583a1f412fe986655
+INPUTS:
+  data/S5R_bhat.rds: NOT_IN_REPO
+  data/S1R_ppml.rds: NOT_IN_REPO
+SEED:      NONE
+
+SPECIFICATION:
+  Anchor table for definitions A, B, D
+  Treated and placebo columns
+  Single-producer table on S5R$placebo (n=17200)
+
+GATES:
+  G1: Treated n == 4182: PASS
+  G2: Placebo n == 17200: PASS
+
+CREATED: 2026-08-02 08:26:32

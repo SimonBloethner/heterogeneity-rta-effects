@@ -1,0 +1,20 @@
+FILE:      TD1R_population_census.csv
+SHA256:    31de0e8a9380cc0f89761c79f60f57e27fe2d85862eebe6bc98dcf920a98cfb1
+PRODUCER:  code/S6R_population.R
+PRODUCER_SHA256: 9e2c4d80c10f3386c50c566d39ea998b2356d140df84c9b4a01e48bb641f5c13
+INPUTS:
+  data/S1R_ppml.rds: NOT_IN_REPO
+  data/S3R_theta.rds: NOT_IN_REPO
+SEED:      NONE
+
+SPECIFICATION:
+  Population census under symmetric window
+  Five-rule filtering (R0-R5)
+  Final n = 4182 pairs
+
+GATES:
+  G1: monotone census (pairs_remaining non-increasing): PASS
+  G2: no duplicate pairs: PASS
+  G3: population size matches census (nrow(popn) == length(k)): PASS
+
+CREATED: 2026-08-02 08:26:32

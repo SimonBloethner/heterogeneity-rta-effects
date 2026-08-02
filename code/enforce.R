@@ -199,6 +199,14 @@ check_built_deps <- function(root, report = FALSE) {
                 results <- c(results, paste0("QUARANTINE|", msg))
             }
         }
+
+        # STRUCTURAL CHECK: Any path under archive/ is forbidden
+        # This catches files not yet in the registry
+        if (any(grepl("archive/", load_lines, fixed = TRUE))) {
+            msg <- sprintf("%s loads from archive/ (structurally forbidden)", script_name)
+            if (report) report_violation("ARCHIVE_STRUCTURAL", msg)
+            results <- c(results, paste0("ARCHIVE_STRUCTURAL|", msg))
+        }
     }
     results
 }

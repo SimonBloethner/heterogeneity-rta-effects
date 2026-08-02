@@ -1,0 +1,18 @@
+FILE:      T20_ge_bracket.csv
+SHA256:    21af48145ca10a72a186c26bac8de798ae44e1bfa30c528ee2b5655dbd7f58cc
+PRODUCER:  code/S23_ge_bracket.R
+PRODUCER_SHA256: 258f1f14b47ba31fa0eab6bcebefbd0c2918b1e94e0b8e63dfc934cfa2c42842
+INPUTS:
+  data/S5R_bhat.rds: NOT_IN_REPO
+SEED:      20260726
+
+SPECIFICATION:
+  GE propagation under symmetric shape at both SD_true endpoints
+  Reports q10, q50, q90, RANGE_1090 per arm
+  No single-number GE headline
+
+GATES:
+  G1: inputs match ledger (MEAN_THETA_D = 0.2473): PASS
+  G2: output has 4 rows (2 arms x 2 shapes): PASS
+
+CREATED: 2026-08-02 08:26:32

@@ -1,0 +1,21 @@
+FILE:      T24_placebo_uncorr.csv
+SHA256:    3413d36c4aec08cb5cf764ed03be7129da884db04027f68b3c0f6d3c5cbb733e
+PRODUCER:  code/S25_placebo_uncorrected.R
+PRODUCER_SHA256: ac87d7f21583eb13af7aa972ac8dacc07728cb338b9b6583452cfcedecf8b1de
+INPUTS:
+  data/S5R_bhat.rds: NOT_IN_REPO
+SEED:      NONE
+
+SPECIFICATION:
+  Uncorrected placebo theta_B (Definition B)
+  Documents bias magnitude by size decile
+  theta_B computed on fixed S5R$placebo population
+
+GATES:
+  G1: Placebo n == 17200: PASS
+  G2: |mean| > 0.05 (bias documented): FAIL (bias present as expected)
+  G3: output n == 11 (1 overall + 10 deciles): PASS
+  G4: overall mean == -0.207204589838223: PASS
+  G5: overall sd == 0.824354559230742: PASS
+
+CREATED: 2026-08-02 08:26:32
