@@ -8,6 +8,7 @@ Amended: 2026-07-30 (SYNC-10: INV-033 CLOSED; Arm C reproduced end to end)
 Amended: 2026-07-30 (SYNC-11: treated-population nesting note; INV-039 opened)
 Amended: 2026-07-30 (SYNC-12: S30 ledgered; INV-040 opened -- three S30 IDs superseded)
 Amended: 2026-08-02 (SYNC-13: (A2) diagnostics ledgered from S34/S35; INV-041 opened)
+Amended: 2026-08-02 (SYNC-14: drift-calibration holdout ledgered; T9 values were cited from output/ with no ledger row)
 Status: THREE OPEN INVESTIGATIONS -- INV-039 (registry coverage), INV-040 (S30 z definition), INV-041 ((A2) normality). None affects a number reported in the article as of SYNC-13.
 
 ## Population
@@ -600,3 +601,59 @@ Superseded by this entry: no ledgered value. Nothing in the article cited any (A
 diagnostic before SYNC-13, because none existed.
 
 Status: OPEN.
+
+## Drift-Calibration Holdout (T9)
+
+The size-decile drift correction is estimated on held-out placebo splits and
+applied out of sample, so no pair contributes to its own correction. It is then
+validated on the held-out half, where the corrected placebo effect should be zero
+if the subtraction removed an artifact and nothing else. These are the validation
+figures.
+
+Until SYNC-14 the article cited all of them directly from
+output/T9_placebo_holdout.csv with no ledger row, which placed them outside the
+dependency closure and outside the sole-authority rule. Section 4's calibration
+paragraph and Section 6's bounded-tolerances subsection both depend on these
+values and must cite the IDs below rather than the CSV.
+
+| ID | Quantity | Value | Producer |
+|----|----------|-------|----------|
+| HOLDOUT_N | Held-out validation pairs, pooled | 8545 | code/S5R_bhat_split.R -> output/T9_placebo_holdout.csv |
+| HOLDOUT_MEAN | Mean corrected placebo effect, pooled | 0.0188 (SE 0.0087) | code/S5R_bhat_split.R -> output/T9_placebo_holdout.csv |
+| HOLDOUT_D3_MEAN | Mean corrected placebo effect, size decile 3 | -0.1013 | code/S5R_bhat_split.R -> output/T9_placebo_holdout.csv |
+| HOLDOUT_D3_N | Validation pairs, size decile 3 | 314 | code/S5R_bhat_split.R -> output/T9_placebo_holdout.csv |
+| HOLDOUT_D3_SE | Standard error, size decile 3 | 0.0591 | code/S5R_bhat_split.R -> output/T9_placebo_holdout.csv |
+| HOLDOUT_D1_N | Validation pairs, size decile 1 (thinnest fold) | 19 | code/S5R_bhat_split.R -> output/T9_placebo_holdout.csv |
+| HOLDOUT_D2_N | Validation pairs, size decile 2 | 94 | code/S5R_bhat_split.R -> output/T9_placebo_holdout.csv |
+| HOLDOUT_D8_N | Validation pairs, size decile 8 (thickest fold) | 1365 | code/S5R_bhat_split.R -> output/T9_placebo_holdout.csv |
+| HOLDOUT_MAX_ABS_EX_D3 | Largest absolute decile mean excluding decile 3 | 0.0569 | code/S5R_bhat_split.R -> output/T9_placebo_holdout.csv |
+
+Note (three-state rule): the bounds are PASS below 0.10, PARTIAL below 0.20, FAIL
+at or above 0.20, per INV-016 in meta/SUPERSEDED.md. Nine of the ten deciles
+clear the first bound, and clear it with room: the largest absolute mean among
+those nine is 0.0569, well inside the stricter 0.05-to-0.10 band rather than
+sitting against it. Decile 3 returns -0.1013 and registers PARTIAL -- beyond
+0.10, well inside 0.20, and 1.72 standard errors from zero. The pooled figure of
+0.0188 clears the stricter 0.05 bound as well.
+
+Note (binding on prose): decile 3 is reported as PARTIAL rather than absorbed
+into the pooled average that would conceal it. Prose must not describe the
+calibration as clearing its bound in all cells, and must not present the pooled
+0.0188 without the decile that fails.
+
+Note (resolution limit, binding on Section 6): 0.10 log points is the resolution
+of the correction layer, not an incidental tolerance. Claims about size-profile
+structure finer than roughly a tenth of a log point are inside the calibration
+tolerance and are not supported. The fall-then-floor reading of the gradient does
+not require any: GRADIENT = 0.9137 exceeds the tolerance by nearly an order of
+magnitude, and the reading asserts nothing about the ordering of the quintiles
+that constitute the floor.
+
+Note (why the partition is not refined): the folds are already thin at this
+resolution -- 19 validation pairs in the smallest size decile and 94 in the
+second, against 1,365 in the eighth. Proposition 2(c) implies a finer partition
+would remove more within-cell drift dispersion, but the correction must be
+estimated on held-out placebo pairs and validated on them, and a finer partition
+buys a smaller residual at the cost of a correction no held-out population is
+large enough to certify. The design declines that trade; the residual drift
+dispersion is carried forward rather than assumed away.
