@@ -1,0 +1,24 @@
+FILE:      F5_a2_normality_qq.png
+SHA256:    e191975607bb7db0b77be36fe5c0a5098ed49bafdbc40e4e27d64dd421830c5a
+PRODUCER:  code/S35_jensen_control.R
+PRODUCER_SHA256: 8e00f909df075faf768b81ede110bb11c9af3ac78f43875978bc5fec92fc3537
+INPUTS:
+  output/F5_a2_normality_qq.pdf: 1c45aa916ed8bc715db8065935d88a4026c860835e09ff6c6201b10584e5bc29
+SEED:      NONE
+
+PROVENANCE NOTE, READ BEFORE RE-RUNNING: this PNG is a raster conversion of the
+PDF, not an independent render. The S34 run could not write it because the Festus
+compute node lacks X11 and Cairo. The conversion was performed with macOS `sips`
+on a local machine because neither pdftoppm nor Ghostscript was available on the
+cluster, and the result was then committed. The producing toolchain is therefore
+NOT reproducible on the cluster, and the file left and re-entered the compute
+environment.
+
+This is recorded rather than corrected. The PNG carries no quantitative content
+that the PDF does not, and nothing cites it. If the figure is regenerated, prefer
+ragg::agg_png() or png(type = "cairo") from the producer directly and replace
+both this sidecar and the file.
+
+GATES: none. This artifact is a format conversion and asserts nothing.
+
+CREATED: 2026-08-02 (registered SYNC-13)

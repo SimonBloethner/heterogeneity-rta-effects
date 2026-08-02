@@ -1,0 +1,22 @@
+FILE:      F5_a2_normality_qq.pdf
+SHA256:    1c45aa916ed8bc715db8065935d88a4026c860835e09ff6c6201b10584e5bc29
+PRODUCER:  code/S34_a2_normality.R
+PRODUCER_SHA256: db3a8099889f9481bc4d36f16cea8a8942327c416b08e32ccb47443267911a7b
+INPUTS:
+  S1R_ppml.rds: 45c937cd78805d7b13b4c43f4bc4888e93a2ff15e787ad4fb41d77b51f837d89
+SEED:      20260731
+
+SPECIFICATION:
+  QQ plot of pooled standardized log gaps, real panel against the MATCHED NORMAL
+  CONTROL (not against a theoretical normal), with the diagonal drawn and an
+  inset restricted to the top one percent so the extreme tail is legible.
+  No interpretive annotations.
+
+COMPANION: output/F5_a2_normality_qq.png carries the same figure. It was produced
+separately; see meta/F5_a2_normality_qq.png.sidecar.
+
+GATES: inherited from the producer; see meta/T38_a2_normality.csv.sidecar.
+
+SEE ALSO: INV-041 in meta/canonical_facts.md.
+
+CREATED: 2026-08-02 (registered SYNC-13; produced by S34 run at commit 4102363)

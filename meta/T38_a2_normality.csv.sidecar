@@ -1,0 +1,53 @@
+FILE:      T38_a2_normality.csv
+SHA256:    fa6741fc4fbd3daebe063acccec0920d72ae5f26c42eb252c85a681397ccc9c0
+PRODUCER:  code/S34_a2_normality.R
+PRODUCER_SHA256: db3a8099889f9481bc4d36f16cea8a8942327c416b08e32ccb47443267911a7b
+INPUTS:
+  S1R_ppml.rds: 45c937cd78805d7b13b4c43f4bc4888e93a2ff15e787ad4fb41d77b51f837d89
+SEED:      20260731
+
+INPUT PATH NOTE: the producer reads the input from
+/scratch/bt307958/ENFORCE_ROOT/data/S1R_ppml.rds, a scratch location that is not
+repository-resident and is subject to purge. The script pins the input by SHA256
+and halts on mismatch, so the CONTENT is reproducible even though the PATH is
+not. A re-run on a different machine must repoint INPUT_PATH at a copy carrying
+the SHA above.
+
+SPECIFICATION:
+  Tests assumption (A2): log eta_ijt = -sigma^2_ij/2 + u_ijt, u normal.
+  Sample: untreated cells only (est_sample & in_model & trade > 0), pairs with
+  >= 8 cells. 27,782 pairs used, 10,879 excluded; 570,791 cells used, 43,931
+  excluded; 614,722 available.
+  Within-pair standardization z = (log eta - mean_i)/sd_i.
+  REFERENCE IS A MATCHED NORMAL CONTROL, NOT A THEORETICAL NORMAL: within-pair
+  centering and scaling on short windows deforms exactly normal data, so the
+  control is drawn pair by pair with identical cell counts and passed through
+  identical code. Any deformation the pipeline introduces appears on both sides.
+
+CONTENTS: long format, one row per (panel, year, statistic, grid_point).
+  Statistics: rejection_rate (Shapiro-Wilk, 5 pct), skewness, excess_kurtosis,
+  quantile (p0.950, p0.990, p0.995, p0.999). Panels: real, control.
+
+HEADLINE VALUES (ledgered SYNC-13):
+  rejection_rate real    = 0.327730185011878   [A2_REJECT_REAL]
+  rejection_rate control = 0.0502843567777698  [A2_REJECT_CONTROL]
+  skewness real          = -0.475527491662458  [A2_SKEW]
+  excess kurtosis real   = 0.784025494520271   [A2_EXKURT]
+  excess kurtosis ctrl   = -0.269319723301643  [A2_EXKURT_CONTROL]
+  quantile ratio p0.99   = 0.9431              [A2_TAIL_RATIO_P99]
+
+DIRECTION NOTE (binding on prose): the departure is left-tailed. The UPPER tail
+is THINNER than the control at p0.95, p0.99 and p0.995 (ratios 0.899, 0.943,
+0.964), matching only at p0.999 (1.020). Do not describe the log gaps as
+heavy-tailed on the right.
+
+GATES:
+  G1: |control rejection rate - 0.05| = 0.0003 < 0.02: PASS
+  G2: pair/cell accounting reconciles exactly (27782+10879=38661;
+      570791+43931=614722): PASS
+  G3: identical pair and per-pair cell counts across both panels: PASS
+  No gate is placed on the real panel's own values; those are the result.
+
+SEE ALSO: INV-041 in meta/canonical_facts.md.
+
+CREATED: 2026-08-02 (registered SYNC-13; produced by S34 run at commit 4102363)

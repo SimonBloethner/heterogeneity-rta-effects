@@ -1,0 +1,47 @@
+FILE:      T40_jensen_control.csv
+SHA256:    2db85c329844c25ece49389106d665d90801cda1bbf3c1bddec9390b8cb30ed4
+PRODUCER:  code/S35_jensen_control.R
+PRODUCER_SHA256: 8e00f909df075faf768b81ede110bb11c9af3ac78f43875978bc5fec92fc3537
+INPUTS:
+  output/T39_a2_jensen_identity.csv: 7906ff4def777cb79d39c6dc59f5a682cfff1a5441cb71ec315e146d85590ebe
+  S1R_ppml.rds:                      45c937cd78805d7b13b4c43f4bc4888e93a2ff15e787ad4fb41d77b51f837d89
+SEED:      20260731
+
+SPECIFICATION:
+  Adds a third control panel to the S34 design to decide whether the observed
+  mean-on-variance slope reflects a failed location identity or an attenuated
+  estimator.
+  Control C: for each pair, that pair's REALIZED variance v_i read from T39;
+  generating mean fixed at exactly -v_i/2 so the identity holds by construction;
+  shape matched to the real pooled data via a sinh-arcsinh distribution
+  (epsilon = 0.2567, delta = 1.5000, calibrated on a 3,000-pair subsample).
+  The regression is run on mean_i and var_i computed FROM THE DRAWN DATA, not
+  from the generating parameters. That symmetry with the real panel is what makes
+  the control informative; computing them from parameters would return -0.5 by
+  construction and test nothing.
+
+CONTENTS: one row per panel (real, normal, control_c) with intercept, slope,
+  their standard errors, r_squared, n_pairs, cor_mean_var, var_reliability.
+
+HEADLINE VALUES (ledgered SYNC-13):
+  slope real       = -0.196599862499929  (SE 0.00100999289459456) [A2_JENSEN_SLOPE]
+  slope control_c  = -0.335064495392663  (SE 0.00138872267605652) [A2_JENSEN_SLOPE_CTRLC]
+  var reliability real      = 0.757509663267823 [A2_VAR_RELIABILITY]
+  var reliability control_c = 0.614400422437355 [A2_VAR_RELIABILITY_CTRLC]
+
+INTERCEPT IS UNINFORMATIVE IN BOTH PANELS: control_c returns -0.588303115227266
+although the location identity is imposed EXACTLY in its generating parameters,
+which is further from zero than the real panel's -0.220088355622992. No reading
+of the intercept is admissible in either panel.
+
+GATES:
+  G1: |pooled skewness - (-0.4755)| = 0.0322 <= 0.10: PASS
+      |pooled excess kurtosis - 0.7840| = 0.0311 <= 0.15: PASS
+  G2: max|mean_generating_i + v_i/2| = 0.00e+00 < 1e-10: PASS
+  G3: identical pair counts across all three panels (27,782 each): PASS
+  G4: real panel reproduces S34 exactly (slope -0.1966, intercept -0.2201): PASS
+  No gate is placed on control_c's realized slope; that value is the result.
+
+SEE ALSO: INV-041 in meta/canonical_facts.md.
+
+CREATED: 2026-08-02 (registered SYNC-13; produced by S35 run at commit f64b912)
