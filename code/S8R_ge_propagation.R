@@ -3,7 +3,7 @@
 # S8R_ge_propagation.R - GE Trade Cost Change Quantiles (FIXED CHAIN)
 # =============================================================================
 # OUTPUTS: data/S8R_ge.rds
-# INPUTS:  data/S5R_bhat.rds (theta_D values), gravity_functions.R, ITPDE_total.rds
+# INPUTS:  data/S5R_bhat.rds (theta_D values), code/vendor/gravity_functions.R, data/ITPDE_total.rds
 # EXPECTED_N: 4182
 # SEED:    20260719
 # GATES:   A (plumbing), B (market clearing), C (convergence)
@@ -39,7 +39,8 @@ say("Available cores: %d", N_CORES)
 # =============================================================================
 say("")
 say("=== LOAD SOLVER ===")
-solver_path <- "/groups/m-larch/bt307958/tails/programs/gravity_functions.R"
+# Vendored solver - see code/vendor/gravity_functions.R
+solver_path <- file.path(REBUILD_DIR, "code/vendor/gravity_functions.R")
 source(solver_path)
 solver_sha <- get_sha256(solver_path)
 say("Solver SHA: %s", solver_sha)
