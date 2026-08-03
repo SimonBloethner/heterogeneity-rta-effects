@@ -64,7 +64,7 @@ not significant. See canonical_facts.md, Gradient section, shape note.
 | INV-036 | CLOSED | Placebo census reconciled |
 | INV-037 | CLOSED | T23/T22 nesting verified; per-pair files committed |
 | INV-038 | CLOSED | Check (d) never fired; SUPERSEDED carried two meanings |
-| INV-039 | OPEN | archive/retired_pack/ outside FILE_REGISTRY.csv; check (d) cannot forbid it |
+| INV-039 | CLOSED | archive/retired_pack/ enrolled (77 rows); check (d) additionally structural against archive/ |
 
 ## Residuals
 
@@ -74,7 +74,7 @@ not significant. See canonical_facts.md, Gradient section, shape note.
   STRAY_W1_COPY_DO_NOT_USE.rds): no sidecar, no producer, do not use.
 - T26 identifier is claimed by two producers (S18_null_stack.R and
   S27_size_gradient.R); neither output is committed. Audit pending.
-- archive/retired_pack/ is unregistered (INV-039). See also CAV-005 in
+- archive/retired_pack/ enrolled with 77 rows (INV-039 closed). See also CAV-005 in
   meta/SUPERSEDED.md for the INV-023 identifier collision and the split INV
   numbering across the two registers.
 
@@ -86,12 +86,12 @@ L1-L5 scripts and T14-T18 outputs.
 
 Run: Rscript code/enforce.R  (from the repository root)
 Pass condition: ZERO violations. No expected-violation list -- see INV-038.
-Registry: meta/FILE_REGISTRY.csv, 252 rows. Statuses present: BUILT / ANCHOR /
+Registry: meta/FILE_REGISTRY.csv, 363 rows. Statuses present: BUILT / ANCHOR /
           ARCHIVED / AUDIT / QUARANTINE, plus one row still carrying the
           pre-INV-038 status SUPERSEDED (code/S13b_matching_sensitivity.R);
           check (d) tests ARCHIVED and QUARANTINE only, so that row's status is
-          unenforced. Coverage is NOT complete: archive/retired_pack/ has zero
-          registry rows and is therefore invisible to check (d). See INV-039.
+          unenforced. Coverage is complete: archive/retired_pack/ is enrolled (77 rows) and check (d) is additionally structural against any
+          path under archive/. INV-039 closed.
           An earlier version of this line claimed every tracked file was
           registered; that claim had not been verified and was false.
 Measured state, NOT an allowance: 2 violations remain under check (f) at commit

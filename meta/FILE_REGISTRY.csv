@@ -358,3 +358,7 @@ archive/retired_pack/output/invalidation_register.md,output,archived,NONE,NONE,n
 prompts/S37_registry_enrolment.md,prompt,manual,NONE,NONE,executed,14,BUILT
 prompts/S38_package_closeout.md,prompt,manual,NONE,NONE,executed,14,BUILT
 data/ITPDE_total.rds,data,external,ITPD-E Release 2,NONE,none,0,ANCHOR
+code/S42_a2_constants.R,code,manual,meta/canonical_facts.md,NONE,G1_G2_G3_PASS,15,BUILT
+article/a2_constants.tex,article,code/S42_a2_constants.R,meta/canonical_facts.md,NONE,G1_G2_G3_PASS,15,BUILT
+meta/a2_constants.tex.sidecar,meta,code/S42_a2_constants.R,article/a2_constants.tex,NONE,exists,15,BUILT
+prompts/S42_a2_constants.md,prompt,manual,NONE,NONE,executed,15,BUILT

@@ -1,0 +1,22 @@
+FILE:           a2_constants.tex
+SHA256:         73bf8bdaf620307e6457d3ec92566b328605d42bbc48cb9271f6ac068b9d80d9
+PRODUCER:       S42_a2_constants.R
+PRODUCER_SHA256: 40e8bc9d114bd2090949c30ccd72b2f71686999c37c5c8d4fb67784e595bf9a0
+INPUTS:
+  meta/canonical_facts.md: 211418efeefab15c274a2d78cdf01bee16e511deed50f02f47c9ec2b082d5976
+SEED:           NONE
+
+SPECIFICATION:
+  Appendix A.2 (Remark 4) normality test constants.
+  Four macros parsed from canonical_facts.md ledger at runtime:
+    \MomPowMinZ      <- MOMPOW_IDENT_MIN_Z (precision 2)
+    \MomPowMaxZ      <- MOMPOW_IDENT_MAX_Z (precision 2)
+    \AtwoExKurt      <- A2_EXKURT (precision 3)
+    \AtwoExKurtControl <- A2_EXKURT_CONTROL (precision 3)
+
+GATES:
+  G1: All four ledger IDs found: PASS
+  G2: Round-trip verification (reparsed == emitted): PASS
+  G3: Exactly four macros defined: PASS
+
+CREATED: 2026-08-02
