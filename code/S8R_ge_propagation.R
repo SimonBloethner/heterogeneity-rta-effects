@@ -44,6 +44,9 @@ solver_path <- file.path(REBUILD_DIR, "code/vendor/gravity_functions.R")
 source(solver_path)
 solver_sha <- get_sha256(solver_path)
 say("Solver SHA: %s", solver_sha)
+SOLVER_SHA_EXPECTED <- "859408d8770e0e3657d38d4ec82ac3b3095ebeb615120ed5cf5ced912fa91783"
+stopifnot("solver hash does not match the vendored copy" =
+              identical(solver_sha, SOLVER_SHA_EXPECTED))
 
 # =============================================================================
 # LOAD THETA_D FROM S5R

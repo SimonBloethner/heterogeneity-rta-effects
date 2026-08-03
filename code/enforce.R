@@ -274,11 +274,29 @@ check_sha256 <- function(root, report = FALSE) {
             
             sidecar_name <- basename(sidecar)
             described_file <- gsub("\\.sidecar$", "", sidecar_name)
-            
+
+            # Check if FILE: field specifies a path (e.g., "code/vendor/gravity_functions.R")
+            file_line <- grep("^FILE:", content, value = TRUE)
+            if (length(file_line) > 0) {
+                file_field <- trimws(gsub("^FILE:\\s*", "", file_line[1]))
+                if (grepl("/", file_field)) {
+                    # FILE: field contains a path, use it directly
+                    described_file <- file_field
+                }
+            }
+
             file_path <- NULL
-            for (dir in c("output", "data", "article")) {
-                candidate <- file.path(root, dir, described_file)
-                if (file.exists(candidate)) { file_path <- candidate; break }
+            # If described_file already contains a path, try it directly first
+            if (grepl("/", described_file)) {
+                candidate <- file.path(root, described_file)
+                if (file.exists(candidate)) file_path <- candidate
+            }
+            # Otherwise search in standard directories
+            if (is.null(file_path)) {
+                for (dir in c("output", "data", "article", "code")) {
+                    candidate <- file.path(root, dir, basename(described_file))
+                    if (file.exists(candidate)) { file_path <- candidate; break }
+                }
             }
             
             if (!is.null(file_path)) {

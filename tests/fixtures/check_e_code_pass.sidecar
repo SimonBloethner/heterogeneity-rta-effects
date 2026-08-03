@@ -1,0 +1,4 @@
+FILE:      code/gates_lib_v2.R
+SHA256:    2b5ce63ac5fd956e6c385473aeb286b913e7d2e4d5ee3c933c1466c8b46baf14
+PRODUCER:  tests/fixtures/check_e_code_pass.sidecar
+NOTE:      Fixture for check (e) code/ path discrimination test - correct SHA256

@@ -1,0 +1,4 @@
+FILE:      code/gates_lib_v2.R
+SHA256:    0000000000000000000000000000000000000000000000000000000000000000
+PRODUCER:  tests/fixtures/check_e_code_fail.sidecar
+NOTE:      Fixture for check (e) code/ path discrimination test - incorrect SHA256

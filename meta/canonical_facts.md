@@ -14,6 +14,7 @@ Amended: 2026-08-03 (SYNC-16: INV-040 and INV-041 CLOSED; CAV-005 resolved; regi
 Amended: 2026-08-03 (SYNC-17: INV-028 entry written; T20 registry input and sidecar INPUTS corrected; live T20 sidecar enrolled)
 Amended: 2026-08-03 (SYNC-18: check (e) extended to article/; INV-044 opened and closed)
 Amended: 2026-08-03 (SYNC-19: Round 2 completion; R1-R5 tasks; enforce zero at 8012510)
+Amended: 2026-08-03 (SYNC-20: R6 check (e) extended to code/; solver sidecar restored; INV-045 CLOSED)
 Status: NO OPEN INVESTIGATIONS. enforce.R reports zero violations at commit 8012510, measured on a clean tree at origin/main.
 
 ## Population
@@ -787,6 +788,35 @@ pair `tests/fixtures/check_e_article_{pass,fail}.sidecar` discriminates this
 defect: the PASS fixture describes an `article/` file whose hash matches; the
 FAIL fixture describes one whose hash does not. `tests/test_check_e.R` runs the
 discrimination test.
+
+Status: CLOSED.
+
+### INV-045: solver sidecar renamed out of check scope (CLOSED)
+Commit `8012510` renamed `meta/gravity_functions.R.sidecar` to `meta/VENDOR_SOLVER.md`
+with the stated reason that "the sidecar naming pattern doesn't work for vendor files
+since enforce.R matches filename to file path." The sidecar described
+`code/vendor/gravity_functions.R`, which `check_sha256()` did not search because it
+only looked in `c("output", "data", "article")`.
+
+The rename took the artifact out of the check's reach rather than extending the check
+to reach it. This is the fifth instance of the pattern (INV-038, INV-039, INV-042,
+INV-044, INV-045) and the second instance of the specific move commit `1678d7f` made
+when facing INV-044.
+
+The commit message also asserted that "the SHA256 gate is enforced in
+S8R_ge_propagation.R and S46_ge_twodyad.R via solver_sha". Both scripts computed the
+hash and passed it to `say()`, but neither had a `stopifnot` on it. A printed value
+is not a gate.
+
+The underlying hash was independently confirmed to match: the `solver_sha` stored in
+`data/S8R_ge.rds` is `859408d8770e0e3657d38d4ec82ac3b3095ebeb615120ed5cf5ced912fa91783`,
+identical to the SHA256 of `code/vendor/gravity_functions.R`. The vendored copy is
+the solver S8R ran with.
+
+Fixed: (1) `check_sha256()` extended to search `c("output", "data", "article", "code")`
+and to handle `FILE:` fields that contain a path; (2) sidecar renamed back to
+`meta/gravity_functions.R.sidecar`; (3) real `stopifnot` gates added to both consumer
+scripts; (4) fixture pair `tests/fixtures/check_e_code_{pass,fail}.sidecar` added.
 
 Status: CLOSED.
 
