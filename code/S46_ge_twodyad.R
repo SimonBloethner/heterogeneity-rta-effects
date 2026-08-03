@@ -6,6 +6,7 @@
 # INPUTS:  data/S5R_bhat.rds, code/vendor/gravity_functions.R, data/ITPDE_total.rds
 # SEED:    20260803
 # GATES:   G1 (plumbing), G2 (market clearing), G3 (convergence), G4 (arm monotonicity), E (draw SD)
+# EXPECTED_N: 4182 (adopting population from S5R_bhat.rds$baseline)
 # SCENARIO: Conditional GE (Y, E held at data values; see solver lines 43-44, 72-74)
 # =============================================================================
 
