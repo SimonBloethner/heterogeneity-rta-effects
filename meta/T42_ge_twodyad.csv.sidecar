@@ -1,5 +1,5 @@
-FILE:      S46_ge_twodyad.rds
-SHA256:    da4588e004c573aaa2ca303cda97fa9077ace252454ca98a694fcceca08418df
+FILE:      T42_ge_twodyad.csv
+SHA256:    e67ff87216b2571f17d4915afb7099201aaafde093026c379c742e766021349d
 PRODUCER:  code/S46_ge_twodyad.R (SHA256: a3573957d2b96144e146af79ffd2a69e8ee87fc0257acedd0f4a546ff0c265db)
 INPUTS:    data/S5R_bhat.rds, code/vendor/gravity_functions.R, ITPDE_total.rds
 SEED:      20260803

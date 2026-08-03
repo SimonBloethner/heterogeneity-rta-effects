@@ -1,11 +1,12 @@
 #!/usr/bin/env Rscript
 # =============================================================================
-# S46_ge_twodyad.R - Two-Dyad Arm-Indexed GE Propagation
+# S46_ge_twodyad.R - Two-Dyad Arm-Indexed GE Propagation (Quintile Endpoints)
 # =============================================================================
-# OUTPUTS: data/S46_ge_twodyad.rds
+# OUTPUTS: data/S46_ge_twodyad.rds, output/T42_ge_twodyad.csv
 # INPUTS:  data/S5R_bhat.rds, code/vendor/gravity_functions.R, data/ITPDE_total.rds
 # SEED:    20260803
-# GATES:   G1 (plumbing), G2 (market clearing), G3 (convergence), G4 (arm monotonicity)
+# GATES:   G1 (plumbing), G2 (market clearing), G3 (convergence), G4 (arm monotonicity), E (draw SD)
+# SCENARIO: Conditional GE (Y, E held at data values; see solver lines 43-44, 72-74)
 # =============================================================================
 
 .libPaths(c("/groups/m-larch/bt307958/Rlibs", .libPaths()))
@@ -19,17 +20,21 @@ setwd(REBUILD_DIR)
 
 SEED <- 20260803
 N_DRAWS <- 500
+SIGMA <- 5
 set.seed(SEED)
 
-# Arm-indexed SD_true from canonical_facts.md
+# Arm-indexed SD_true from canonical_facts.md [SD_THETA_TRUE]
 SD_TRUE_LO <- 0.74
 SD_TRUE_HI <- 1.48
+
+# Draw SD tolerance for Gate E
+DRAW_SD_TOL <- 0.05
 
 get_sha256 <- function(p) strsplit(system2("sha256sum", args = shQuote(p), stdout = TRUE), " ")[[1]][1]
 say <- function(...) cat(sprintf(...), "\n", sep = "")
 
 say("================================================================")
-say("S46: TWO-DYAD ARM-INDEXED GE PROPAGATION")
+say("S46: TWO-DYAD ARM-INDEXED GE PROPAGATION (QUINTILE ENDPOINTS)")
 say("Start: %s", format(Sys.time()))
 say("================================================================")
 
@@ -47,16 +52,77 @@ solver_sha <- get_sha256(solver_path)
 say("Solver SHA: %s", solver_sha)
 
 # =============================================================================
-# LOAD THETA_D FROM S5R
+# LOAD THETA_D AND PRE-ADOPTION TRADE FROM S5R
 # =============================================================================
 say("")
-say("=== LOAD THETA_D ===")
+say("=== LOAD ADOPTING POPULATION ===")
 S5R <- readRDS("data/S5R_bhat.rds")
 base <- S5R$baseline
-stopifnot(nrow(base) == 4182)
+stopifnot("Adopting population must be n=4182" = nrow(base) == 4182)
+
 theta_D <- base$theta_D
 MEAN_THETA_D <- mean(theta_D)
 say("BASELINE theta_D: n=%d, mean=%.4f, sd=%.4f", length(theta_D), MEAN_THETA_D, sd(theta_D))
+
+# Pre-adoption trade for quintile assignment
+pre_trade <- base$pre_trade
+say("Pre-adoption trade: min=%.2f, median=%.2f, max=%.2f", min(pre_trade), median(pre_trade), max(pre_trade))
+
+# =============================================================================
+# QUINTILE PARTITION (LEDGERED RULE)
+# =============================================================================
+say("")
+say("=== QUINTILE PARTITION ===")
+# Ledgered rule from canonical_facts.md Note (partition) and code/S28_gradient_B.R
+quintile <- as.integer(cut(rank(pre_trade), breaks = 5, labels = FALSE))
+
+# Assert expected cell sizes: 837 / 836 / 836 / 836 / 837
+cell_sizes <- table(quintile)
+say("Cell sizes: %s", paste(cell_sizes, collapse = " / "))
+stopifnot(
+    "Quintile 1 must have 837 pairs" = cell_sizes[1] == 837,
+    "Quintile 2 must have 836 pairs" = cell_sizes[2] == 836,
+    "Quintile 3 must have 836 pairs" = cell_sizes[3] == 836,
+    "Quintile 4 must have 836 pairs" = cell_sizes[4] == 836,
+    "Quintile 5 must have 837 pairs" = cell_sizes[5] == 837
+)
+say("Cell size assertion: PASS")
+
+# =============================================================================
+# SELECT MEDIAN PAIRS WITHIN Q1 AND Q5
+# =============================================================================
+say("")
+say("=== SELECT CALIBRATION DYADS ===")
+
+# Attach quintile assignment (pair column already exists in baseline)
+base$quintile <- quintile
+
+# Q1: smallest pre-trade
+q1_pairs <- base[base$quintile == 1, ]
+q1_pairs <- q1_pairs[order(q1_pairs$pre_trade), ]
+q1_median_idx <- ceiling(nrow(q1_pairs) / 2)
+dyad_lo_row <- q1_pairs[q1_median_idx, ]
+dyad_lo <- dyad_lo_row$pair
+dyad_lo_iso <- strsplit(dyad_lo, "_")[[1]]
+say("Q1 median dyad: %s (pre_trade=%.4f)", dyad_lo, dyad_lo_row$pre_trade)
+
+# Q5: largest pre-trade
+q5_pairs <- base[base$quintile == 5, ]
+q5_pairs <- q5_pairs[order(q5_pairs$pre_trade), ]
+q5_median_idx <- ceiling(nrow(q5_pairs) / 2)
+dyad_hi_row <- q5_pairs[q5_median_idx, ]
+dyad_hi <- dyad_hi_row$pair
+dyad_hi_iso <- strsplit(dyad_hi, "_")[[1]]
+say("Q5 median dyad: %s (pre_trade=%.4f)", dyad_hi, dyad_hi_row$pre_trade)
+
+# Binding assertions
+stopifnot(
+    "both dyads must be adopters" = all(c(dyad_lo, dyad_hi) %in% base$pair),
+    "dyad_lo must be in quintile 1" = base$quintile[match(dyad_lo, base$pair)] == 1L,
+    "dyad_hi must be in quintile 5" = base$quintile[match(dyad_hi, base$pair)] == 5L,
+    "CUW-SUR is not an adopter" = !any(grepl("CUW|SUR", c(dyad_lo, dyad_hi)))
+)
+say("Dyad assertions: PASS")
 
 # =============================================================================
 # LOAD 2019 DATA & CONSTRUCT COST_EQ
@@ -79,41 +145,11 @@ df_2019$cost_eq[is.na(df_2019$cost_eq)] <- 1
 cost_eq_clean <- df_2019$cost_eq
 
 # =============================================================================
-# DEFINE TWO DYADS (MEDIAN AND 25TH PERCENTILE BY TRADE)
-# =============================================================================
-say("")
-say("=== SELECT TWO DYADS ===")
-non_rta_dyads <- df_2019 %>%
-    filter(intl == 1, rta == 0, trade > 0) %>%
-    mutate(pair = paste(pmin(iso_x, iso_i), pmax(iso_x, iso_i), sep = "_"))
-
-pair_trade <- non_rta_dyads %>%
-    group_by(pair) %>%
-    summarise(two_way = sum(trade), n_dir = n(), .groups = "drop") %>%
-    filter(n_dir == 2) %>%
-    arrange(two_way)
-
-# Median dyad (50th percentile)
-median_idx <- ceiling(nrow(pair_trade) / 2)
-DYAD_MED <- strsplit(pair_trade$pair[median_idx], "_")[[1]]
-say("Median dyad (q50): %s - %s", DYAD_MED[1], DYAD_MED[2])
-
-# 25th percentile dyad (smaller trade volume)
-q25_idx <- ceiling(nrow(pair_trade) / 4)
-DYAD_Q25 <- strsplit(pair_trade$pair[q25_idx], "_")[[1]]
-say("Q25 dyad: %s - %s", DYAD_Q25[1], DYAD_Q25[2])
-
-DYADS <- list(
-    list(name = "median", iso = DYAD_MED),
-    list(name = "q25", iso = DYAD_Q25)
-)
-
-# =============================================================================
-# BASELINE SOLVE & GATES
+# BASELINE SOLVE & GATES G1, G2
 # =============================================================================
 say("")
 say("=== BASELINE SOLVE ===")
-params <- list(sig = 5)
+params <- list(sig = SIGMA)
 df_2019_df <- as.data.frame(df_2019)
 
 baseline_result <- solve_gravity_single_year(cost_eq = cost_eq_clean, df_year = df_2019_df,
@@ -153,6 +189,11 @@ ARMS <- list(
     list(name = "hi", sd_true = SD_TRUE_HI)
 )
 
+DYADS <- list(
+    list(name = "Q1", iso = dyad_lo_iso, quintile = 1, pair = dyad_lo, pre_trade = dyad_lo_row$pre_trade),
+    list(name = "Q5", iso = dyad_hi_iso, quintile = 5, pair = dyad_hi, pre_trade = dyad_hi_row$pre_trade)
+)
+
 results_all <- list()
 
 for (dyad_info in DYADS) {
@@ -165,7 +206,7 @@ for (dyad_info in DYADS) {
     base_trade_1 <- baseline_trade[baseline_trade$exporter == dyad[1] & baseline_trade$importer == dyad[2], ]$trade
     base_trade_2 <- baseline_trade[baseline_trade$exporter == dyad[2] & baseline_trade$importer == dyad[1], ]$trade
     base_two_way <- base_trade_1 + base_trade_2
-    say("Dyad %s baseline two-way trade: %.4f", dyad_name, base_two_way)
+    say("Dyad %s (%s) baseline two-way trade: %.4f", dyad_name, dyad_info$pair, base_two_way)
 
     for (arm in ARMS) {
         arm_name <- arm$name
@@ -175,6 +216,11 @@ for (dyad_info in DYADS) {
 
         set.seed(SEED)
         draws <- rnorm(N_DRAWS, mean = MEAN_THETA_D, sd = sd_true)
+
+        # Gate E: Draw SD must match target
+        draw_sd <- sd(draws)
+        say("    Draw SD: %.4f (target: %.2f, diff: %.4f)", draw_sd, sd_true, abs(draw_sd - sd_true))
+        stopifnot("GATE E failed: draw SD deviates from SD_true" = abs(draw_sd - sd_true) < DRAW_SD_TOL)
 
         # Worker function
         run_cf <- function(d) {
@@ -216,11 +262,14 @@ for (dyad_info in DYADS) {
 
         results_all[[paste(dyad_name, arm_name, sep = "_")]] <- list(
             dyad = dyad_name,
+            dyad_pair = dyad_info$pair,
+            dyad_quintile = dyad_info$quintile,
             arm = arm_name,
             sd_true = sd_true,
             n_draws = N_DRAWS,
             n_valid = sum(!is.na(trade_changes)),
             fail_rate = fail_rate,
+            draw_sd = draw_sd,
             q10 = as.numeric(q10),
             q50 = as.numeric(q50),
             q90 = as.numeric(q90),
@@ -248,7 +297,6 @@ stopifnot("GATE G3 failed: too many non-convergent draws" = max_fail_rate < 0.02
 # =============================================================================
 say("")
 say("=== GATE G4: ARM MONOTONICITY ===")
-# For each dyad, range_hi should be >= range_lo
 g4_pass <- TRUE
 for (dyad_info in DYADS) {
     dyad_name <- dyad_info$name
@@ -268,68 +316,113 @@ stopifnot("GATE G4 failed: arm monotonicity violated" = g4_pass)
 say("")
 say("=== OUTPUT ===")
 
-# Create summary table
+# Create summary table for CSV
 summary_table <- do.call(rbind, lapply(results_all, function(x) {
     data.frame(
-        dyad = x$dyad,
         arm = x$arm,
         sd_true = x$sd_true,
-        n_valid = x$n_valid,
+        dyad = x$dyad_pair,
+        dyad_quintile = x$dyad_quintile,
+        sigma = SIGMA,
         q10 = x$q10,
         q50 = x$q50,
         q90 = x$q90,
-        range_1090 = x$range_1090,
+        RANGE_1090 = x$range_1090,
         stringsAsFactors = FALSE
     )
 }))
 rownames(summary_table) <- NULL
 print(summary_table)
 
+# Write CSV
+if (!dir.exists("output")) dir.create("output")
+write.csv(summary_table, "output/T42_ge_twodyad.csv", row.names = FALSE)
+csv_sha <- get_sha256("output/T42_ge_twodyad.csv")
+say("Wrote output/T42_ge_twodyad.csv  SHA %s", csv_sha)
+
+# Full output object
 output <- list(
     dyads = list(
-        median = DYAD_MED,
-        q25 = DYAD_Q25
+        Q1 = list(pair = dyad_lo, iso = dyad_lo_iso, quintile = 1, pre_trade = dyad_lo_row$pre_trade),
+        Q5 = list(pair = dyad_hi, iso = dyad_hi_iso, quintile = 5, pre_trade = dyad_hi_row$pre_trade)
     ),
     arms = list(
         lo = SD_TRUE_LO,
         hi = SD_TRUE_HI
     ),
-    sigma = 5,
+    sigma = SIGMA,
     n_draws = N_DRAWS,
     mean_theta_D = MEAN_THETA_D,
     results = results_all,
     summary_table = summary_table,
+    scenario = "Conditional GE (Y, E held at data values; solver lines 43-44, 72-74)",
     gates = list(
         G1_plumbing = max_diff,
         G2_market_clearing = c(row = max_row_diff, col = max_col_diff),
         G3_convergence = max_fail_rate,
-        G4_arm_monotonicity = g4_pass
+        G4_arm_monotonicity = g4_pass,
+        E_draw_sd = sapply(results_all, function(x) x$draw_sd)
     ),
     seed = SEED,
     solver_sha = solver_sha
 )
 
 saveRDS(output, "data/S46_ge_twodyad.rds")
-osha <- get_sha256("data/S46_ge_twodyad.rds")
+rds_sha <- get_sha256("data/S46_ge_twodyad.rds")
+say("Wrote data/S46_ge_twodyad.rds  SHA %s", rds_sha)
 
+# Sidecar for CSV
 writeLines(c(
-    "FILE:      S46_ge_twodyad.rds",
-    sprintf("SHA256:    %s", osha),
+    "FILE:      T42_ge_twodyad.csv",
+    sprintf("SHA256:    %s", csv_sha),
     sprintf("PRODUCER:  code/S46_ge_twodyad.R (SHA256: %s)", get_sha256("code/S46_ge_twodyad.R")),
-    "INPUTS:    data/S5R_bhat.rds, gravity_functions.R, ITPDE_total.rds",
+    "INPUTS:    data/S5R_bhat.rds, code/vendor/gravity_functions.R, ITPDE_total.rds",
     sprintf("SEED:      %d", SEED),
     sprintf("N_DRAWS:   %d", N_DRAWS),
-    "SIGMA:     5",
-    sprintf("DYADS:     median(%s-%s), q25(%s-%s)", DYAD_MED[1], DYAD_MED[2], DYAD_Q25[1], DYAD_Q25[2]),
+    sprintf("SIGMA:     %d", SIGMA),
+    sprintf("DYAD_Q1:   %s (quintile 1, pre_trade=%.4f)", dyad_lo, dyad_lo_row$pre_trade),
+    sprintf("DYAD_Q5:   %s (quintile 5, pre_trade=%.4f)", dyad_hi, dyad_hi_row$pre_trade),
     sprintf("ARMS:      lo(SD=%.2f), hi(SD=%.2f)", SD_TRUE_LO, SD_TRUE_HI),
+    "SCENARIO:  Conditional GE (Y, E held at data values)",
     "GATE:      G1_plumbing [PASS]",
     "GATE:      G2_market_clearing [PASS]",
     "GATE:      G3_convergence [PASS]",
     "GATE:      G4_arm_monotonicity [PASS]",
+    "GATE:      E_draw_sd [PASS]",
+    "NOTE:      cost_eq is built from PPML coefficients, already in tau^(1-sigma) units.",
+    "           Multiplying by exp(theta) adds a log TRADE effect to log trade-equivalent",
+    "           resistance, which is dimensionally correct. Treating theta as a change in",
+    "           log tau would be wrong by a factor of (1-sigma) and would flip the sign.",
+    sprintf("R_VERSION: %s", paste(R.version$major, R.version$minor, sep = ".")),
+    sprintf("CREATED:   %s", format(Sys.time()))
+), "meta/T42_ge_twodyad.csv.sidecar")
+
+# Sidecar for RDS
+writeLines(c(
+    "FILE:      S46_ge_twodyad.rds",
+    sprintf("SHA256:    %s", rds_sha),
+    sprintf("PRODUCER:  code/S46_ge_twodyad.R (SHA256: %s)", get_sha256("code/S46_ge_twodyad.R")),
+    "INPUTS:    data/S5R_bhat.rds, code/vendor/gravity_functions.R, ITPDE_total.rds",
+    sprintf("SEED:      %d", SEED),
+    sprintf("N_DRAWS:   %d", N_DRAWS),
+    sprintf("SIGMA:     %d", SIGMA),
+    sprintf("DYAD_Q1:   %s (quintile 1, pre_trade=%.4f)", dyad_lo, dyad_lo_row$pre_trade),
+    sprintf("DYAD_Q5:   %s (quintile 5, pre_trade=%.4f)", dyad_hi, dyad_hi_row$pre_trade),
+    sprintf("ARMS:      lo(SD=%.2f), hi(SD=%.2f)", SD_TRUE_LO, SD_TRUE_HI),
+    "SCENARIO:  Conditional GE (Y, E held at data values)",
+    "GATE:      G1_plumbing [PASS]",
+    "GATE:      G2_market_clearing [PASS]",
+    "GATE:      G3_convergence [PASS]",
+    "GATE:      G4_arm_monotonicity [PASS]",
+    "GATE:      E_draw_sd [PASS]",
+    "NOTE:      cost_eq is built from PPML coefficients, already in tau^(1-sigma) units.",
+    "           Multiplying by exp(theta) adds a log TRADE effect to log trade-equivalent",
+    "           resistance, which is dimensionally correct. Treating theta as a change in",
+    "           log tau would be wrong by a factor of (1-sigma) and would flip the sign.",
     sprintf("R_VERSION: %s", paste(R.version$major, R.version$minor, sep = ".")),
     sprintf("CREATED:   %s", format(Sys.time()))
 ), "meta/S46_ge_twodyad.rds.sidecar")
 
 say("")
-say("Wrote data/S46_ge_twodyad.rds  SHA %s", osha)
+say("=== ALL GATES PASSED ===")
 say("Done: %s", format(Sys.time()))

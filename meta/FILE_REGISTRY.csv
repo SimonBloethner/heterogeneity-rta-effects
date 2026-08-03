@@ -380,3 +380,7 @@ article/ledger_constants.tex,output,code/S45_ledger_constants.R,meta/canonical_f
 meta/ledger_constants.tex.sidecar,meta,code/S45_ledger_constants.R,article/ledger_constants.tex,NONE,sha256_match,16,BUILT
 code/vendor/gravity_functions.R,code,vendored,/groups/m-larch/bt307958/tails/programs/gravity_functions.R,NONE,sha256_859408d8,0,ANCHOR
 data/S46_ge_twodyad.rds,data,code/S46_ge_twodyad.R,data/S5R_bhat.rds;code/vendor/gravity_functions.R;ITPDE_total.rds,20260803,G1_plumbing;G2_market_clearing;G3_convergence;G4_arm_monotonicity,8,BUILT
+code/S46_ge_twodyad.R,code,manual,data/S5R_bhat.rds;code/vendor/gravity_functions.R;ITPDE_total.rds,20260803,syntax_valid,8,BUILT
+output/T42_ge_twodyad.csv,output,code/S46_ge_twodyad.R,data/S5R_bhat.rds;code/vendor/gravity_functions.R;ITPDE_total.rds,20260803,G1_G2_G3_G4_E_PASS,8,BUILT
+meta/T42_ge_twodyad.csv.sidecar,meta,code/S46_ge_twodyad.R,output/T42_ge_twodyad.csv,NONE,sha256_match,8,BUILT
+meta/S46_ge_twodyad.rds.sidecar,meta,code/S46_ge_twodyad.R,data/S46_ge_twodyad.rds,NONE,sha256_match,8,BUILT
