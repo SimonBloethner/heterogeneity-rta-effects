@@ -9,12 +9,16 @@
 LEDGER_PATH <- "meta/canonical_facts.md"
 OUTPUT_PATH <- "article/a2_constants.tex"
 
-# Macro definitions: name -> (ledger_id, precision)
+# Macro definitions: name -> (ledger_id, precision, is_integer)
+# is_integer = TRUE for counts that should render as bare integers
 MACROS <- list(
-    MomPowMinZ = list(id = "MOMPOW_IDENT_MIN_Z", precision = 2),
-    MomPowMaxZ = list(id = "MOMPOW_IDENT_MAX_Z", precision = 2),
-    AtwoExKurt = list(id = "A2_EXKURT", precision = 3),
-    AtwoExKurtControl = list(id = "A2_EXKURT_CONTROL", precision = 3)
+    MomPowMinZ = list(id = "MOMPOW_IDENT_MIN_Z", precision = 2, is_integer = FALSE),
+    MomPowMaxZ = list(id = "MOMPOW_IDENT_MAX_Z", precision = 2, is_integer = FALSE),
+    AtwoExKurt = list(id = "A2_EXKURT", precision = 3, is_integer = FALSE),
+    AtwoExKurtControl = list(id = "A2_EXKURT_CONTROL", precision = 3, is_integer = FALSE),
+    HoldoutDThreeMean = list(id = "HOLDOUT_D3_MEAN", precision = 4, is_integer = FALSE),
+    HoldoutDThreeN = list(id = "HOLDOUT_D3_N", precision = 0, is_integer = TRUE),
+    HoldoutMaxAbsExDThree = list(id = "HOLDOUT_MAX_ABS_EX_D3", precision = 4, is_integer = FALSE)
 )
 
 # Expected values for verification
@@ -22,7 +26,10 @@ EXPECTED <- list(
     MOMPOW_IDENT_MIN_Z = 2.96,
     MOMPOW_IDENT_MAX_Z = 11.44,
     A2_EXKURT = 0.784,
-    A2_EXKURT_CONTROL = -0.269
+    A2_EXKURT_CONTROL = -0.269,
+    HOLDOUT_D3_MEAN = -0.1013,
+    HOLDOUT_D3_N = 314,
+    HOLDOUT_MAX_ABS_EX_D3 = 0.0569
 )
 
 # =============================================================================
@@ -67,7 +74,7 @@ for (macro_name in names(MACROS)) {
     parsed_values[[cfg$id]] <- val
     cat(sprintf("  %s = %s (raw: %s)\n", cfg$id, val, val))
 }
-cat("G1: PASS - all four IDs found\n")
+cat("G1: PASS - all seven IDs found\n")
 
 # =============================================================================
 # Verify against expected values
@@ -109,7 +116,12 @@ for (macro_name in names(MACROS)) {
     rounded_val <- round(raw_val, cfg$precision)
 
     # Format the value string
-    val_str <- format(rounded_val, nsmall = cfg$precision, scientific = FALSE)
+    if (isTRUE(cfg$is_integer)) {
+        # Integer: bare number, no decimal point, no thousands separator
+        val_str <- as.character(as.integer(rounded_val))
+    } else {
+        val_str <- format(rounded_val, nsmall = cfg$precision, scientific = FALSE)
+    }
 
     output_lines <- c(output_lines, sprintf("\\newcommand{\\%s}{%s}", macro_name, val_str))
     emitted_values[[macro_name]] <- rounded_val
@@ -153,7 +165,7 @@ newcommand_lines <- grep("^\\\\newcommand", emitted_content, value = TRUE)
 n_macros <- length(newcommand_lines)
 cat(sprintf("  Macros defined: %d\n", n_macros))
 
-stopifnot("G3 FAIL: Expected exactly 4 macros" = n_macros == 4)
-cat("G3: PASS - exactly four macros defined\n")
+stopifnot("G3 FAIL: Expected exactly 7 macros" = n_macros == 7)
+cat("G3: PASS - exactly seven macros defined\n")
 
 cat("\n=== All gates passed ===\n")
