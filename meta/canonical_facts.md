@@ -16,7 +16,8 @@ Amended: 2026-08-03 (SYNC-18: check (e) extended to article/; INV-044 opened and
 Amended: 2026-08-03 (SYNC-19: Round 2 completion; R1-R5 tasks; enforce zero at 8012510)
 Amended: 2026-08-03 (SYNC-20: R6 check (e) extended to code/; solver sidecar restored; INV-045 CLOSED)
 Amended: 2026-08-03 (SYNC-21: T42/T43 scale-invariance finding ledgered; quintile-conditional GE propagation)
-Status: NO OPEN INVESTIGATIONS. enforce.R reports zero violations at commit 8012510, measured on a clean tree at origin/main.
+Amended: 2026-08-03 (SYNC-22: R9 check (f) extended to body; 58 violations measured (23 lines), all resolved; R8 annotation splits fixed)
+Status: NO OPEN INVESTIGATIONS. enforce.R reports zero violations at commit 2745576, measured on a clean tree at origin/main.
 
 ## Population
 
@@ -984,10 +985,9 @@ that every ID is found, that each emitted value round-trips against the ledger,
 and that exactly seven macros are defined.
 
 Four serve Remark 4 in the propositions appendix, where check (f) forbids typed
-literals. Three serve Section 6, which is body text and where check (f) does not
-apply; macros are used there anyway, because a hardcoded number in the body is the
-same defect as one in the appendix and differs only in whether an automated check
-happens to look at it.
+literals. Three serve Section 6, which is body text. Check (f) was extended to
+body text (lines 100-2200) in R9 (SYNC-22); 58 violations on 23 lines were measured
+and resolved by adding fact-comments within ±1 line of each numeric literal.
 
 Any change to one of those seven ledger rows must be followed by re-running the
 generator. The article will otherwise carry a stale value that no check reports.
