@@ -3,7 +3,11 @@ SHA256:    21af48145ca10a72a186c26bac8de798ae44e1bfa30c528ee2b5655dbd7f58cc
 PRODUCER:  code/S23_ge_bracket.R
 PRODUCER_SHA256: 258f1f14b47ba31fa0eab6bcebefbd0c2918b1e94e0b8e63dfc934cfa2c42842
 INPUTS:
-  data/S5R_bhat.rds: NOT_IN_REPO
+  meta/canonical_facts.md: MEAN_THETA_D, SD_THETA_TRUE
+  NOTE: the producer reads no file at run time. Both quantities are
+  transcribed into constants in code/S23_ge_bracket.R and guarded by
+  stopifnot(). The former declaration of data/S5R_bhat.rds as an input was
+  incorrect: that file is never opened by this producer (corrected SYNC-17).
 SEED:      20260726
 
 SPECIFICATION:

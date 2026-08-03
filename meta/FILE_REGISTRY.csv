@@ -207,6 +207,7 @@ meta/T12_N1_oos_null.csv.sidecar,meta,code/N1_oos_null.R,output/T12_N1_oos_null.
 meta/T12_N1b_horizon.csv.sidecar,meta,code/N1_oos_null.R,output/T12_N1b_horizon.csv,NONE,exists,10,ANCHOR
 meta/T12_N4_gradient.csv.sidecar,meta,code/N4_distribution.R,output/T12_N4_gradient.csv,NONE,exists,10,ANCHOR
 meta/T1R_spec_spread.csv.sidecar,meta,code/S10R_exhibits.R,output/T1R_spec_spread.csv,NONE,exists,7,BUILT
+meta/T20_ge_bracket.csv.sidecar,meta,code/S23_ge_bracket.R,output/T20_ge_bracket.csv,NONE,exists,12,BUILT
 meta/T22_theta_A_placebo.csv.sidecar,meta,code/S24_PROV.R,output/T22_theta_A_placebo.csv,NONE,exists,12,BUILT
 meta/T22_theta_A_treated.csv.sidecar,meta,code/S24_PROV.R,output/T22_theta_A_treated.csv,NONE,exists,12,BUILT
 meta/T27_gradient_B.csv.sidecar,meta,code/S28_gradient_B.R,output/T27_gradient_B.csv,NONE,exists,13,BUILT
@@ -228,7 +229,7 @@ output/T17_ge_arms.csv,output,code/L4_ge_arms.R,data/S5R_bhat.rds,NONE,exists,12
 output/T18_11plus_gate.csv,output,code/L5_11plus_gate.R,data/S18_null_stack.rds,NONE,exists,12,QUARANTINE
 output/T19_pleq0_bracket.csv,output,code/S22_ladder_closed_form.R,data/S5R_bhat.rds,NONE,bracket_valid,12,BUILT
 output/T1R_spec_spread.csv,output,code/S10R_exhibits.R,data/S9R_spec.rds,NONE,exists,7,BUILT
-output/T20_ge_bracket.csv,output,code/S23_ge_bracket.R,data/S5R_bhat.rds,20260726,arm_indexed,12,BUILT
+output/T20_ge_bracket.csv,output,code/S23_ge_bracket.R,meta/canonical_facts.md,20260726,arm_indexed,12,BUILT
 output/T21_arms.csv,output,code/S24_arms_canonical.R,data/S5R_bhat.rds,NONE,gates_pass,12,BUILT
 output/T22_reliability.csv,output,code/S24_reliability.R,data/S5R_bhat.rds;data/S1R_ppml.rds,20260719,report_only,12,BUILT
 output/T22_theta_A_placebo.csv,output,code/S24_PROV.R,data/S5R_bhat.rds;data/S1R_ppml.rds,20260719,G2_PASS,12,BUILT

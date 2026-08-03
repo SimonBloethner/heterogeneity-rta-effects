@@ -11,6 +11,7 @@ Amended: 2026-08-02 (SYNC-13: (A2) diagnostics ledgered from S34/S35; INV-041 op
 Amended: 2026-08-02 (SYNC-14: drift-calibration holdout ledgered; T9 values were cited from output/ with no ledger row)
 Amended: 2026-08-03 (SYNC-15: package closure; INV-039, INV-042, INV-043 CLOSED; enforce zero at 1678d7f)
 Amended: 2026-08-03 (SYNC-16: INV-040 and INV-041 CLOSED; CAV-005 resolved; register closed)
+Amended: 2026-08-03 (SYNC-17: INV-028 entry written; T20 registry input and sidecar INPUTS corrected; live T20 sidecar enrolled)
 Status: NO OPEN INVESTIGATIONS. enforce.R reports zero violations on a clean tree at origin/main. See the Closure Register (SYNC-16).
 
 ## Population
@@ -220,6 +221,37 @@ The superseded value 0.9244 (G2c) is reproduced by the R-chain at 0.924345 under
 Both values are high; the reliability paradox rests on the within-run contrast between treated 0.9243 and placebo 0.7463, computed identically under the same split rule, not on either value's comparison to the retired chain.
 
 Status: CLOSED.
+
+### INV-028: GE range values retired as un-indexed by arm (CLOSED)
+Three values in the Superseded Entries table cite this ID and no entry existed for
+it. Written retrospectively; no value changes.
+
+Retired: "41% share theta_D <= 0" (wrong-object: a property of the estimates, not
+of the effects; superseded by RAW_SHARE = 0.4211 with that label made explicit),
+and two GE ranges, 12.5x and 27.25x. The 27.25x figure is RANGE_1090 from
+data/S8R_ge.rds, produced by code/S8R_ge_propagation.R: a structural gravity
+counterfactual on the 2019 cross-section, sigma = 5, 500 draws applied as a
+bilateral trade-cost shock to the median non-RTA dyad, gates A (plumbing),
+B (market clearing) and C (convergence) all PASS. The defect is not the solve.
+It is the draw: `sample(theta_D, 500, replace = TRUE)` resamples the raw
+pair-level estimates, whose SD is 1.5614, so the propagated range inherits
+estimation noise as though it were effect heterogeneity and is indexed by no arm
+of INV-027. The same objection retires 12.5x.
+
+Replacement: output/T20_ge_bracket.csv (code/S23_ge_bracket.R), which reports
+q10/q50/q90 and RANGE_1090 at both endpoints of SD_THETA_TRUE. Recorded for
+accuracy: the replacement performs no equilibrium solve. It draws
+theta ~ N(MEAN_THETA_D, SD_true) and maps (exp(theta) - 1) * 100, holding
+multilateral resistances, third-country reallocation, incomes and expenditures
+fixed; no solver, elasticity or calibrated dyad enters it. Its two `shape` rows,
+"symmetric" and "normal_same_SD", are the same data.frame under two labels, so
+gate G2 ("4 rows = 2 arms x 2 shapes") passes on a relabel and the committed
+shape sweep does not vary the form. The heading under which the replacement is
+ledgered above ("GE Propagation (Arm-Indexed)") therefore describes the arm
+indexing accurately and the scenario class inaccurately; the heading is under
+review and no value depends on the outcome.
+
+Status: CLOSED as to the retirement. The replacement's label is open.
 
 ### INV-029: Shape unidentified (CLOSED)
 K=3 mixture returned duplicate components at the SD floor (k=2 mean 0.190 sd 0.100; k=3 mean 0.213 sd 0.100). Shape is not identified at the canonical signal share of 0.37. No mixture-based P(theta<=0) is reported.
