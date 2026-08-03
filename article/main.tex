@@ -832,16 +832,14 @@ post years.
 % that motivates layer (ii) is stated rather than deferred.
 
 The move is decisive for the mean and only for the mean. Across the canonical
-population the average effect goes from $-0.2837$ under $A$ to $0.0758$ under
+population the average effect goes from $-0.2837$ under $A$ to $0.0758$ under % [T23: A,treated_mean; B,treated_mean]
 $B$:
-% [T5R: Mean_theta_A; T5R: Mean_theta_B]
  the sign flip happens here, at an arithmetic layer, before any correction that
 uses information about untreated pairs. The zero-effect population moves in the
 same direction and by more. Measured on the same $17{,}200$ never-treated pairs
-by the same producer, its mean rises from $-0.6880$ under $A$ to $-0.2072$ under
+by the same producer, its mean rises from $-0.6880$ under $A$ to $-0.2072$ under % [T23: A,placebo_mean; B,placebo_mean]
 $B$.
-% [T23: A,placebo_mean; T23: B,placebo_mean]
- It does not, however, reach zero. Against the validity threshold of $0.05$
+ It does not, however, reach zero. Against the validity threshold of $0.05$ % [GATE_THRESHOLD]
 carried by the pipeline's gate library, the uncorrected placebo mean under
 Definition~$B$ sits at roughly four times the threshold.
 % [T24: PLACEBO_B_UNCORR_OVERALL]
@@ -883,10 +881,9 @@ than a relabeling. It is estimated on held-out placebo splits and applied out of
 sample, so no pair contributes to its own correction. And it is validated on the
 held-out half, where the corrected placebo effect should be zero if the
 subtraction removed an artifact and nothing else. It is: across $8{,}545$
-validation pairs the mean corrected placebo effect is $0.0188$ with a standard
+validation pairs the mean corrected placebo effect is $0.0188$ with a standard % [HOLDOUT_MEAN]
 error of $0.0087$,
-% [T9: NA row]
- inside the $0.10$ decile bound of the pipeline's three-state gate and inside
+ inside the $0.10$ decile bound of the pipeline's three-state gate and inside % [GATE_DECILE_BOUND]
 the stricter $0.05$ bound as well.
 % [INV-016]
  One of the ten size deciles does not clear the first bound. The third decile
@@ -896,9 +893,8 @@ returns $-0.1013$ on $314$ validation pairs, with a standard error of $0.0591$,
 inside $0.20$, and $1.7$ standard errors from zero.
 % [INV-016]
  We report it as such rather than absorbing it into an average that would hide
-it. Applying the correction moves the mean from $0.0758$ under $B$ to $\LedgerMeanThetaD$
+it. Applying the correction moves the mean from $0.0758$ under $B$ to $\LedgerMeanThetaD$ % [T5R: Mean_theta_B; MEAN_THETA_D]
 under $D$, with a standard error of $\LedgerMeanThetaDSE$.
-% [T5R: Mean_theta_B; MEAN_THETA_D]
 
 
 % ¶8a — Explains the resolution of the correction and marks where it stops,
@@ -927,9 +923,8 @@ it away.
 % dispersion, which is the fact that organizes the rest of the subsection.
 
 The two corrections between them move the mean by roughly half a log point. They
-do almost nothing to the spread. The standard deviation is $1.6630$ under $A$,
+do almost nothing to the spread. The standard deviation is $1.6630$ under $A$, % [T5R: SD_theta_A]
 $1.5799$ under $B$, and $1.5614$ under $D$
-% [T5R: SD_theta_A; SD_theta_B; SD_theta_D]
 ---a decline of about six percent across a path that reversed the sign of the
 mean. This is not a failure of the corrections. It is a statement about what
 they were built to remove: both are corrections to a location, the first to a
@@ -1057,9 +1052,8 @@ $0.754$ against the $0.746$ observed.
 parameter chosen to make it do so. The prediction is evaluated pair by pair,
 which the convexity of $1/T$ requires: post windows differ across pairs, the
 reciprocal of the mean window length is not the mean of the reciprocals, and a
-plug-in evaluation at the mean over-predicts, returning $0.807$ and a gap eight
+plug-in evaluation at the mean over-predicts, returning $0.807$ and a gap eight % [T25: PROP_R_PRED_PLUGIN]
 times larger.
-% [T25: PROP_R_PRED_PLUGIN]
 
 
 % ¶13a — The variant that fails, which is the sharper half of the certificate.
@@ -1071,10 +1065,9 @@ biasing the recovered variance by
 $-(\kappa_w-1)\E[V^{\mathrm{post}}]/T_{\mathrm{post}}$.
 % [Cor:rhoop]
  The consequence is exact and can be read off. At $\kappa_w=1$ the subtraction
-is the noise-only arm and returns its dispersion of $1.475$ by construction; at
-$\kappa_w=2,3,5$ the recovered dispersion falls to $1.384$, $1.286$ and $1.064$;
+is the noise-only arm and returns its dispersion of $1.475$ by construction; at % [SD_THETA_TRUE]
+$\kappa_w=2,3,5$ the recovered dispersion falls to $1.384$, $1.286$ and $1.064$; % [T25: PROP_TAU_K2, PROP_TAU_K3, PROP_TAU_K5]
 and at $\kappa_w=9.34$ the entire estimated heterogeneity is absorbed.
-% [T25: PROP_TAU_K1, PROP_TAU_K2, PROP_TAU_K3, PROP_TAU_K5, PROP_KAPPA_FLOOR]
  A mis-specified null window therefore consumes true heterogeneity at a rate the
 derivation gives in closed form, and a sufficiently mis-specified one consumes
 all of it while returning a number that looks like an answer. That the failure
@@ -1095,14 +1088,12 @@ centering and scaling within a pair over a short window deforms the distribution
 even when the underlying data are exactly normal; the control is drawn pair by
 pair with identical cell counts and passed through identical code, so any
 deformation the procedure introduces appears on both sides and cancels. On
-$27{,}782$ pairs the assumption is rejected: $32.8$ percent of pairs reject
+$27{,}782$ pairs the assumption is rejected: $32.8$ percent of pairs reject % [A2_REJECT_REAL]
 normality at the five percent level against $5.0$ percent for the control.
-% [A2_N_PAIRS, A2_REJECT_REAL, A2_REJECT_CONTROL]
  The direction matters more than the rejection. The departure is left-skewed and
-leptokurtic --- skewness $-0.476$, excess kurtosis $0.784$ against the control's
-$-0.269$ --- while the \emph{upper} tail is thinner than the control's at the
+leptokurtic --- skewness $-0.476$, excess kurtosis $0.784$ against the control's % [A2_SKEW, A2_EXKURT]
+$-0.269$ --- while the \emph{upper} tail is thinner than the control's at the % [A2_EXKURT_CONTROL]
 ninety-fifth, ninety-ninth and ninety-nine-and-a-half percentiles.
-% [A2_SKEW, A2_EXKURT, A2_EXKURT_CONTROL, A2_TAIL_RATIO_P99]
  What the data carry is not an excess of extreme gains but an excess of
 collapses: trade falling far below its counterfactual more often than a normal
 law allows.
@@ -1219,16 +1210,16 @@ to find, and the accompaniment should be enforced rather than remembered.
 \cmidrule(lr){2-4}\cmidrule(lr){5-7}
 Definition & Mean & SD & $n$ & Mean & SD & $n$ \\
 \midrule
-$A$: mean of log ratios     & $-0.2837$  & $1.6630$ & $4{,}182$ & $-0.6880$  & $1.1187$ & $17{,}200$ \\
+$A$: mean of log ratios     & $-0.2837$  & $1.6630$ & $4{,}182$ & $-0.6880$  & $1.1187$ & $17{,}200$ \\ % [T23: A]
                             & $(0.0257)$ &          &           & $(0.0085)$ &          &            \\
 \addlinespace
-$B$: log of ratio of sums   & $0.0758$   & $1.5799$ & $4{,}182$ & $-0.2072$  & $0.8244$ & $17{,}200$ \\
+$B$: log of ratio of sums   & $0.0758$   & $1.5799$ & $4{,}182$ & $-0.2072$  & $0.8244$ & $17{,}200$ \\ % [T23: B]
                             & $(0.0244)$ &          &           & $(0.0063)$ &          &            \\
 \addlinespace
-$D$: $B$ less cell drift    & $\LedgerMeanThetaD$   & $1.5614$ & $\LedgerN$ & ---        & ---      & ---        \\
+$D$: $B$ less cell drift    & $\LedgerMeanThetaD$   & $1.5614$ & $\LedgerN$ & ---        & ---      & ---        \\ % [T23: D]
                             & $(\LedgerMeanThetaDSE)$ &          &           &            &          &            \\
 \midrule
-\multicolumn{7}{l}{\footnotesize\emph{Memo.} Held-out corrected placebo under $D$: $0.0188$ $(0.0087)$, $n=8{,}545$.} \\
+\multicolumn{7}{l}{\footnotesize\emph{Memo.} Held-out corrected placebo under $D$: $0.0188$ $(0.0087)$, $n=8{,}545$.} \\ % [HOLDOUT_MEAN]
 \multicolumn{7}{l}{\footnotesize\phantom{\emph{Memo.}} Split-half reliability under $A$: $\LedgerSplithalfR$ $(n=4{,}120)$ against $\LedgerPlaceboR$ $(n=15{,}683)$.} \\
 \bottomrule
 \end{tabular}
@@ -1425,14 +1416,13 @@ the normal form, which at the noise-only arm returns a value exceeding that
 % [P\_LO; P\_HI]
 share. Both assumptions are load-bearing and neither is
 innocent: the first imposes a shape the data do not identify, the second
-substitutes an observed frequency for a modelled one. Separately, $42.11$
-percent of the pair-level estimates are themselves non-positive
-% [RAW\_SHARE], but that figure is a property of the noisy estimates, not of
+substitutes an observed frequency for a modelled one. Separately, $42.11$ % [RAW_SHARE]
+percent of the pair-level estimates are themselves non-positive, but that figure is a property of the noisy estimates, not of
 the effects, and it bounds nothing but itself.
 
 % ¶5 — The honesty paragraph: what the achievable signal share does and does not permit.
 What cannot be reported is the shape. At the signal share these data achieve
---- roughly $0.37$ of the observed variance attributable to true effect
+--- roughly $0.37$ of the observed variance attributable to true effect % [P_LO]
 variation --- the mixture deconvolution does not resolve: fitting three
 components returns duplicates sitting at the standard-deviation floor rather
 % [INV-029]
@@ -1470,13 +1460,13 @@ Pairs & $\LedgerN$ \\
 Mean effect $\bar\theta_D$ & $\LedgerMeanThetaD$ \\
 \quad standard error & $(\LedgerMeanThetaDSE)$ \\
 Trade-weighted mean, pre-adoption weights & $\LedgerTWMean$ \\
-Standard deviation of estimates & $1.5614$ \\
+Standard deviation of estimates & $1.5614$ \\ % [T5R: SD_theta_D]
 Standard deviation of true effects, identified set & $[\LedgerSDTrueLo,\,\LedgerSDTrueHi]$ \\
 \quad hardened drift arm & $\LedgerSDTrueLo$ \\
 \quad noise-only arm & $\LedgerSDTrueHi$ \\
 $\Pr(\theta \leq 0)$, bracket & $[\LedgerPLo,\,\LedgerPHi]$ \\
 Share of estimates $\leq 0$ & $\LedgerRawShare$ \\
-Signal share & $0.37$ \\
+Signal share & $0.37$ \\ % [P_LO]
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1494,7 +1484,7 @@ $\LedgerGradientQFive$ in the largest, a spread of $\LedgerGradient$
 with a standard error of $\LedgerGradientSE$ --- eleven standard errors from
 zero. Two features of its shape carry the argument. The decline is steep across
 the first three quintiles and then stops: the fourth and fifth quintiles differ
-by $-0.008$ against a standard error of $0.046$, which is to say they cannot be
+by $-0.008$ against a standard error of $0.046$, which is to say they cannot be % [T27_gradient_B: Q4-Q5]
 told apart. And the floor they share is small but not zero, the largest
 quintile differing from zero at the five percent level where the fourth does
 not.
@@ -1550,15 +1540,15 @@ distribution.
 \toprule
  & \multicolumn{2}{c}{Corrected ($D$)} & \multicolumn{2}{c}{Uncorrected ($B$)} & Pre-adoption \\
 \cmidrule(lr){2-3}\cmidrule(lr){4-5}
-Quintile & Mean & (SE) & Mean & (SE) & trade (\$m) \\
+Quintile & Mean & (SE) & Mean & (SE) & trade (\$m) \\ % [T27_gradient_B]
 \midrule
 1 (smallest) & $0.855$ & $(0.076)$ & $0.557$ & $(0.077)$ & $0.7$ \\
-2            & $0.374$ & $(0.060)$ & $0.137$ & $(0.062)$ & $7.8$ \\
+2            & $0.374$ & $(0.060)$ & $0.137$ & $(0.062)$ & $7.8$ \\ % [T27_gradient_B]
 3            & $0.131$ & $(0.049)$ & $-0.022$ & $(0.050)$ & $47.1$ \\
-4            & $-0.066$ & $(0.037)$ & $-0.168$ & $(0.038)$ & $251.6$ \\
+4            & $-0.066$ & $(0.037)$ & $-0.168$ & $(0.038)$ & $251.6$ \\ % [T27_gradient_B]
 5 (largest)  & $-0.058$ & $(0.028)$ & $-0.126$ & $(0.028)$ & $15{,}691.0$ \\
 \midrule
-Spread, 1 $-$ 5 & $0.914$ & $(0.081)$ & $0.683$ & $(0.082)$ & \\
+Spread, 1 $-$ 5 & $0.914$ & $(0.081)$ & $0.683$ & $(0.082)$ & \\ % [T27_gradient_B_spread]
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1876,7 +1866,7 @@ where transitory heterogeneity is greatest.
 Two further limits are bounds rather than walls, and each carries its number. The
 first is the resolution of the drift calibration. The correction is estimated on
 held-out placebo pairs and validated on them decile by decile against a bound of
-$0.10$ log points; nine of the ten size deciles clear it, and clear it with room,
+$0.10$ log points; nine of the ten size deciles clear it, and clear it with room, % [GATE_DECILE_BOUND]
 the largest absolute mean among those nine being $\HoldoutMaxAbsExDThree$. The
 third decile returns $\HoldoutDThreeMean$ on $\HoldoutDThreeN$ validation pairs
 and registers PARTIAL.
@@ -1940,7 +1930,7 @@ Quantity & Status & Instrument \\
 \midrule
 Dispersion of persistent effects & Set-identified & Prop.~\ref{prop:ident}(a); arm accounting \\
 Transitory/volatility split & Conditionally unidentified & Prop.~\ref{prop:ident}(b); Rem.~\ref{rem:moments} \\
-Drift-calibration residual & Bounded at $0.10$ & Out-of-sample decile validation \\
+Drift-calibration residual & Bounded at $0.10$ & Out-of-sample decile validation \\ % [GATE_DECILE_BOUND]
 Effect on a non-adopting pair & Unidentified by design & Estimating-population construction \\
 \bottomrule
 \end{tabular}
