@@ -1,0 +1,15 @@
+FILE:      S46_ge_twodyad.rds
+SHA256:    920a96fc8e0efe72fcadd85ac38c738eb6c57917cafeeeb2c8b7467aeaada29c
+PRODUCER:  code/S46_ge_twodyad.R (SHA256: ca5e202e234a1e6b906e38ff6da9cca2844ab488638d0de60b9a0552b7e9b7eb)
+INPUTS:    data/S5R_bhat.rds, gravity_functions.R, ITPDE_total.rds
+SEED:      20260803
+N_DRAWS:   500
+SIGMA:     5
+DYADS:     median(CUW-SUR), q25(MAC-PAK)
+ARMS:      lo(SD=0.74), hi(SD=1.48)
+GATE:      G1_plumbing [PASS]
+GATE:      G2_market_clearing [PASS]
+GATE:      G3_convergence [PASS]
+GATE:      G4_arm_monotonicity [PASS]
+R_VERSION: 4.4.1
+CREATED:   2026-08-03 15:13:53
