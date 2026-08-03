@@ -180,7 +180,13 @@ simulate_cell <- function(n_pairs, T_post_vec, w, kappa_u, n_reps, seed_offset =
     delta_vec[r] <- stat_V - stat_T
   }
   
-  list(delta = mean(delta_vec), mc_se = sd(delta_vec) / sqrt(n_reps), reps = n_reps)
+  # AMENDED INV-040: return BOTH SE definitions
+  list(
+    delta = mean(delta_vec),
+    mc_se_mc = sd(delta_vec) / sqrt(n_reps),  # Monte Carlo precision
+    sd_single_dataset = sd(delta_vec),         # Sampling SD in one realization
+    reps = n_reps
+  )
 }
 
 # =============================================================================
@@ -204,18 +210,23 @@ run_cell <- function(idx) {
   reps <- 400
   res <- simulate_cell(N, T_post_empirical, w, ku, reps, seed_offset = idx * 1000)
   
-  # G4: for kappa_u > 0, need mc_se < 0.10 * |delta|
-  if (ku > 0 && res$mc_se >= 0.10 * abs(res$delta) && reps < 4000) {
+  # G4: for kappa_u > 0, need mc_se_mc < 0.10 * |delta|
+  if (ku > 0 && res$mc_se_mc >= 0.10 * abs(res$delta) && reps < 4000) {
     reps <- 1600
     res <- simulate_cell(N, T_post_empirical, w, ku, reps, seed_offset = idx * 1000 + 500)
   }
-  
-  z <- abs(res$delta) / res$mc_se
-  G4_pass <- if (ku == 0) TRUE else (res$mc_se < 0.10 * abs(res$delta))
-  
+
+  # AMENDED INV-040: z uses sd_single_dataset (identification-relevant SE)
+  # NOT mc_se_mc. Old z values were inflated by sqrt(reps).
+  z <- abs(res$delta) / res$sd_single_dataset
+  G4_pass <- if (ku == 0) TRUE else (res$mc_se_mc < 0.10 * abs(res$delta))
+
   data.table(
     kappa_u = ku, w_over_Esigma2 = wf,
-    delta = res$delta, mc_se = res$mc_se, z = z,
+    delta = res$delta,
+    mc_se_mc = res$mc_se_mc,           # Monte Carlo precision
+    sd_single_dataset = res$sd_single_dataset,  # Sampling SD in one realization
+    z = z,
     z_deff10 = z / sqrt(10), z_deff50 = z / sqrt(50),
     reps = res$reps, n_pairs = N, G3_violation = FALSE, G4_pass = G4_pass
   )

@@ -1,0 +1,42 @@
+FILE:           T41_drift_inflation.csv
+SHA256:         b725304b04fa0724e78e3e85712549d581718f10822c31596ce3fa3e4bc1ff3f
+PRODUCER:       code/S43_drift_inflation.R
+PRODUCER_SHA256: d193f06a0a5c75ce0b74d4ad9bb324922e1d052ae3d9316c192ccaf159f2167c
+INPUTS:
+  output/T39_a2_jensen_identity.csv: (per-pair mean_log_eta, var_log_eta)
+  output/T40_jensen_control.csv:     (panel-level slopes and reliability)
+SEED:           NONE
+
+SPECIFICATION:
+  Gates drift-inflation arithmetic from INV-041.
+  
+  Verifies that the level-route and slope-route derivations of the drift
+  inflation factor agree, and that the Control C disattenuation recovers
+  the true -0.5 slope.
+  
+  Level-route: w_level = E[var] / (-2 * E[mean])
+  Slope-route: w_slope = 0.5 / |disatt_slope_real|
+  
+  Under (A2), E[mean] = -E[sigma^2]/2 and E[var] = E[sigma^2].
+  With drift: E[var] includes drift, so w > 1.
+
+GATES:
+  B1: |w_level - w_slope| / w_level = 0.0053 < 0.05: PASS
+  B2: |disatt_slope_ctrlc + 0.5| = 0.0454 < 0.10: PASS
+  B3: |predicted - observed| = 0.0014 < 0.01: PASS
+
+KEY VALUES:
+  E_mean:               -0.9229
+  E_var:                3.5748
+  w_level:              1.9367
+  w_slope:              1.9265
+  disatt_slope_ctrlc:   -0.5454
+  predicted_slope:      -0.2582
+  observed_slope:       -0.2595
+
+NOTE:
+  This closes INV-041 (drift-inflation arithmetic portion).
+  The level-route (1.937) and slope-route (1.927) agree to 0.5%.
+  Control C recovers -0.5454 from a true -0.5, validating disattenuation.
+
+CREATED: 2026-08-03

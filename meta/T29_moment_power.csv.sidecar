@@ -1,37 +1,43 @@
-FILE:      T29_moment_power.csv
-SHA256:    8bed5f08f287a94aee351fef1862b66190efbae14355f8c66f179a356d0d3cc2
-PRODUCER:  code/S30_moment_power.R
-PRODUCER_SHA256: d266b5d1a951bc53c7de7092d68e4b823db69a8bc0195e83ed77a7efa1624e25
+FILE:           T29_moment_power.csv
+SHA256:         5d0eb1269fb6dfaf4ddf58cf4e063a76a3a6235c8201d3cd459011b7a9e8b313
+PRODUCER:       code/S30_moment_power.R
+PRODUCER_SHA256: 11749fab77d893c09596cf0f62c6ed82d1b160c5fcb2e5c6c8c10b1ebc82adc9
 INPUTS:
-  meta/canonical_facts.md:        a1dc51ea75313b5ee099137b89972726b6d6f689e2eb0faff369f70a7c226cc3
-  output/T22_theta_A_treated.csv: 2ec840c06917d45dea4ac19efaadb9010e07f83dec6cb38638275ab6117217a7
-SEED:      20260719
+  meta/canonical_facts.md: (runtime read, ledger)
+  output/T22_theta_A_treated.csv: (n_post_cells column)
+SEED:           20260719
+REPS:           400
 
 SPECIFICATION:
+  Pooled higher-moment separation power calculation.
   Measures power of pooled excess kurtosis to distinguish World T (transitory
-  effect variation, rho=1, omega^2=w) from World V (volatility change, omega^2=0,
-  rho^2=(sigma^2+w)/sigma^2) under non-normal multiplicative shocks.
+  effect variation) from World V (volatility change) under non-normal shocks.
 
-  sigma^2 distribution: Gamma(shape=0.463, rate=0.339), matched to ESIGMA2=1.3642
-  and VAR_SIGMA2=4.021 from canonical_facts.md.
+  Grid: kappa_u in {0, 0.75, 1.0, 1.5, 3.0} x w/E[sigma^2] in {0.10, 0.25, 0.50, 1.00}
 
-  T_post: Per-pair post-window cell count from T22_theta_A_treated.csv column
-  n_post_cells (n=4182, range=[3,26], median=10).
+  COLUMNS (INV-040 amendment):
+    mc_se_mc          = sd(delta_vec)/sqrt(reps)   -- Monte Carlo precision
+    sd_single_dataset = sd(delta_vec)              -- Sampling SD in one realization
+    z                 = |delta| / sd_single_dataset -- Identification-relevant z
 
-  theta_ij: Drawn from N(0,1); differenced out by the statistic.
-
-  Design-effect sensitivity: z_deff10 and z_deff50 assume design effects of 10
-  and 50 respectively. Cross-pair dependence has never been estimated in this
-  repository, so no design effect is measured here.
+  Old version had z = |delta| / mc_se, which overstated z by sqrt(reps) = 20.
 
 GATES:
-  G1: |delta| at kappa_u=0 < 3*mc_se (normal identification): PASS
-      w=0.10: |delta|=0.0025 < 0.0050
-      w=0.25: |delta|=0.0014 < 0.0052
-      w=0.50: |delta|=0.0000 < 0.0049
-      w=1.00: |delta|=0.0008 < 0.0053
-  G2: max|Var_V - Var_T| = 8.88e-16 < 1e-10: PASS
-  G3: Monotonicity violations recorded: 2 (at kappa_u=0, expected noise)
-  G4: mc_se < 0.10*|delta| for all kappa_u > 0: PASS
+  G1: Normal identification (kappa_u=0) -- |delta| < 3*mc_se: PASS
+  G2: Variance match (Var_V = Var_T by construction): PASS
+  G3: Monotonicity -- z increases in both kappa_u and w: PASS (0 violations)
+  G4: Precision -- mc_se < 0.10*|delta| for kappa_u > 0: PASS
 
-CREATED: 2026-07-30 11:35:00
+LEDGER QUANTITIES:
+  MOMPOW_KAPPA0_DELTA:       -0.000485 (mean delta at kappa_u=0)
+  MOMPOW_IDENT_MIN_Z:        2.96 (kappa_u=0.75, w/E=0.10)
+  MOMPOW_IDENT_KAPPA1_W50_Z: 5.83 (kappa_u=1.0, w/E=0.50)
+  MOMPOW_IDENT_MAX_Z:        11.44 (kappa_u=3.0, w/E=1.00)
+  MOMPOW_IDENT_DEFF10_MAX_Z: 3.62 (max cell, assumed DEFF=10)
+  MOMPOW_IDENT_DEFF50_MAX_Z: 1.62 (max cell, assumed DEFF=50)
+
+A1_VERIFICATION:
+  Old z / sqrt(400) = new z, verified cell by cell.
+  Old hash: 8bed5f08f287a94aee351fef1862b66190efbae14355f8c66f179a356d0d3cc2
+
+CREATED: 2026-08-03

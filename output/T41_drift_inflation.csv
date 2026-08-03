@@ -1,0 +1,16 @@
+quantity,value,pass
+E_mean,-0.922891872817835,
+E_var,3.57478442286511,
+w_level,1.93672982076998,
+slope_real,-0.196599862499929,
+var_reliability_real,0.757509663267823,
+disatt_slope_real,-0.259534461450718,
+w_slope,1.92652643200118,
+slope_ctrlc,-0.335064495392663,
+var_reliability_ctrlc,0.614400422437355,
+disatt_slope_ctrlc,-0.54535199384051,
+predicted_slope,-0.258167140629464,
+slope_prediction_error,0.00136732082125357,
+B1_rel_diff,0.00526835940634125,TRUE
+B2_deviation,-0.0453519938405097,TRUE
+B3_error,0.00136732082125357,TRUE
