@@ -15,6 +15,7 @@ Amended: 2026-08-03 (SYNC-17: INV-028 entry written; T20 registry input and side
 Amended: 2026-08-03 (SYNC-18: check (e) extended to article/; INV-044 opened and closed)
 Amended: 2026-08-03 (SYNC-19: Round 2 completion; R1-R5 tasks; enforce zero at 8012510)
 Amended: 2026-08-03 (SYNC-20: R6 check (e) extended to code/; solver sidecar restored; INV-045 CLOSED)
+Amended: 2026-08-03 (SYNC-21: T42/T43 scale-invariance finding ledgered; quintile-conditional GE propagation)
 Status: NO OPEN INVESTIGATIONS. enforce.R reports zero violations at commit 8012510, measured on a clean tree at origin/main.
 
 ## Population
@@ -50,6 +51,42 @@ Note: TW_MEAN uses pre_trade weights (INV-034). total_trade weights yield 0.304;
 |-----|---------|-----|------------|----------|
 | C_hardened | 0.740 | 28.2% | 6.64 | code/S23_ge_bracket.R -> output/T20_ge_bracket.csv |
 | A_noise_only | 1.475 | 23.5% | 44.44 | code/S23_ge_bracket.R -> output/T20_ge_bracket.csv |
+
+## Scale-Invariance (T42/T43)
+
+Transmission is flat across the size distribution; the outcome gradient is a theta gradient.
+
+T42 shows that for a given SD_true, RANGE_1090 is invariant across dyad size quintiles: the
+median dyad in Q1 (smallest pre-trade) and the median dyad in Q5 (largest pre-trade) have
+nearly identical RANGE_1090 values (6.34 vs 6.30 at SD_true=0.74; 39.8 vs 39.1 at SD_true=1.48).
+What differs is the q50 (median trade change): Q1's is higher than Q5's because Q1 pairs have
+a higher mean theta_D (0.0760) than Q5 pairs (-0.0583 -> ledgered as 0.0277 absolute value but
+note the sign).
+
+T43 propagates this finding through the conditional GE solver with quintile-conditional draws:
+each dyad draws from N(GRADIENT_Qi, SD_true) rather than N(MEAN_THETA_D, SD_true). Gate G5
+confirms that the q50 difference (Q1 - Q5) is at least 0.05, consistent with the theta gradient
+propagating through the outcome while the transmission remains flat.
+
+| ID | Quantity | Value | Producer |
+|----|----------|-------|----------|
+| SCALE_INV_RANGE_Q1_LO | RANGE_1090, Q1 median dyad, SD_true=0.74 | 6.337 | code/S47_ge_gradient.R -> output/T43_ge_gradient.csv |
+| SCALE_INV_RANGE_Q5_LO | RANGE_1090, Q5 median dyad, SD_true=0.74 | 6.298 | code/S47_ge_gradient.R -> output/T43_ge_gradient.csv |
+| SCALE_INV_RANGE_Q1_HI | RANGE_1090, Q1 median dyad, SD_true=1.48 | 39.827 | code/S47_ge_gradient.R -> output/T43_ge_gradient.csv |
+| SCALE_INV_RANGE_Q5_HI | RANGE_1090, Q5 median dyad, SD_true=1.48 | 39.082 | code/S47_ge_gradient.R -> output/T43_ge_gradient.csv |
+| SCALE_INV_Q50_Q1_LO | q50 (median trade change), Q1, SD_true=0.74 | 0.1083 | code/S47_ge_gradient.R -> output/T43_ge_gradient.csv |
+| SCALE_INV_Q50_Q5_LO | q50 (median trade change), Q5, SD_true=0.74 | 0.0560 | code/S47_ge_gradient.R -> output/T43_ge_gradient.csv |
+| SCALE_INV_Q50_DIFF_LO | Q1-Q5 q50 difference, SD_true=0.74 | 0.0523 | code/S47_ge_gradient.R (Gate G5) |
+| SCALE_INV_Q50_DIFF_HI | Q1-Q5 q50 difference, SD_true=1.48 | 0.0538 | code/S47_ge_gradient.R (Gate G5) |
+
+Note (binding on prose): the scale-invariance finding is conditional on the assumption that
+within-quintile SD_true equals the population SD_true. This is stated explicitly in the T43
+sidecar. If within-quintile dispersion differs from the population, the transmission would
+not be exactly flat; the finding establishes that the gradient observed in outcomes is
+primarily a gradient in means, not a gradient in transmissions.
+
+Note (dyads): Q1 median dyad is LUX_ATG (pre_trade=0.46); Q5 median dyad is NLD_CRI
+(pre_trade=1946.63). These reproduce T42's dyad selection (gate assertion in S47).
 
 ## Gradient
 
