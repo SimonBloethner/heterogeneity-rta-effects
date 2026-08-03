@@ -448,16 +448,16 @@ which the counterfactual is built. Nothing here reports an estimate.
 Bilateral trade comes from the International Trade and Production Database for
 Estimation, Release~2 \citep{borchert2022international}, aggregated to total goods
 trade for each ordered exporter--importer pair and year, in millions of current
-United States dollars. The panel runs from 1988 to 2019
+United States dollars. The panel runs from 1988 to 2019,
 % [FROZEN_FACTS$year_min, FROZEN_FACTS$year_max]
-, which is the window over which the release's goods sectors are jointly
+ which is the window over which the release's goods sectors are jointly
 available; its services industries begin only in 2000 and are outside the panel
 by coverage rather than by choice. After the restrictions described next, the
 estimation panel contains $794{,}720$ observations % [FROZEN_FACTS$n_obs]
-across $46{,}803$ ordered pairs % [TD1R, R0]
-, of which the terminal cross-section contributes $31{,}650$
+across $46{,}803$ ordered pairs, % [TD1R, R0]
+ of which the terminal cross-section contributes $31{,}650$.
 % [FROZEN_FACTS$n_2019]
-. These counts and the year bounds are frozen: every script verifies them
+ These counts and the year bounds are frozen: every script verifies them
 against the source file before computing anything and halts if they do not
 reproduce.
 
@@ -519,9 +519,9 @@ contribute to a within-pair design, whatever their weight in world trade. Pairs
 recording more than one transition are excluded, because adoption is not well
 defined for them and a pair-level effect computed across their regimes would
 average over the very heterogeneity the paper measures. Together these
-exclusions are large: $6{,}339$ of $46{,}803$ pairs are single switchers
+exclusions are large: $6{,}339$ of $46{,}803$ pairs are single switchers,
 % [TD1R, R1]
-, and the $40{,}464$ removed are overwhelmingly never-treated.
+ and the $40{,}464$ removed are overwhelmingly never-treated.
 
 % ¶7 — Back-reference to §2.3's passage on instrument depth. No new claims.
 
@@ -552,8 +552,8 @@ multi-switcher pairs are excluded by
 Section~\ref{sec:data-agreements}. (b) \emph{adoption within 1991--2016}: a
 pair adopting in the panel's first or last years cannot satisfy the window
 requirements below, and the range makes the boundary explicit rather than
-implicit; it removes $753$ pairs % [TD1R, R2]
-. (c) \emph{a symmetric one-year exclusion band around adoption}. The
+implicit; it removes $753$ pairs. % [TD1R, R2]
+ (c) \emph{a symmetric one-year exclusion band around adoption}. The
 pre-period ends at $\text{adoption}-2$ and the post-period begins at
 $\text{adoption}+2$; the adoption year and both flanking years are assigned to
 neither side. Agreements are announced before they enter force and implemented
@@ -569,14 +569,14 @@ Two further rules concern estimability and window length. (d) \emph{a usable
 counterfactual}: a pair enters only if the imputation model of
 Section~\ref{sec:empirical} yields a prediction for its post-adoption cells,
 which requires that its own fixed effect be identified from untreated data.
-This removes $576$ pairs % [TD1R, R3]
-; because identification binds at the pair fixed effect rather than cell by
+This removes $576$ pairs; % [TD1R, R3]
+ because identification binds at the pair fixed effect rather than cell by
 cell, every retained pair has a counterfactual for all of its post-adoption
 years, and no retained pair is estimated on a truncated window. (e) \emph{at
 least three pre- and three post-adoption years of positive trade}, outside the
-exclusion band, removing $353$ and $475$ pairs respectively
+exclusion band, removing $353$ and $475$ pairs respectively.
 % [TD1R, R4 and R5]
-. A pair-level effect estimated on one or two years is dominated by whichever
+ A pair-level effect estimated on one or two years is dominated by whichever
 shocks fall in them, and the minimum buys enough within-pair observations for
 the effect and its sampling error to be separately estimable. Robustness across
 the threshold grid is reported in Appendix~\ref{app:tables}~[X-REF: threshold
@@ -596,17 +596,17 @@ agreement might matter most in proportional terms.
 
 % ¶12 — The resulting population, its weight, and its composition, honestly.
 
-Applying these rules yields the canonical population of $4{,}182$ pairs
+Applying these rules yields the canonical population of $4{,}182$ pairs,
 % [TD1R, R5]
-, with adoption years from 1992 to 2015. The population is economically
+ with adoption years from 1992 to 2015. The population is economically
 substantial: its members account for $22.1$ percent of world international
-goods trade in 2015 % [I2]
-. Its composition, however, deserves comment. The largest members by
+goods trade in 2015. % [I2]
+ Its composition, however, deserves comment. The largest members by
 pre-adoption trade are the Korea--United States agreement of 2012, the
 Australia--Japan and Australia--China agreements of 2015, the China--Hong Kong
 arrangement of 2003, and the Japanese agreements with Thailand, Indonesia and
-Singapore % [I3]
-; the ten largest directed pairs account for $34.3$ percent of the
+Singapore; % [I3]
+ the ten largest directed pairs account for $34.3$ percent of the
 population's pre-adoption trade. Conspicuously absent are the North American
 and European agreements a reader might expect. They are absent by construction
 rather than by selection: Canada and the United States were already in force
@@ -683,10 +683,10 @@ one-year exclusion band, is not a separate row: it defines the pre- and
 post-periods over which (e1) and (e2) count years, so its effect is embedded
 in those two rows. Pre years are those before $\text{adoption}-1$ and post
 years those after $\text{adoption}+1$, both requiring positive trade. Panel
-totals are frozen and verified at load
+totals are frozen and verified at load.
 % [FROZEN_FACTS$n_obs]
-. Source: % [TD1R]
-.
+ Source:. % [TD1R]
+
 \end{minipage}
 \end{table}
 
@@ -722,17 +722,17 @@ estimate available without further apparatus. For each switching pair, take the
 untreated-only PPML fit, impute the trade the pair would have carried in each of
 its post-adoption years, and average the log gap between realized and imputed
 trade over those years. Call this Definition~$A$. Across the canonical
-population it returns a mean of $-0.2837$
+population it returns a mean of $-0.2837$,
 % [T5R: Mean_theta_A]
-, a standard deviation of $1.6630$
+ a standard deviation of $1.6630$,
 % [T5R: SD_theta_A]
-, and a split-half correlation across disjoint halves of each pair's post window
+ and a split-half correlation across disjoint halves of each pair's post window
 of $\LedgerSplithalfR$, on the $4{,}120$ pairs with at least two post-adoption years in
-each half
+each half,
 % [SPLITHALF_A_R]
-, or $0.9607$ once corrected for split length
+ or $0.9607$ once corrected for split length.
 % [SPLITHALF_A_RELIABILITY]
-. The estimator is thus sign-wrong against everything the aggregate literature
+ The estimator is thus sign-wrong against everything the aggregate literature
 reports, enormously dispersed, and---by the one diagnostic that pair-level
 estimation makes available---close to perfectly reliable.
 
@@ -743,15 +743,15 @@ The never-treated pairs of Section~\ref{sec:data-comparison} carry
 pseudo-adoption dates assigned under the same band and minimum-length rules, and
 nothing whatever happens to them at those dates. Run Definition~$A$ on them
 unchanged. On the $15{,}683$ never-treated pairs that qualify for the same split, the mean
-``effect'' is $-0.6821$
+``effect'' is $-0.6821$,
 % [PLACEBO_A_MEAN]
-, with a standard deviation of $1.0814$
+ with a standard deviation of $1.0814$
 % [PLACEBO_A_SD]
-and a split-half correlation of $\LedgerPlaceboR$
+and a split-half correlation of $\LedgerPlaceboR$,
 % [PLACEBO_A_R]
-, or $0.8547$ corrected for split length
+ or $0.8547$ corrected for split length.
 % [PLACEBO_A_RELIABILITY]
-. A population in which the effect is zero by construction thus reproduces
+ A population in which the effect is zero by construction thus reproduces
 roughly four-fifths of the treated estimator's reliability---$\LedgerPlaceboR$ against
 $\LedgerSplithalfR$, computed under the same split rule in the same run
 % [PLACEBO_A_R; SPLITHALF_A_R]
@@ -770,12 +770,12 @@ relationship, not of the years sampled from it, so they replicate across
 splits as faithfully as a real effect would. Proposition~\ref{prop:jensen}(c)
 gives the exact result under the stated assumptions: the split-half correlation
 of a zero-effect estimator equals the share of its variance carried by
-persistent bias, $\Var(b)/\big(\Var(b)+\E[\sigma^2]/T_h\big)$
+persistent bias, $\Var(b)/\big(\Var(b)+\E[\sigma^2]/T_h\big)$.
 % [Prop1c]
-. Corollary~\ref{cor:rel} states the consequence without reference to any
-particular artifact: \emph{any} dispersed, persistent per-pair bias passes
+ Corollary~\ref{cor:rel} states the consequence without reference to any
+particular artifact: \emph{any} dispersed, persistent per-pair bias passes.
 % [Cor:rel]
-. High reliability certifies persistence. It does not certify validity, and no
+ High reliability certifies persistence. It does not certify validity, and no
 amount of it can, because the two are different questions and only one of them
 is being asked.
 
@@ -816,36 +816,36 @@ The first layer is aggregation. Definition~$A$ averages log ratios, and the
 logarithm is concave, so a pair whose realized trade is volatile around its
 counterfactual is penalized for the volatility itself. Under the assumptions of
 the appendix and with zero treatment effect,
-$\E[\theta^A_{ij}\mid ij]=-\sigma^2_{ij}/2$ exactly
+$\E[\theta^A_{ij}\mid ij]=-\sigma^2_{ij}/2$ exactly:
 % [Prop1]
-: the estimator returns a negative number whose magnitude is half the pair's own
+ the estimator returns a negative number whose magnitude is half the pair's own
 log-variance and has nothing to do with any agreement. The remedy is to
 aggregate before taking the logarithm rather than after---the log of the ratio
 of sums over the post window, Definition~$B$---which replaces a pair-level
 penalty of order $\sigma^2_{ij}$ with one of order
 $\Var(R_{ij})=\Var(\eta_{ij})\sum_t w_t^2$, smaller by roughly the number of
-post years
+post years.
 % [Prop1]
-.
+
 
 % ¶6 — Layer (i) empirics: the sign flip is located, and the residual failure
 % that motivates layer (ii) is stated rather than deferred.
 
 The move is decisive for the mean and only for the mean. Across the canonical
 population the average effect goes from $-0.2837$ under $A$ to $0.0758$ under
-$B$
+$B$:
 % [T5R: Mean_theta_A; T5R: Mean_theta_B]
-: the sign flip happens here, at an arithmetic layer, before any correction that
+ the sign flip happens here, at an arithmetic layer, before any correction that
 uses information about untreated pairs. The zero-effect population moves in the
 same direction and by more. Measured on the same $17{,}200$ never-treated pairs
 by the same producer, its mean rises from $-0.6880$ under $A$ to $-0.2072$ under
-$B$
+$B$.
 % [T23: A,placebo_mean; T23: B,placebo_mean]
-. It does not, however, reach zero. Against the validity threshold of $0.05$
+ It does not, however, reach zero. Against the validity threshold of $0.05$
 carried by the pipeline's gate library, the uncorrected placebo mean under
-Definition~$B$ sits at roughly four times the threshold
+Definition~$B$ sits at roughly four times the threshold.
 % [T24: PLACEBO_B_UNCORR_OVERALL]
-. That residual is systematic rather than incidental---it is a property of the
+ That residual is systematic rather than incidental---it is a property of the
 population and the window, not of any resampling---and the second layer is what
 it is made of.
 
@@ -859,9 +859,9 @@ effect. Proposition~\ref{prop:drift}(a) makes the size of the misreading
 explicit: for a never-treated pair with a post window equal to the last
 $T_{\mathrm{post}}$ years of its span, the post-window mean of centered time is
 $T_{\mathrm{pre}}/2$, so
-$\E[\theta^{A}_{ij}]=-\sigma^2_{ij}/2+\delta_{ij}T_{\mathrm{pre}}/2$
+$\E[\theta^{A}_{ij}]=-\sigma^2_{ij}/2+\delta_{ij}T_{\mathrm{pre}}/2$.
 % [Prop2]
-. Two signatures follow and are jointly restrictive. The bias depends on window
+ Two signatures follow and are jointly restrictive. The bias depends on window
 geometry alone and never on calendar time, so it cannot be a macroeconomic
 episode in disguise. And where drift correlates with pair size, the bias is
 graded in size---which is what makes a size-cell correction the right shape of
@@ -884,22 +884,22 @@ sample, so no pair contributes to its own correction. And it is validated on the
 held-out half, where the corrected placebo effect should be zero if the
 subtraction removed an artifact and nothing else. It is: across $8{,}545$
 validation pairs the mean corrected placebo effect is $0.0188$ with a standard
-error of $0.0087$
+error of $0.0087$,
 % [T9: NA row]
-, inside the $0.10$ decile bound of the pipeline's three-state gate and inside
-the stricter $0.05$ bound as well
+ inside the $0.10$ decile bound of the pipeline's three-state gate and inside
+the stricter $0.05$ bound as well.
 % [INV-016]
-. One of the ten size deciles does not clear the first bound. The third decile
-returns $-0.1013$ on $314$ validation pairs, with a standard error of $0.0591$
+ One of the ten size deciles does not clear the first bound. The third decile
+returns $-0.1013$ on $314$ validation pairs, with a standard error of $0.0591$,
 % [T9: decile 3]
-, which registers as PARTIAL under the three-state rule---beyond $0.10$, well
-inside $0.20$, and $1.7$ standard errors from zero
+ which registers as PARTIAL under the three-state rule---beyond $0.10$, well
+inside $0.20$, and $1.7$ standard errors from zero.
 % [INV-016]
-. We report it as such rather than absorbing it into an average that would hide
+ We report it as such rather than absorbing it into an average that would hide
 it. Applying the correction moves the mean from $0.0758$ under $B$ to $\LedgerMeanThetaD$
-under $D$, with a standard error of $\LedgerMeanThetaDSE$
+under $D$, with a standard error of $\LedgerMeanThetaDSE$.
 % [T5R: Mean_theta_B; MEAN_THETA_D]
-.
+
 
 % ¶8a — Explains the resolution of the correction and marks where it stops,
 % which is the hinge into layer (iii).
@@ -909,14 +909,14 @@ of the layer's limitation. Proposition~\ref{prop:drift}(c) is explicit that
 subtracting a size-cell mean removes $\E[\delta_{ij}\mid s]T_{\mathrm{pre}}/2$
 and leaves the within-cell dispersion of drift untouched, so that
 $\Var(\theta^D\mid s)$ still contains $(T_{\mathrm{pre}}/2)^2\Var(\delta_{ij}\mid
-s)$ alongside the true effect variance and the sampling term
+s)$ alongside the true effect variance and the sampling term.
 % [Prop2]
-. A finer partition would remove more of it. The binding constraint is that the
+ A finer partition would remove more of it. The binding constraint is that the
 correction must be estimated on held-out placebo pairs and validated on them,
 and the validation folds are already thin at the current resolution: the
-smallest size decile contributes $19$ validation pairs and the second $94$
+smallest size decile contributes $19$ validation pairs and the second $94$,
 % [T9: deciles 1 and 2]
-, against $1{,}365$ in the eighth. Refining the partition would buy a smaller
+ against $1{,}365$ in the eighth. Refining the partition would buy a smaller
 residual at the cost of a correction no held-out population is large enough to
 certify, which is the trade the current design declines to make. The consequence
 is carried forward: whatever drift heterogeneity survives within cells is still
@@ -945,22 +945,22 @@ that remains is a different object and has to be accounted for separately.
 
 That accounting proceeds by asking how much of the observed dispersion a
 zero-effect population reproduces, and the answer depends on which zero-effect
-population one is entitled to use. Against a total variance of $2.4380$
+population one is entitled to use. Against a total variance of $2.4380$,
 % [T21: VAR_THETA_D]
-, three admissible nulls have been computed. Sampling noise from finite post
+ three admissible nulls have been computed. Sampling noise from finite post
 windows, augmented by the uncertainty in the estimated counterfactual itself,
-accounts for $0.2611$, or $11$ percent
+accounts for $0.2611$, or $11$ percent;
 % [T21: A_noise_only]
-; the counterfactual component is a third of that total and cannot be dropped
+ the counterfactual component is a third of that total and cannot be dropped.
 % [T11: share_sd_cf; INV-022]
-. The in-sample placebo null---the dispersion the machinery generates on
-never-treated pairs over the same years---accounts for $0.6796$, or $28$ percent
+ The in-sample placebo null---the dispersion the machinery generates on
+never-treated pairs over the same years---accounts for $0.6796$, or $28$ percent.
 % [T21: B_placebo]
-. The out-of-sample drift null, computed under the canonical symmetric-window
+ The out-of-sample drift null, computed under the canonical symmetric-window
 design so that treated and pseudo-treated pairs are compared across identically
-drawn windows, accounts for $1.887$, or $77$ percent
+drawn windows, accounts for $1.887$, or $77$ percent.
 % [T21: C\_OOS]
-.
+
 
 % ¶10a — Prevents the arithmetic misreading of the three shares and states the
 % ordering as a consequence of what each null admits.
@@ -973,9 +973,9 @@ the same calendar years; the third admits those together with the
 window-geometry drift of Proposition~\ref{prop:drift}, measured on pseudo-treated
 pairs whose windows are drawn as the treated pairs' windows are. Each is the
 previous one plus a further admitted source, which is why they run $11$, $28$,
-and $77$ percent rather than in any other order
+and $77$ percent rather than in any other order,
 % [T21: all arms]
-, and why the middle one is an interior value rather than an endpoint. Choosing
+ and why the middle one is an interior value rather than an endpoint. Choosing
 among them is choosing how much of the observed spread one is prepared to
 concede to a mechanism that produces spread without producing effects, and the
 propositions do not settle that choice---they establish what is at stake in it.
@@ -984,20 +984,20 @@ propositions do not settle that choice---they establish what is at stake in it.
 % interval form by Proposition 3's logic rather than by caution.
 
 The first and third of these are the admissible endpoints, and they bracket the
-standard deviation of true effects at $[\LedgerSDTrueLo,\,\LedgerSDTrueHi]$
+standard deviation of true effects at $[\LedgerSDTrueLo,\,\LedgerSDTrueHi]$.
 % [SD_THETA_TRUE / INV-027]
-. We report the interval and no point inside it, and the reason is not caution
+ We report the interval and no point inside it, and the reason is not caution
 but Proposition~\ref{prop:ident}. Part~(a) identifies the variance of persistent
 effects as the cross-pair variance of the estimate minus the expected
-within-pair variance over the post window, which is estimable
+within-pair variance over the post window, which is estimable.
 % [Prop3]
-. Part~(b) shows that the composition of that within-pair variance is not:
+ Part~(b) shows that the composition of that within-pair variance is not:
 under the stated normality, transitory effect heterogeneity and a
 treatment-coincident change in volatility enter the likelihood only through
 their sum, so any two parameterizations with equal composites generate identical
-data distributions
+data distributions.
 % [Prop3]
-. The split between them is a modeling label, not an estimable quantity, and the
+ The split between them is a modeling label, not an estimable quantity, and the
 two endpoints are what the two admissible labels imply. The interval is
 therefore the dispersion conclusion of this section, with each arm's assumption
 attached to it: the upper endpoint concedes only noise, the lower concedes
@@ -1007,9 +1007,9 @@ that endpoint conservative rather than merely small. The out-of-sample null is
 not formed by applying an already-fitted counterfactual to held-out years. The
 counterfactual is re-estimated from a sample from which the evaluation window
 has been excluded entirely, so that no cell used to judge the null contributed
-to the fit that generates it
+to the fit that generates it.
 % [INV-027a]
-. This matters more than it may appear. A null built the other way---reusing a
+ This matters more than it may appear. A null built the other way---reusing a
 counterfactual fitted on the very cells it is then evaluated against---reproduces
 substantially less of the observed dispersion, because the fit has already
 absorbed part of what the null is meant to measure, and it would place the lower
@@ -1036,31 +1036,31 @@ occur where the derivation says they will.
 
 The first is available in full. Each proposition is evaluated numerically at the
 ledgered dispersion, which the zero-effect population identifies directly, since
-the mean log-ratio there is exactly minus half the mean log-variance
+the mean log-ratio there is exactly minus half the mean log-variance.
 % [T25: PROP_ESIGMA2]
-. Three of the evaluations plant a parameter and recover it. The Jensen
+ Three of the evaluations plant a parameter and recover it. The Jensen
 expansion is checked where it is weakest: at the empirical scale the generic
 second-order form is invalid for Definition~$A$ altogether, and for
 Definition~$B$ it overstates the bias magnitude by about thirty percent, the
-positive third-order term partially offsetting the variance term
+positive third-order term partially offsetting the variance term.
 % [T25: PROP_APPROX_B, PROP_MC_B, PROP_OVERSTATE_PCT]
-. The drift formula is checked by planting a per-pair trend and recovering the
-window-geometry prediction
+ The drift formula is checked by planting a per-pair trend and recovering the
+window-geometry prediction.
 % [T25: PROP_V2_PRED, PROP_V2_SIM]
-. And the reliability decomposition is over-identified, which permits a check
+ And the reliability decomposition is over-identified, which permits a check
 with nothing fitted to it: the cross-pair variance of the estimator on the
 zero-effect population implies a dispersion of pair volatilities, and
 substituting that into the split-half formula \emph{predicts} a reliability of
-$0.754$ against the $0.746$ observed
+$0.754$ against the $0.746$ observed.
 % [R_PRED, PLACEBO_A_R]
-. The formula reproduces the observed figure to within eight thousandths, with no
+ The formula reproduces the observed figure to within eight thousandths, with no
 parameter chosen to make it do so. The prediction is evaluated pair by pair,
 which the convexity of $1/T$ requires: post windows differ across pairs, the
 reciprocal of the mean window length is not the mean of the reciprocals, and a
 plug-in evaluation at the mean over-predicts, returning $0.807$ and a gap eight
-times larger
+times larger.
 % [T25: PROP_R_PRED_PLUGIN]
-.
+
 
 % ¶13a — The variant that fails, which is the sharper half of the certificate.
 
@@ -1068,14 +1068,14 @@ The most informative check is of an estimator variant that does not work. A null
 calibrated on a window shorter than the window over which the estimate is formed
 over-subtracts by a computable factor $\kappa_w:=T_{\mathrm{post}}/T_0>1$,
 biasing the recovered variance by
-$-(\kappa_w-1)\E[V^{\mathrm{post}}]/T_{\mathrm{post}}$
+$-(\kappa_w-1)\E[V^{\mathrm{post}}]/T_{\mathrm{post}}$.
 % [Cor:rhoop]
-. The consequence is exact and can be read off. At $\kappa_w=1$ the subtraction
+ The consequence is exact and can be read off. At $\kappa_w=1$ the subtraction
 is the noise-only arm and returns its dispersion of $1.475$ by construction; at
 $\kappa_w=2,3,5$ the recovered dispersion falls to $1.384$, $1.286$ and $1.064$;
-and at $\kappa_w=9.34$ the entire estimated heterogeneity is absorbed
+and at $\kappa_w=9.34$ the entire estimated heterogeneity is absorbed.
 % [T25: PROP_TAU_K1, PROP_TAU_K2, PROP_TAU_K3, PROP_TAU_K5, PROP_KAPPA_FLOOR]
-. A mis-specified null window therefore consumes true heterogeneity at a rate the
+ A mis-specified null window therefore consumes true heterogeneity at a rate the
 derivation gives in closed form, and a sufficiently mis-specified one consumes
 all of it while returning a number that looks like an answer. That the failure
 occurs at the magnitude the derivation predicts is a stronger statement than a
@@ -1096,14 +1096,14 @@ even when the underlying data are exactly normal; the control is drawn pair by
 pair with identical cell counts and passed through identical code, so any
 deformation the procedure introduces appears on both sides and cancels. On
 $27{,}782$ pairs the assumption is rejected: $32.8$ percent of pairs reject
-normality at the five percent level against $5.0$ percent for the control
+normality at the five percent level against $5.0$ percent for the control.
 % [A2_N_PAIRS, A2_REJECT_REAL, A2_REJECT_CONTROL]
-. The direction matters more than the rejection. The departure is left-skewed and
+ The direction matters more than the rejection. The departure is left-skewed and
 leptokurtic --- skewness $-0.476$, excess kurtosis $0.784$ against the control's
 $-0.269$ --- while the \emph{upper} tail is thinner than the control's at the
-ninety-fifth, ninety-ninth and ninety-nine-and-a-half percentiles
+ninety-fifth, ninety-ninth and ninety-nine-and-a-half percentiles.
 % [A2_SKEW, A2_EXKURT, A2_EXKURT_CONTROL, A2_TAIL_RATIO_P99]
-. What the data carry is not an excess of extreme gains but an excess of
+ What the data carry is not an excess of extreme gains but an excess of
 collapses: trade falling far below its counterfactual more often than a normal
 law allows.
 
@@ -1175,8 +1175,8 @@ assumptions exactly which number to take. Proposition~\ref{prop:ident}(b) is the
 model case, because it establishes that a particular decomposition is
 unavailable in exact terms under the model's normality assumption, and only
 conditionally recoverable outside it
-% [Prop3] % [see Remark 4]
-: no weakening of the assumption that a reader is likely to grant moves that
+% [Prop3]: % [see Remark 4]
+ no weakening of the assumption that a reader is likely to grant moves that
 boundary far, and reporting a point inside it would represent as measured what is
 in fact chosen.
 
@@ -1237,13 +1237,13 @@ $D$: $B$ less cell drift    & $\LedgerMeanThetaD$   & $1.5614$ & $\LedgerN$ & --
 \begin{minipage}{0.95\textwidth}
 \footnotesize
 \emph{Notes.} Each row is a pair-level effect definition applied to the
-canonical population of $4{,}182$ switching pairs
+canonical population of $4{,}182$ switching pairs,
 % [T23: treated_n]
-, and each is paired with the same definition applied to the $17{,}200$
+ and each is paired with the same definition applied to the $17{,}200$
 never-treated pairs carrying pseudo-adoption dates, for which the effect is zero
-by construction
+by construction.
 % [T23: placebo_n; INV-036]
-. Definition~$A$ averages the log ratio of realized to imputed trade over a
+ Definition~$A$ averages the log ratio of realized to imputed trade over a
 pair's post-adoption years. Definition~$B$ takes the log of the ratio of the
 sums over the same years, aggregating before the logarithm rather than after,
 which removes the concavity penalty of Proposition~\ref{prop:jensen}.
@@ -1256,16 +1256,16 @@ post-window definition are common to every cell shown. The $D$ row has no
 placebo entry: the correction is defined by subtracting a placebo mean, so its
 zero-effect benchmark is not a column of this table but the held-out validation
 of Table~[X-REF: T9], where the corrected placebo effect on $8{,}545$ pairs the
-correction never saw is $0.0188$ with a standard error of $0.0087$
+correction never saw is $0.0188$ with a standard error of $0.0087$.
 % [T9: NA row]
-. Reliability is reported separately, in Table~[X-REF: T22], because it is
+ Reliability is reported separately, in Table~[X-REF: T22], because it is
 computed on the subsets with at least two post-adoption years in each half
 ($4{,}120$ treated, $15{,}683$ placebo) and so does not share this table's row
 denominators; it is reported for treated and placebo as a pair, since the
 treated figure alone is uninterpretable---$\LedgerSplithalfR$ against $\LedgerPlaceboR$ under
-Definition~$A$
+Definition~$A$.
 % [SPLITHALF\_A\_R; PLACEBO\_A\_R]
-. Standard errors in parentheses.
+ Standard errors in parentheses.
 \end{minipage}
 \end{table}
 
@@ -1637,9 +1637,9 @@ tested in the distributional diagnostics; no such diagnostic is reported, and th
 prediction is left untested. What Section~\ref{sec:empirical} does test is the
 narrower distributional assumption the propositions themselves maintain --- that
 the within-pair log gaps are normal --- and that assumption is rejected, with the
-departure running to the left rather than the right
+departure running to the left rather than the right.
 % [A2_REJECT_REAL, A2_REJECT_CONTROL, A2_SKEW]
-. The mechanism's tail prediction therefore stands neither confirmed nor
+ The mechanism's tail prediction therefore stands neither confirmed nor
 refuted, and the reader should discount the conjunction accordingly. Effects
 graded in size and prior integration are confirmed here, and confirmed in the
 specific fall-then-floor form the mechanism requires rather than merely as a
@@ -1818,9 +1818,9 @@ post-adoption log gaps are independent and identically distributed as
 $N(\theta_{ij},\,\sigma^2_{ij}\rho^2+\omega^2)$, so transitory effect variation
 and the post-to-pre volatility ratio reach the likelihood only through the
 composite, and any two parameterizations sharing that composite generate
-identical data distributions
+identical data distributions.
 % [Prop3]
-. Distributions that are identical cannot be separated by any statistic computed
+ Distributions that are identical cannot be separated by any statistic computed
 from them.
 
 The content of that statement is easiest to see as a pair of economies. In the
@@ -1839,15 +1839,15 @@ estimate. Two qualifications follow immediately, and both are material. The
 complement deserves equal emphasis: Proposition~\ref{prop:ident}(a) identifies
 the persistent component, the interval this paper reports is an interval in that
 quantity, and its width is generated by the noise-attribution arms rather than by
-the equivalence of part~(b)
+the equivalence of part~(b).
 % [SD_THETA_TRUE]
-. And the equivalence is exact only under normality. Outside it, the composite no
+ And the equivalence is exact only under normality. Outside it, the composite no
 longer exhausts the likelihood, and Remark~\ref{rem:moments} reports what a
 pooled higher-order moment recovers at this sample: separation of
 $\MomPowMinZ$ to $\MomPowMaxZ$ under cross-pair independence, against a measured
-departure that falls inside the simulated range
+departure that falls inside the simulated range.
 % [MOMPOW_IDENT_MIN_Z, MOMPOW_IDENT_MAX_Z, A2_EXKURT]
-. The boundary is therefore measured rather than absolute, and its position
+ The boundary is therefore measured rather than absolute, and its position
 depends on two conditions --- cross-pair independence and a shock shape treatment
 does not alter --- neither of which this paper establishes.
 
@@ -1862,9 +1862,9 @@ volatility change, exactly as part~(b) requires. A null calibrated by scaling a
 pre-based noise variance of shorter window by that ratio therefore subtracts the
 effect variation along with the noise, and over-subtracts by a derivable window
 factor; at this paper's calibration the whole of the estimated heterogeneity is
-absorbed at $\kappa_{\mathrm{floor}}=\PropKappaFloor$
+absorbed at $\kappa_{\mathrm{floor}}=\PropKappaFloor$.
 % [Cor:rhoop]
-. Two properties of this class of estimator are worth stating plainly. The bias
+ Two properties of this class of estimator are worth stating plainly. The bias
 is signed and computable rather than a matter of luck. And it is largest where
 the quantity of interest is largest, since the term inflating the operational
 ratio is the transitory variance itself: an estimator of this class returns its
@@ -1879,9 +1879,9 @@ held-out placebo pairs and validated on them decile by decile against a bound of
 $0.10$ log points; nine of the ten size deciles clear it, and clear it with room,
 the largest absolute mean among those nine being $\HoldoutMaxAbsExDThree$. The
 third decile returns $\HoldoutDThreeMean$ on $\HoldoutDThreeN$ validation pairs
-and registers PARTIAL
+and registers PARTIAL.
 % [HOLDOUT_D3_MEAN, HOLDOUT_D3_N, HOLDOUT_MAX_ABS_EX_D3]
-. That bound is the resolution of the correction layer, and it governs what may
+ That bound is the resolution of the correction layer, and it governs what may
 be claimed about fine structure: variation in the size profile smaller than about
 a tenth of a log point lies inside the calibration tolerance, and this paper
 makes no claim at that resolution. The fall-then-floor reading of
@@ -1893,9 +1893,9 @@ constituting the floor.
 The second is the distributional assumption itself. The propositions are derived
 under normality of the within-pair log gaps, and that assumption is tested
 directly in Section~\ref{sec:empirical} and rejected, at $32.8$ percent of pairs
-against $5.0$ percent for a matched control
+against $5.0$ percent for a matched control.
 % [A2_REJECT_REAL, A2_REJECT_CONTROL]
-. Two things follow, and they pull in opposite directions. The predictions the
+ Two things follow, and they pull in opposite directions. The predictions the
 propositions generate survive the failure of their own premise --- the
 reliability formula lands within eight thousandths of the observed value on the
 same data
@@ -2110,15 +2110,15 @@ Part~(a) predicts a placebo bias governed by window geometry alone and, where
 $\delta_{ij}$ correlates with size, graded in size. Simulation confirms both:
 at $\delta=0.02$ the mean pseudo-effect matches the predicted $\PropVtwoPred$ at
 $\PropVtwoSim$; shifting every pair's span by an arbitrary calendar offset
-leaves the result unchanged (shift $\approx\PropVtwoShift$, confirming calendar invariance)
+leaves the result unchanged (shift $\approx\PropVtwoShift$, confirming calendar invariance).
 % [T25: PROP_V2_PRED, PROP_V2_SIM, PROP_V2_SHIFT]
-. Empirically the R-chain placebo means under Definition~$B$ are graded over the
+ Empirically the R-chain placebo means under Definition~$B$ are graded over the
 upper size deciles, falling in magnitude from $-0.365$ at the fifth decile to
 % [T24: PLACEBO_B_UNCORR_DECILE5, PLACEBO_B_UNCORR_DECILE10]
 $-0.057$ at the largest, and are non-monotone below the fifth: the smallest
-decile returns $-0.206$ against an overall mean of $-0.207$
+decile returns $-0.206$ against an overall mean of $-0.207$.
 % [T24: PLACEBO_B_UNCORR_DECILE5, DECILE10, DECILE1, OVERALL]
-. The proposition predicts grading conditional on the size--drift correlation and
+ The proposition predicts grading conditional on the size--drift correlation and
 does not predict monotonicity across the full support; the observed profile is
 reported as it stands.
 \end{remark}
@@ -2183,9 +2183,9 @@ Corollary~\ref{cor:rhoop} quantifies what a mis-specified null window costs. At
 window factor $\kappa=1$ the subtraction is the noise-only arm and returns its
 $\mathrm{SD}_{\mathrm{true}}$ of $\PropTauKone$ by construction; at
 $\kappa=2,3,5$ the recovered dispersion falls to $\PropTauKtwo$, $\PropTauKthree$
-and $\PropTauKfive$, reaching zero at $\kappa_{\mathrm{floor}}=\PropKappaFloor$
+and $\PropTauKfive$, reaching zero at $\kappa_{\mathrm{floor}}=\PropKappaFloor$.
 % [T25: Cor:rhoop rows]
-. A null calibrated on a window shorter than the estimation window therefore
+ A null calibrated on a window shorter than the estimation window therefore
 absorbs true heterogeneity at a computable rate, and at
 $\kappa_{\mathrm{floor}}$ absorbs all of it.
 The transitory slice $\omega^2/T$ is, by part~(b), exactly inseparable from
@@ -2203,26 +2203,26 @@ calibrated simulation answers it. Drawing $\sigma^2_{ij}$ to match the ledgered
 first two moments and using the empirical distribution of post-window lengths,
 the two worlds are constructed with equal composites and compared on the pooled
 mean of per-pair sample excess kurtosis. Under normality the difference is zero
-to simulation precision, as part~(b) requires
+to simulation precision, as part~(b) requires.
 % [MOMPOW_KAPPA0_DELTA]
-. Away from it, and expressed as the ratio of the difference to the sampling
+ Away from it, and expressed as the ratio of the difference to the sampling
 standard deviation of the statistic in a \emph{single} realization of $4{,}182$
 pairs, separation runs from $\MomPowMinZ$ to $\MomPowMaxZ$ across excess kurtosis in
-$[0.75,\,3.0]$ and transitory shares in $[0.10,\,1.00]$
+$[0.75,\,3.0]$ and transitory shares in $[0.10,\,1.00]$.
 % [MOMPOW_IDENT_MIN_Z, MOMPOW_IDENT_MAX_Z]
-. The relevant departure is measured rather than assumed: the standardized log
+ The relevant departure is measured rather than assumed: the standardized log
 gaps carry an excess kurtosis of $\AtwoExKurt$ against $\AtwoExKurtControl$ for a matched normal
 control passed through identical code, a net departure near unity that falls
-inside the simulated grid
+inside the simulated grid.
 % [A2_EXKURT, A2_EXKURT_CONTROL]
-.
+
 
 Two qualifications bound the reading, and both are material. The simulation
 treats pairs as independent; cross-pair dependence is not estimated anywhere in
 this paper, and at assumed variance inflations of ten and fifty the same
-separation falls to $3.62$ and $1.62$ at the most favorable cell
+separation falls to $3.62$ and $1.62$ at the most favorable cell.
 % [MOMPOW_IDENT_DEFF10_MAX_Z, MOMPOW_IDENT_DEFF50_MAX_Z]
-. And the route requires committing to a shape for the multiplicative shock that
+ And the route requires committing to a shape for the multiplicative shock that
 treatment does not alter; if treatment may change the shape as well as the scale,
 the separation closes again. The honest statement is therefore conditional. The
 split between transitory effect heterogeneity and treatment-coincident volatility
