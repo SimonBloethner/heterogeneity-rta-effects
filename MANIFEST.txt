@@ -94,4 +94,4 @@ Registry: meta/FILE_REGISTRY.csv, 363 rows. Statuses present: BUILT / ANCHOR /
           path under archive/. INV-039 closed.
           An earlier version of this line claimed every tracked file was
           registered; that claim had not been verified and was false.
-Measured state: enforce.R reports zero violations at commit 7fb506c.
+Measured state: enforce.R reports zero violations at commit 756cb71.

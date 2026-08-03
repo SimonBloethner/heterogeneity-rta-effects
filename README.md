@@ -78,7 +78,7 @@ Rscript code/enforce.R
 expected-violation list; an earlier version of this file published one that had
 never been measured against the repository (see INV-038). All ten checks carry a
 known-pass and known-fail fixture and provably discriminate. As measured at
-commit `7fb506c`, enforce.R reports zero violations.
+commit `756cb71`, enforce.R reports zero violations.
 
 ## Validation Gates
 
