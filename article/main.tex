@@ -395,10 +395,11 @@ reports which survived.
 %      with the right expectations; mirrors §5.4 and the coda.
 We state the outcome in advance, because the conjunction is only as strong as
 its weakest leg and the reader should know from the outset which leg that is.
-Lognormal-type outcome tails are confirmed: the observed flows are heavy-tailed
-without being Pareto, and the apparent divergence of higher moments is an
-artifact of the estimator rather than a property of the data. Effects graded in
-size and prior integration are confirmed, and in the specific form this
+Lognormal-type outcome tails are not tested here. The prediction concerns the
+marginal distribution of flows, and this paper's design bears on it only through
+the distributional assumption the propositions maintain; that assumption is
+examined directly in Section~\ref{sec:empirical}, and it is rejected. Effects
+graded in size and prior integration are confirmed, and in the specific form this
 mechanism requires --- a steep decline across the less integrated pairs
 followed by a common floor, not a smooth monotone descent, which would count
 against the mechanism rather than for it. Selection on match quality is
@@ -1617,15 +1618,19 @@ particular pair.
 
 % ¶16 — Predictions (i) and (iii): confirmed.
 Section~\ref{sec:theory-distribution} advanced four predictions and asked that
-they be held jointly. Three now carry evidence. Lognormal-type outcome tails
-were confirmed by the distributional diagnostics of
-Section~\ref{sec:empirical}, where the observed flows are heavy-tailed without
-being Pareto and the apparent divergence of higher moments is an estimator
-artifact rather than a property of the data. Effects graded in size and prior
-integration are confirmed here, and confirmed in the specific fall-then-floor
-form the mechanism requires rather than merely as a negative slope
-% [NEEDED: literature comparison --- no ledgered source supports a claim about
-% the magnitude of this gradient relative to prior estimates].
+they be held jointly. Two now carry evidence, and the reason the third does not
+is worth stating rather than eliding. Lognormal-type outcome tails were to be
+tested in the distributional diagnostics; no such diagnostic is reported, and the
+prediction is left untested. What Section~\ref{sec:empirical} does test is the
+narrower distributional assumption the propositions themselves maintain --- that
+the within-pair log gaps are normal --- and that assumption is rejected, with the
+departure running to the left rather than the right
+% [A2_REJECT_REAL, A2_REJECT_CONTROL, A2_SKEW]
+. The mechanism's tail prediction therefore stands neither confirmed nor
+refuted, and the reader should discount the conjunction accordingly. Effects
+graded in size and prior integration are confirmed here, and confirmed in the
+specific fall-then-floor form the mechanism requires rather than merely as a
+negative slope.
 
 % ¶17 — Prediction (iv) supported; prediction (ii) under-identified, and what that means.
 Selection on match quality is supported rather than confirmed, on the placebo
@@ -1778,6 +1783,180 @@ direction. It is not recoverable from these data, and we do not claim it.
 %     9 and 10. Sources: the ledger for the distribution summary,
 %     output/T27_gradient_B.csv for every gradient cell. booktabs is loaded in
 %     the preamble; no siunitx, so alignment is plain r-columns.
+
+
+
+
+% =============================================================================
+% SECTION 6 — THE BOUNDARY OF LEARNABILITY
+% Fact convention: trailing "% [ID]" per quantitative claim.
+% =============================================================================
+
+\section{\label{sec:limits}The Boundary of Learnability}
+
+\subsection{\label{sec:limits-equivalence}The Equivalence Theorem}
+
+The sharpest limit these data impose is not a matter of statistical power, and no
+larger sample relieves it. Within the post-adoption window, transitory
+pair-level variation in the effect and a treatment-coincident change in the
+volatility of trade itself enter the estimating problem only through their sum.
+Proposition~\ref{prop:ident}(b) states this exactly: conditional on the pair, the
+post-adoption log gaps are independent and identically distributed as
+$N(\theta_{ij},\,\sigma^2_{ij}\rho^2+\omega^2)$, so transitory effect variation
+and the post-to-pre volatility ratio reach the likelihood only through the
+composite, and any two parameterizations sharing that composite generate
+identical data distributions
+% [Prop3]
+. Distributions that are identical cannot be separated by any statistic computed
+from them.
+
+The content of that statement is easiest to see as a pair of economies. In the
+first, the bite of an agreement flickers within the pair: its persistent
+component is fixed, and a transitory increment of variance is drawn afresh each
+post-adoption year. In the second, the bite is perfectly steady and what
+treatment changes is the environment, scaling each pair's pre-adoption dispersion
+by a common factor. These are different economic claims with different content.
+Choose the two parameters so that the composites agree, and no statistic
+distinguishes the economies.
+
+The consequence is the thesis of this section. Under the model's normality
+assumption, ``heterogeneous effects'' and ``noisier outcomes'' are labels for the
+same data, and the choice between them is a modeling commitment rather than an
+estimate. Two qualifications follow immediately, and both are material. The
+complement deserves equal emphasis: Proposition~\ref{prop:ident}(a) identifies
+the persistent component, the interval this paper reports is an interval in that
+quantity, and its width is generated by the noise-attribution arms rather than by
+the equivalence of part~(b)
+% [SD_THETA_TRUE]
+. And the equivalence is exact only under normality. Outside it, the composite no
+longer exhausts the likelihood, and Remark~\ref{rem:moments} reports what a
+pooled higher-order moment recovers at this sample: separation of
+$\MomPowMinZ$ to $\MomPowMaxZ$ under cross-pair independence, against a measured
+departure that falls inside the simulated range
+% [MOMPOW_IDENT_MIN_Z, MOMPOW_IDENT_MAX_Z, A2_EXKURT]
+. The boundary is therefore measured rather than absolute, and its position
+depends on two conditions --- cross-pair independence and a shock shape treatment
+does not alter --- neither of which this paper establishes.
+
+\subsection{\label{sec:limits-warning}A Warning for Practice}
+
+Corollary~\ref{cor:rhoop} generalizes what
+Section~\ref{sec:empirical-certificate} demonstrated on a single estimator.
+Define the operational dispersion ratio as a pair's post-window variance over its
+pre-window variance. Under the model of Proposition~\ref{prop:ident} that ratio
+carries the transitory effect variation inside it, indistinguishable from a
+volatility change, exactly as part~(b) requires. A null calibrated by scaling a
+pre-based noise variance of shorter window by that ratio therefore subtracts the
+effect variation along with the noise, and over-subtracts by a derivable window
+factor; at this paper's calibration the whole of the estimated heterogeneity is
+absorbed at $\kappa_{\mathrm{floor}}=\PropKappaFloor$
+% [Cor:rhoop]
+. Two properties of this class of estimator are worth stating plainly. The bias
+is signed and computable rather than a matter of luck. And it is largest where
+the quantity of interest is largest, since the term inflating the operational
+ratio is the transitory variance itself: an estimator of this class returns its
+most reassuring number --- heterogeneity near zero --- in precisely those worlds
+where transitory heterogeneity is greatest.
+
+\subsection{\label{sec:limits-tolerances}Bounded Tolerances}
+
+Two further limits are bounds rather than walls, and each carries its number. The
+first is the resolution of the drift calibration. The correction is estimated on
+held-out placebo pairs and validated on them decile by decile against a bound of
+$0.10$ log points; nine of the ten size deciles clear it, and clear it with room,
+the largest absolute mean among those nine being $\HoldoutMaxAbsExDThree$. The
+third decile returns $\HoldoutDThreeMean$ on $\HoldoutDThreeN$ validation pairs
+and registers PARTIAL
+% [HOLDOUT_D3_MEAN, HOLDOUT_D3_N, HOLDOUT_MAX_ABS_EX_D3]
+. That bound is the resolution of the correction layer, and it governs what may
+be claimed about fine structure: variation in the size profile smaller than about
+a tenth of a log point lies inside the calibration tolerance, and this paper
+makes no claim at that resolution. The fall-then-floor reading of
+Section~\ref{sec:results-gradient} does not require any. It turns on the collapse
+from the smallest quintile to the floor, which exceeds the tolerance by nearly an
+order of magnitude, and it asserts nothing about the ordering of the quintiles
+constituting the floor.
+
+The second is the distributional assumption itself. The propositions are derived
+under normality of the within-pair log gaps, and that assumption is tested
+directly in Section~\ref{sec:empirical} and rejected, at $32.8$ percent of pairs
+against $5.0$ percent for a matched control
+% [A2_REJECT_REAL, A2_REJECT_CONTROL]
+. Two things follow, and they pull in opposite directions. The predictions the
+propositions generate survive the failure of their own premise --- the
+reliability formula lands within eight thousandths of the observed value on the
+same data
+% [R_PRED, PLACEBO_A_R]
+--- which is evidence about the mechanism rather than about the premise. But the
+equivalence of Section~\ref{sec:limits-equivalence} was exact only under that
+premise, and its failure is what opens the higher-moment route. The paper reports
+both rather than choosing.
+
+\subsection{\label{sec:limits-transport}The Transportability Boundary}
+
+The estimand is a distribution of effects over self-selected matches, and that is
+a limit of the same standing as the equivalence theorem: proven by the design
+rather than conjectured about it. The estimating population consists of pairs
+that adopted an agreement, and the counterfactual against which their effects are
+measured is fitted on untreated cells only
+(Section~\ref{sec:data-comparison}). Nothing in that construction identifies the
+effect of an agreement assigned to a pair that did not choose one. No such pair
+appears in the estimating population, and no assumption available to the design
+manufactures one. This is stronger than the customary caution about external
+validity, which concerns whether an estimate travels: here the population over
+which the estimand is defined does not contain the pairs to which a reader might
+wish to extrapolate.
+
+The margin at issue is the one the theory names in advance.
+Section~\ref{sec:theory-nonsep} predicts that agreements are selected on the same
+unobserved conditions that modulate their effects, and the placebo and stability
+evidence of Section~\ref{sec:empirical-diagnostics} supports that prediction. The
+prediction and the limit are one fact seen from two sides: the selection that
+makes the mechanism testable is the selection the estimand conditions on. That
+conditioning is the constraint any policy reading must respect.
+
+\subsection*{The identification ledger}
+
+\begin{table}[htbp]
+\centering
+\caption{The identification ledger}
+\label{tab:identification}
+\begin{tabular}{lll}
+\toprule
+Quantity & Status & Instrument \\
+\midrule
+Dispersion of persistent effects & Set-identified & Prop.~\ref{prop:ident}(a); arm accounting \\
+Transitory/volatility split & Conditionally unidentified & Prop.~\ref{prop:ident}(b); Rem.~\ref{rem:moments} \\
+Drift-calibration residual & Bounded at $0.10$ & Out-of-sample decile validation \\
+Effect on a non-adopting pair & Unidentified by design & Estimating-population construction \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent Each row records a quantity this design bears on, its status, and the
+instrument establishing that status. ``Set-identified'' means an interval is
+recovered whose endpoints differ in an assumption the data do not adjudicate.
+``Conditionally unidentified'' means exactly unidentified under the model's
+normality assumption and recoverable outside it only under conditions this paper
+does not establish. ``Bounded'' means measured up to a tolerance a gate on
+held-out data certifies. No row reports a status stronger than its instrument
+supports.
+
+None of these four limits is assumed. The first is a theorem, the second a
+corollary of it, the third the reported outcome of a gate run on held-out data,
+and the fourth a property of a population whose construction is tabulated. Each
+also names its own exit. The equivalence is broken by exogenous variation in
+outcome volatility, or by non-normality sufficient to make pooled higher-order
+moments informative --- a route this paper measures but does not walk. The
+over-subtracting null is defeated by matching the null's window to the estimation
+window, which is a design choice rather than a discovery. The calibration
+tolerance narrows with cells that are finer and still large enough to certify.
+The transportability boundary is crossed only by variation in assignment. What
+remains between the limits is the shape of this paper's contribution: the
+diagnostics that could be computed were confidently wrong, the quantities that
+mattered most are bounded rather than free, and the section between those two
+facts is where this paper's positive claims live.
+
 
 \newpage
 \bibliographystyle{aer}
