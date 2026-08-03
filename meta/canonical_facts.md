@@ -13,7 +13,8 @@ Amended: 2026-08-03 (SYNC-15: package closure; INV-039, INV-042, INV-043 CLOSED;
 Amended: 2026-08-03 (SYNC-16: INV-040 and INV-041 CLOSED; CAV-005 resolved; register closed)
 Amended: 2026-08-03 (SYNC-17: INV-028 entry written; T20 registry input and sidecar INPUTS corrected; live T20 sidecar enrolled)
 Amended: 2026-08-03 (SYNC-18: check (e) extended to article/; INV-044 opened and closed)
-Status: NO OPEN INVESTIGATIONS. enforce.R reports zero violations on a clean tree at origin/main. See the Closure Register (SYNC-16).
+Amended: 2026-08-03 (SYNC-19: Round 2 completion; R1-R5 tasks; enforce zero at 8012510)
+Status: NO OPEN INVESTIGATIONS. enforce.R reports zero violations at commit 8012510, measured on a clean tree at origin/main.
 
 ## Population
 
