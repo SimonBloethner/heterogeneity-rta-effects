@@ -12,6 +12,7 @@ Amended: 2026-08-02 (SYNC-14: drift-calibration holdout ledgered; T9 values were
 Amended: 2026-08-03 (SYNC-15: package closure; INV-039, INV-042, INV-043 CLOSED; enforce zero at 1678d7f)
 Amended: 2026-08-03 (SYNC-16: INV-040 and INV-041 CLOSED; CAV-005 resolved; register closed)
 Amended: 2026-08-03 (SYNC-17: INV-028 entry written; T20 registry input and sidecar INPUTS corrected; live T20 sidecar enrolled)
+Amended: 2026-08-03 (SYNC-18: check (e) extended to article/; INV-044 opened and closed)
 Status: NO OPEN INVESTIGATIONS. enforce.R reports zero violations on a clean tree at origin/main. See the Closure Register (SYNC-16).
 
 ## Population
@@ -761,6 +762,30 @@ check unless `git rev-parse HEAD` equals `git rev-parse origin/main` and the tre
 is clean excluding `data/`, printing both SHAs and the dirty count. An explicit
 `--allow-dirty` flag overrides it and prints a banner stating the result does not
 describe `origin/main` and must not be published.
+
+Status: CLOSED.
+
+### INV-044: check (e) did not search article/ (CLOSED)
+`check_sha256()` in `code/enforce.R` searched `output/` and `data/` for files
+described by sidecars, but not `article/`. When `meta/a2_constants.tex.sidecar`
+recorded a real SHA256 for `article/a2_constants.tex`, check (e) reported
+"described file not found" because it never looked in `article/`.
+
+Commit `1678d7f` resolved this by writing a placeholder into the sidecar:
+`SHA256: (article directory - not verified by check (e))`. The check stopped
+firing because it had nothing to verify. Commit `bcfdd01` (S44) regenerated the
+sidecar with the real hash, re-arming the defect. At commit `b040982`, enforce.R
+reports one violation: `a2_constants.tex: described file not found`.
+
+This is the fourth instance of a verification instrument reporting a number that
+does not describe what it claims to (INV-038, INV-039, INV-042, INV-044). As with
+the others, no reported quantity was affected; the defect concerned the check.
+
+Fixed: `check_sha256()` now searches `c("output", "data", "article")`. Fixture
+pair `tests/fixtures/check_e_article_{pass,fail}.sidecar` discriminates this
+defect: the PASS fixture describes an `article/` file whose hash matches; the
+FAIL fixture describes one whose hash does not. `tests/test_check_e.R` runs the
+discrimination test.
 
 Status: CLOSED.
 

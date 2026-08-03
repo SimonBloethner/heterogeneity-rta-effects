@@ -276,7 +276,7 @@ check_sha256 <- function(root, report = FALSE) {
             described_file <- gsub("\\.sidecar$", "", sidecar_name)
             
             file_path <- NULL
-            for (dir in c("output", "data")) {
+            for (dir in c("output", "data", "article")) {
                 candidate <- file.path(root, dir, described_file)
                 if (file.exists(candidate)) { file_path <- candidate; break }
             }

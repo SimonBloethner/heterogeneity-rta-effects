@@ -1,0 +1,4 @@
+FILE:      test_article_fail.tex
+SHA256:    0000000000000000000000000000000000000000000000000000000000000000
+PRODUCER:  tests/fixtures/check_e_article_fail.sidecar
+NOTE:      Fixture for check (e) discrimination test - intentionally wrong SHA256
