@@ -9,7 +9,8 @@ Amended: 2026-07-30 (SYNC-11: treated-population nesting note; INV-039 opened)
 Amended: 2026-07-30 (SYNC-12: S30 ledgered; INV-040 opened -- three S30 IDs superseded)
 Amended: 2026-08-02 (SYNC-13: (A2) diagnostics ledgered from S34/S35; INV-041 opened)
 Amended: 2026-08-02 (SYNC-14: drift-calibration holdout ledgered; T9 values were cited from output/ with no ledger row)
-Status: THREE OPEN INVESTIGATIONS -- INV-039 (registry coverage), INV-040 (S30 z definition), INV-041 ((A2) normality). None affects a number reported in the article as of SYNC-13.
+Amended: 2026-08-03 (SYNC-15: package closure; INV-039, INV-042, INV-043 CLOSED; enforce zero at 1678d7f)
+Status: TWO OPEN INVESTIGATIONS -- INV-040 (S30 z definition), INV-041 ((A2) normality). None affects a number reported in the article.
 
 ## Population
 
@@ -657,3 +658,112 @@ estimated on held-out placebo pairs and validated on them, and a finer partition
 buys a smaller residual at the cost of a correction no held-out population is
 large enough to certify. The design declines that trade; the residual drift
 dispersion is carried forward rather than assumed away.
+
+## Package Closure (SYNC-15)
+
+`enforce.R` reports ZERO violations at commit 1678d7f, measured on a clean tree
+at `origin/main` with a dirty count of 0. This is the first zero ever recorded
+against the repository rather than against a mirror.
+
+### INV-039: archive/retired_pack/ outside FILE_REGISTRY.csv (CLOSED)
+Both fixes were applied, and they were never alternatives.
+
+The instance: 77 rows enumerated from `git ls-files archive/retired_pack/` and
+appended with status ARCHIVED, so check (d)'s registry-driven half can now see
+the directory.
+
+The class: check (d) was additionally made structural, so any path under
+`archive/` is a forbidden input to a BUILT output whether or not it is enrolled.
+Fixtures `tests/fixtures/check_d_pass.R` and `check_d_fail.R` prove it
+discriminates.
+
+Also closed in passing: `output/canonical_facts.md`, a 288-byte tombstone reading
+"superseded by meta/canonical_facts.md", was registered BUILT -- which asserts it
+is citable as the source of a number. Moved to
+`archive/retired_2026-07-29/canonical_facts.md` and recoded ARCHIVED.
+
+Status: CLOSED.
+
+### INV-042: check (d) matched basenames, not paths (CLOSED)
+Closing INV-039 broke check (d), and the breakage is worth recording because it
+is the third instance of one pattern.
+
+Check (d) reduced each registry path to `basename()` and grepped script text for
+that string. Sound only while no archived file shared a basename with a live one.
+Enrolling `archive/retired_pack/` created 77 such collisions at a stroke. The
+visible consequence: `ITPDE_total.rds` became "archived" by name, so check (d)
+flagged `S1R_ppml_untreated.R` and `S8R_ge_propagation.R` -- the foundation of the
+estimation chain -- for loading `data/ITPDE_total.rds`, a live input. Five false
+positives, on correct code, from a correct fix to a different defect.
+
+Fixed by comparing full registry paths. Fixtures
+`tests/fixtures/check_d_itpde_pass.R` and `check_d_itpde_fail.R` differ only in
+path and share a basename, so they discriminate exactly this defect.
+
+Related: `data/ITPDE_total.rds` had no registry row of its own, though seven rows
+named it as an input and the only row carrying that basename was the archived
+pack copy. Now enrolled as ANCHOR.
+
+The pattern, three times over: INV-038 recorded a check that could not fire
+because it read the wrong column; INV-039 a check that could not fire because the
+objects it would forbid were never enrolled; INV-042 a check that fired wrongly
+because it compared the wrong thing. In each case the instrument reported a
+number that did not describe what it claimed to.
+
+Status: CLOSED.
+
+### INV-043: a violation count was published from a stale mirror (CLOSED)
+Task S40 ran `enforce.R` in `/groups/m-larch/bt307958/REBUILD_V2` -- 133 dirty
+files, several commits behind HEAD -- and wrote the resulting count of 7 into
+`README.md` and `MANIFEST.txt`. INV-038 names that same directory as the reason
+every enforce result ever produced described a mirror rather than the repository.
+
+Two of those seven were stale-file artifacts: `T39_a2_jensen_identity.csv` at
+origin hashes to `7906ff4def77...`, exactly its sidecar value, while the mirror
+held a different file. Five were the INV-042 false positives. The true count on a
+clean tree was zero once both were resolved.
+
+Fixed structurally rather than by instruction. `enforce.R` now halts before any
+check unless `git rev-parse HEAD` equals `git rev-parse origin/main` and the tree
+is clean excluding `data/`, printing both SHAs and the dirty count. An explicit
+`--allow-dirty` flag overrides it and prints a banner stating the result does not
+describe `origin/main` and must not be published.
+
+Status: CLOSED.
+
+### INV-040: T29 z column answers the wrong question (OPEN, one item closed)
+Item (2) is closed: every sidecar now carries `PRODUCER_SHA256`, a field the
+original format lacked, so the producing script's version is pinned. Fourteen
+sidecar hashes were independently recomputed from bytes at origin during
+drafting; all fourteen matched.
+
+Items (1) and (3) remain: T29 regenerated with both `mc_se_mc` and
+`sd_single_dataset` columns, and the MOMPOW_IDENT_* values re-derived from the
+regenerated table. Until then the correction is a ledger note rather than a
+column, and the T29 z column must never be cited.
+
+Status: OPEN.
+
+### Appendix constants (Remark 4)
+`article/a2_constants.tex` is generated by `code/S42_a2_constants.R`, which parses
+`MOMPOW_IDENT_MIN_Z`, `MOMPOW_IDENT_MAX_Z`, `A2_EXKURT` and `A2_EXKURT_CONTROL`
+from this ledger at run time and emits four macros. Remark 4 previously stated
+those four values as typed literals, which is the body convention; the appendix
+convention is generated macros, so that an appendix value cannot go stale when its
+ledger row moves. Check (f) caught it.
+
+Note: `meta/a2_constants.tex.sidecar` carries no SHA256 for the file it describes,
+because check (e) scans `output/` and `data/` only and a hash there would not be
+verified. The producer hash is recorded. This is a known gap, not an oversight;
+`article/prop_constants.tex` has no sidecar at all.
+
+### Remaining open items
+- INV-040 items (1) and (3): regenerate T29 with both columns.
+- INV-041: reproduce the drift-inflation arithmetic in a gated script before any
+  of it is cited in the article.
+- CAV-005: `code/S13b_matching_sensitivity.R` still carries the pre-INV-038 status
+  SUPERSEDED, which no check examines. Making it enforceable means ARCHIVED, and
+  under INV-038's own definition that means moving the file under `archive/`.
+  Undecided.
+
+None of the three blocks submission. None affects a reported number.
