@@ -1,7 +1,7 @@
 FILE:      ledger_constants.tex
-SHA256:    04f368d6908c7726a156897374f2ddea7363424b4f77c5a45977fae7b6b62bae
+SHA256:    abce0253cd8c1ce92c5a6f52ccbd9a80213cbb7ef27f76555b277c9d8a3ca5c4
 PRODUCER:  code/S45_ledger_constants.R
-PRODUCER_SHA256: dc03a3636de21c26203d4f92706c97e0da407a600cae5311df827dcacda36058
+PRODUCER_SHA256: 8c799d28b74860faec2bedfee803511f05a741082222936ed67bf6f7810a0d9a
 INPUTS:    meta/canonical_facts.md
-GATES:     G1 (all 23 IDs resolve), G2 (parsed equals expected), G3 (no Prop*/Atwo* collision), G4 (round-trip)
-NOTE:      23 LaTeX macros for main body constants, all with Ledger* prefix
+GATES:     G1 (all 30 IDs resolve), G2 (string identity), G3 (no Prop*/Atwo* collision), G4 (round-trip)
+NOTE:      30 LaTeX macros for main body constants, all with Ledger* prefix

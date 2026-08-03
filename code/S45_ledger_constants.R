@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 # S45_ledger_constants.R - Generate main body macros from canonical_facts.md
-# Emits: article/ledger_constants.tex (23 macros)
-# Gates: G1 (all IDs resolve), G2 (parsed equals expected), G3 (no Prop*/Atwo* collision), G4 (round-trip)
+# Emits: article/ledger_constants.tex (30 macros)
+# Gates: G1 (all IDs resolve), G2 (string identity), G3 (no Prop*/Atwo* collision), G4 (round-trip)
 
 # =============================================================================
 # Configuration
@@ -40,7 +40,16 @@ MACROS <- list(
     LedgerGradientB = list(id = "GRADIENT_B", precision = 4, is_integer = FALSE, is_interval = FALSE),
     LedgerGradientBSE = list(id = "GRADIENT_B", precision = 4, is_integer = FALSE, is_interval = FALSE, extract_se = TRUE),
     LedgerGradientQOne = list(id = "GRADIENT_Q1", precision = 4, is_integer = FALSE, is_interval = FALSE),
+    LedgerGradientQOneSE = list(id = "GRADIENT_Q1", precision = 4, is_integer = FALSE, is_interval = FALSE, extract_se = TRUE),
     LedgerGradientQFive = list(id = "GRADIENT_Q5", precision = 4, is_integer = FALSE, is_interval = FALSE),
+    LedgerGradientQFiveSE = list(id = "GRADIENT_Q5", precision = 4, is_integer = FALSE, is_interval = FALSE, extract_se = TRUE),
+    LedgerGradientBShare = list(id = "GRADIENT_B_SHARE", precision = 4, is_integer = FALSE, is_interval = FALSE),
+
+    # Derived percentage macros (exp(x) - 1) * 100
+    LedgerMeanThetaDPct = list(id = "MEAN_THETA_D", precision = 1, is_integer = FALSE, is_interval = FALSE, derive_pct = TRUE),
+    LedgerTWMeanPct = list(id = "TW_MEAN", precision = 1, is_integer = FALSE, is_interval = FALSE, derive_pct = TRUE),
+    LedgerGradientQOnePct = list(id = "GRADIENT_Q1", precision = 0, is_integer = FALSE, is_interval = FALSE, derive_pct = TRUE),
+    LedgerGradientQFivePct = list(id = "GRADIENT_Q5", precision = 1, is_integer = FALSE, is_interval = FALSE, derive_pct = TRUE),
 
     # Reliability
     LedgerSplithalfR = list(id = "SPLITHALF_A_R", precision = 4, is_integer = FALSE, is_interval = FALSE),
@@ -71,7 +80,14 @@ EXPECTED <- list(
     LedgerGradientB = 0.6827,
     LedgerGradientBSE = 0.0821,
     LedgerGradientQOne = 0.8554,
+    LedgerGradientQOneSE = 0.0760,
     LedgerGradientQFive = -0.0583,
+    LedgerGradientQFiveSE = 0.0277,
+    LedgerGradientBShare = 0.7472,
+    LedgerMeanThetaDPct = 28.1,
+    LedgerTWMeanPct = 9.4,
+    LedgerGradientQOnePct = 135,
+    LedgerGradientQFivePct = -5.7,
     LedgerSplithalfR = 0.9243,
     LedgerPlaceboR = 0.7463,
     LedgerEsigmaSq = 1.3642,
@@ -170,34 +186,49 @@ for (macro_name in names(MACROS)) {
         stop(sprintf("G1 FAIL: Ledger ID '%s' (macro \\%s) not found or unparseable", cfg$id, macro_name))
     }
 
+    # Apply derive_pct transformation: (exp(x) - 1) * 100
+    if (isTRUE(cfg$derive_pct)) {
+        val <- (exp(val) - 1) * 100
+    }
+
     parsed_values[[macro_name]] <- val
     cat(sprintf("  %s -> \\%s = %s\n", cfg$id, macro_name, val))
 }
-cat("G1: PASS - all 23 IDs resolve\n")
-stopifnot("G1: exactly 23 macros defined" = length(parsed_values) == 23)
+cat("G1: PASS - all 30 IDs resolve\n")
+stopifnot("G1: exactly 30 macros defined" = length(parsed_values) == 30)
 
 # =============================================================================
-# G2: Parsed equals expected
+# G2: String identity (not numeric tolerance)
 # =============================================================================
-cat("\n=== G2: Verifying against expected values ===\n")
+cat("\n=== G2: Verifying string identity against expected values ===\n")
 for (macro_name in names(EXPECTED)) {
     cfg <- MACROS[[macro_name]]
     parsed <- parsed_values[[macro_name]]
     expected <- EXPECTED[[macro_name]]
 
-    # Round parsed to stated precision for comparison
+    # Round parsed to stated precision
     rounded <- round(parsed, cfg$precision)
 
-    if (abs(rounded - expected) > 1e-9) {
+    # Format both to string at stated precision for identity comparison
+    if (isTRUE(cfg$is_integer) || cfg$precision == 0) {
+        parsed_str <- as.character(as.integer(rounded))
+        expected_str <- as.character(as.integer(expected))
+    } else {
+        parsed_str <- format(rounded, nsmall = cfg$precision, scientific = FALSE)
+        expected_str <- format(expected, nsmall = cfg$precision, scientific = FALSE)
+    }
+
+    # String identity comparison - no tolerance
+    if (trimws(parsed_str) != trimws(expected_str)) {
         stop(sprintf(
-            "G2 FAIL: \\%s parsed=%.6f rounded=%.4f expected=%.4f. Ledger may have moved.",
-            macro_name, parsed, rounded, expected
+            "G2 FAIL: \\%s parsed_str='%s' expected_str='%s'. Ledger may have moved.",
+            macro_name, trimws(parsed_str), trimws(expected_str)
         ))
     }
-    cat(sprintf("  \\%s: %.4f == %.4f OK\n", macro_name, rounded, expected))
+    cat(sprintf("  \\%s: '%s' == '%s' OK\n", macro_name, trimws(parsed_str), trimws(expected_str)))
 }
-cat("G2: PASS - all parsed values match expected\n")
-stopifnot("G2: all 23 values verified" = length(EXPECTED) == 23)
+cat("G2: PASS - all parsed values match expected (string identity)\n")
+stopifnot("G2: all 30 values verified" = length(EXPECTED) == 30)
 
 # =============================================================================
 # G3: No Prop*/Atwo* collision
@@ -286,7 +317,7 @@ cat("G4: PASS - all values round-trip correctly\n")
 # =============================================================================
 newcommand_lines <- grep("^\\\\newcommand", emitted_content, value = TRUE)
 n_macros <- length(newcommand_lines)
-stopifnot("Exactly 23 macros emitted" = n_macros == 23)
+stopifnot("Exactly 30 macros emitted" = n_macros == 30)
 
 cat("\n=== All gates passed ===\n")
 cat(sprintf("Emitted %d macros to %s\n", n_macros, OUTPUT_PATH))
