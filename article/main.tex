@@ -984,7 +984,7 @@ propositions do not settle that choice---they establish what is at stake in it.
 % interval form by Proposition 3's logic rather than by caution.
 
 The first and third of these are the admissible endpoints, and they bracket the
-standard deviation of true effects at $[0.74,\,1.48]$
+standard deviation of true effects at $[\LedgerSDTrueLo,\,\LedgerSDTrueHi]$
 % [SD_THETA_TRUE / INV-027]
 . We report the interval and no point inside it, and the reason is not caution
 but Proposition~\ref{prop:ident}. Part~(a) identifies the variance of persistent
@@ -1387,11 +1387,13 @@ Section~\ref{sec:results}'s successor.
 
 % ¶2 — Trade-weighted mean, with the endogeneity-of-weights sentence required by INV-034.
 Weighting pairs by the volume of trade they carry rather than counting them
-equally drives the average down to $\LedgerTWMean$ % [TW_MEAN]. The weights are
+% [TW_MEAN]
+equally drives the average down to $\LedgerTWMean$. The weights are
 pre-adoption trade, not contemporaneous or post-adoption trade, and the choice
 is not innocuous: post-treatment volume is itself a function of the effect
 being estimated, so weighting by it would let large estimated effects earn
-themselves large weights % [INV-034]. On pre-adoption weights, the
+% [INV-034]
+themselves large weights. On pre-adoption weights, the
 dollar-weighted average agreement effect is roughly a third of the
 pair-weighted one. That gap is not measurement error. It is the first
 appearance of a structural feature that organises the rest of this section:
@@ -1402,7 +1404,8 @@ concentrated are not the places where the effect is large.
 The dispersion of true effects is identified only up to an interval. Subtracting
 the noise-only null from the observed variance leaves a standard deviation of
 $1.475$; subtracting the hardened out-of-sample drift null leaves $0.740$; the
-identified set is $[0.74,\,1.48]$ % [SD\_THETA\_TRUE], and the two endpoints
+% [SD\_THETA\_TRUE]
+identified set is $[\LedgerSDTrueLo,\,\LedgerSDTrueHi]$, and the two endpoints
 differ in exactly one assumption --- whether the persistent, pair-specific
 component that the placebo machinery reproduces is counted as noise to be
 removed or as effect heterogeneity to be retained. The construction is derived
@@ -1414,11 +1417,13 @@ first moment of a distribution whose second moment dwarfs it.
 
 % ¶4 — The P(theta<=0) bracket, both assumptions in the sentence that reports it.
 The probability that a randomly chosen pair's true effect is non-positive lies
-in $[\LedgerPLo,\,\LedgerPHi]$ % [P\_THETA\_LEQ\_0], where the lower endpoint is the
+% [P\_THETA\_LEQ\_0]
+in $[\LedgerPLo,\,\LedgerPHi]$, where the lower endpoint is the
 normal-form probability evaluated at the hardened arm and the upper endpoint is
 capped at the empirical share of non-positive estimates rather than taken from
 the normal form, which at the noise-only arm returns a value exceeding that
-share % [P\_LO; P\_HI]. Both assumptions are load-bearing and neither is
+% [P\_LO; P\_HI]
+share. Both assumptions are load-bearing and neither is
 innocent: the first imposes a shape the data do not identify, the second
 substitutes an observed frequency for a modelled one. Separately, $42.11$
 percent of the pair-level estimates are themselves non-positive
@@ -1430,7 +1435,8 @@ What cannot be reported is the shape. At the signal share these data achieve
 --- roughly $0.37$ of the observed variance attributable to true effect
 variation --- the mixture deconvolution does not resolve: fitting three
 components returns duplicates sitting at the standard-deviation floor rather
-than distinct subpopulations % [INV-029]. This is a limit of the measurement,
+% [INV-029]
+than distinct subpopulations. This is a limit of the measurement,
 and it forecloses a family of claims that the literature makes casually. We
 cannot report the share of pairs that are winners, because that requires
 locating mass on one side of a threshold in a density we do not have. We cannot
@@ -1482,8 +1488,10 @@ Signal share & $0.37$ \\
 Sorting pairs into quintiles of pre-adoption trade volume produces the sharpest
 structural fact in the data. The profile is reported in
 Table~\ref{tab:gradient}. It runs from $\LedgerGradientQOne$ in the smallest quintile to
-$\LedgerGradientQFive$ in the largest % [GRADIENT\_Q1; GRADIENT\_Q5], a spread of $\LedgerGradient$
-with a standard error of $\LedgerGradientSE$ % [GRADIENT] --- eleven standard errors from
+% [GRADIENT\_Q1; GRADIENT\_Q5]
+$\LedgerGradientQFive$ in the largest, a spread of $\LedgerGradient$
+% [GRADIENT]
+with a standard error of $\LedgerGradientSE$ --- eleven standard errors from
 zero. Two features of its shape carry the argument. The decline is steep across
 the first three quintiles and then stops: the fourth and fifth quintiles differ
 by $-0.008$ against a standard error of $0.046$, which is to say they cannot be
@@ -1524,8 +1532,10 @@ The gradient is not manufactured by the correction. Computing the same
 quintile profile on the uncorrected pair-level estimates --- before the
 placebo-based bias correction is applied, reported alongside the corrected
 profile in Table~\ref{tab:gradient} --- returns a smallest-to-largest spread of
-$0.683$ with a standard error of $0.082$ % [GRADIENT\_B], which is
-$74.7$ percent of the corrected spread % [GRADIENT\_B\_SHARE]. Three quarters
+% [GRADIENT\_B]
+$0.683$ with a standard error of $0.082$, which is
+% [GRADIENT\_B\_SHARE]
+$74.7$ percent of the corrected spread. Three quarters
 of the gradient is present in the raw estimates. The correction sharpens it and
 shifts its level, as it shifts every level in this paper, but it does not
 create it. A reader who distrusts the correction machinery entirely still faces
@@ -1560,7 +1570,8 @@ Spread, 1 $-$ 5 & $0.914$ & $(0.081)$ & $0.683$ & $(0.082)$ & \\
 The puzzle set out in Section~\ref{sec:introduction} can now be answered. Four
 specifications of the same gravity equation, on the same data, estimating the
 same nominal parameter, return agreement effects of $\LedgerSpecB$, $\LedgerSpecC$, $\LedgerSpecCY$
-and $\LedgerSpecFull$ % [T1R\_spec\_spread]. The spread is a factor of fifteen. Each of
+% [T1R\_spec\_spread]
+and $\LedgerSpecFull$. The spread is a factor of fifteen. Each of
 the four is defensible by some standard in the literature, and the discipline
 has largely treated the range as a robustness exercise --- a band within which
 the truth presumably lies, to be narrowed by better controls.
@@ -1598,8 +1609,10 @@ carries no presumption about credibility.
 
 % ¶15 — Anchor in the paper's own numbers, with the honest limit on what is identified.
 The paper's own estimates trace the same pattern. The dollar-weighted mean is
-$\LedgerTWMean$ % [TW\_MEAN], close to the fourth specification's $\LedgerSpecFull$; the
-unweighted pair-level mean is $\LedgerMeanThetaD$ % [MEAN\_THETA\_D]; the country-year
+% [TW\_MEAN]
+$\LedgerTWMean$, close to the fourth specification's $\LedgerSpecFull$; the
+% [MEAN\_THETA\_D]
+unweighted pair-level mean is $\LedgerMeanThetaD$; the country-year
 specification returns $\LedgerSpecCY$. Moving from counting pairs to counting dollars
 moves the average by roughly the same distance as moving between the two
 defensible specifications. We state plainly what this does and does not
