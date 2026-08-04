@@ -477,7 +477,7 @@ check_cf_producer <- function(root, report = FALSE) {
     
     cf <- readLines(cf_path, warn = FALSE)
     table_lines <- cf[grepl("^\\|", cf)]
-    path_pattern <- "(code|data|output|meta)/[A-Za-z0-9_./]+"
+    path_pattern <- "(archive/[A-Za-z0-9_-]+/)?(code|data|output|meta)/[A-Za-z0-9_./]+"
     
     all_paths <- character()
     for (line in table_lines) {
