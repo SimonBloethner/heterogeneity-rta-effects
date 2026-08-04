@@ -240,7 +240,7 @@ if (treated_result$n_qualifying > 0) {
 }
 
 if (placebo_result$n_qualifying > 0) {
-  placebo_pairs_out <- placebo_data[, .(pair, theta_A = theta_A_full, n_post_cells)]
+  placebo_pairs_out <- placebo_data[, .(pair, theta_A = theta_A_full, n_post_cells, qualifies = TRUE)]
   write.csv(placebo_pairs_out, file.path(RTA_ROOT, "output/T22_theta_A_placebo.csv"), row.names = FALSE)
   cat(sprintf("Saved: output/T22_theta_A_placebo.csv (%d pairs)\n", nrow(placebo_pairs_out)))
 }

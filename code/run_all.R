@@ -55,8 +55,8 @@ cat(sprintf("Registry rows: %d\n", nrow(registry)))
 cat(sprintf("Columns: %s\n", paste(names(registry), collapse = ", ")))
 
 # Filter to BUILT code scripts only (excluding ANCHOR, ARCHIVED, etc.)
-scripts <- registry[kind == "code" & status == "BUILT" & grepl("^code/S[0-9]", file_path)]
-cat(sprintf("BUILT scripts matching code/S*: %d\n", nrow(scripts)))
+scripts <- registry[kind == "code" & status == "BUILT" & grepl("^code/[SN][0-9]", file_path)]
+cat(sprintf("BUILT scripts matching code/[SN]*: %d\n", nrow(scripts)))
 
 # =============================================================================
 # BUILD DEPENDENCY GRAPH
