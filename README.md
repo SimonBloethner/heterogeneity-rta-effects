@@ -118,14 +118,25 @@ naive mean -0.52) was a chimera with no R-chain provenance; see INV-010 in
 ## Verification
 
 Every committed artifact carries a sidecar in `meta/` recording its producer,
-inputs, seed, gates, and SHA256, and a row in `meta/FILE_REGISTRY.csv` with one
-of three statuses: `BUILT` (live and citable as a source), `ANCHOR` (live
-dependency, not citable), `ARCHIVED` (dead, moved under `archive/`). Registry
-coverage is not yet complete; see INV-039.
+inputs, seed, gates, and SHA256, and a row in `meta/FILE_REGISTRY.csv`. See
+**Registry statuses** below for status meanings. Run `enforce.R` to verify
+all constraints hold.
 
 ```bash
 Rscript code/enforce.R
 ```
+
+## Registry statuses
+
+| Status | Meaning |
+|--------|---------|
+| `BUILT` | Live artifact that must exist in the tree and is citable as a source. |
+| `ANCHOR` | Live dependency that must exist (or appear on `meta/EXISTENCE_ALLOWLIST.txt`) but is not citable. |
+| `ARCHIVED` | Dead artifact under `archive/`; must not be loaded by any BUILT script. |
+| `AUDIT` | Forensic artifact under `audit/` preserved for investigative record; not part of the main chain. |
+
+Historical: `QUARANTINE` (produced under a premise later found invalid) was
+retired under INV-029 and INV-046; all such rows were recoded to `ARCHIVED`.
 
 ## Contact
 

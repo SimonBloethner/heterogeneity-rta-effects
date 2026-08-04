@@ -1,5 +1,5 @@
 # MANIFEST.txt - Replication Package
-# Updated: 2026-07-30 (SYNC-11)
+# Updated: 2026-08-04 (SYNC-25)
 # Repository: heterogeneity-rta-effects
 
 ## Directory Structure
@@ -65,6 +65,7 @@ not significant. See canonical_facts.md, Gradient section, shape note.
 | INV-037 | CLOSED | T23/T22 nesting verified; per-pair files committed |
 | INV-038 | CLOSED | Check (d) never fired; SUPERSEDED carried two meanings |
 | INV-039 | CLOSED | archive/retired_pack/ enrolled (77 rows); check (d) additionally structural against archive/ |
+| INV-046 | CLOSED | Registry existence reconciliation; 26 absent rows resolved, check (i) added |
 
 ## Residuals
 
@@ -78,20 +79,19 @@ not significant. See canonical_facts.md, Gradient section, shape note.
   meta/SUPERSEDED.md for the INV-023 identifier collision and the split INV
   numbering across the two registers.
 
-## QUARANTINED (INV-029)
+## QUARANTINED (INV-029) — RETIRED
 
-L1-L5 scripts and T14-T18 outputs.
+L1-L5 scripts and T14-T18 outputs were quarantined under INV-029. Under INV-046,
+all QUARANTINE rows were recoded to ARCHIVED and files moved to archive/quarantine_inv029/.
 
 ## Verification
 
 Run: Rscript code/enforce.R  (from the repository root)
 Pass condition: ZERO violations. No expected-violation list -- see INV-038.
-Registry: meta/FILE_REGISTRY.csv, 363 rows. Statuses present: BUILT / ANCHOR /
-          ARCHIVED / AUDIT / QUARANTINE, plus one row still carrying the
-          pre-INV-038 status SUPERSEDED (code/S13b_matching_sensitivity.R);
-          check (d) tests ARCHIVED and QUARANTINE only, so that row's status is
-          unenforced. Coverage is complete: archive/retired_pack/ is enrolled (77 rows) and check (d) is additionally structural against any
-          path under archive/. INV-039 closed.
-          An earlier version of this line claimed every tracked file was
-          registered; that claim had not been verified and was false.
+Registry: meta/FILE_REGISTRY.csv, 381 rows. Statuses present: BUILT / ANCHOR /
+          ARCHIVED / AUDIT. QUARANTINE was retired under INV-046 (all rows
+          recoded to ARCHIVED). Check (d) tests ARCHIVED only; check (i) verifies
+          BUILT/ANCHOR files exist (or are allowlisted). Coverage is complete:
+          archive/ paths are enrolled and check (d) is additionally structural
+          against any path under archive/.
 Measured state: enforce.R reports zero violations at commit 4325590.

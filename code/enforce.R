@@ -499,6 +499,61 @@ check_cf_producer <- function(root, report = FALSE) {
 }
 
 # =============================================================================
+# CHECK (i): Registry existence - BUILT/ANCHOR files must exist or be allowlisted
+# =============================================================================
+check_registry_existence <- function(root, report = FALSE) {
+    results <- character()
+    registry_path <- file.path(root, "meta/FILE_REGISTRY.csv")
+    allowlist_path <- file.path(root, "meta/EXISTENCE_ALLOWLIST.txt")
+
+    if (!file.exists(registry_path)) {
+        msg <- "FILE_REGISTRY.csv not found"
+        if (report) report_violation("EXISTENCE", msg)
+        return(c(results, paste0("EXISTENCE|", msg)))
+    }
+
+    registry <- fread(registry_path)
+
+    # Read allowlist (skip comments and blank lines)
+    allowlist <- character()
+    if (file.exists(allowlist_path)) {
+        al_lines <- readLines(allowlist_path, warn = FALSE)
+        allowlist <- trimws(al_lines[!grepl("^#", al_lines) & al_lines != ""])
+    }
+
+    # Check BUILT and ANCHOR files (excluding archive/ paths)
+    live_rows <- registry[status %in% c("BUILT", "ANCHOR") & !grepl("^archive/", file_path)]
+
+    missing <- character()
+    for (i in seq_len(nrow(live_rows))) {
+        fp <- live_rows$file_path[i]
+
+        # Skip allowlisted files
+        if (fp %in% allowlist) next
+
+        full_path <- file.path(root, fp)
+        if (!file.exists(full_path)) {
+            missing <- c(missing, fp)
+        }
+    }
+
+    if (length(missing) > 0) {
+        for (mp in missing) {
+            msg <- sprintf("BUILT/ANCHOR file missing: %s", mp)
+            if (report) report_violation("EXISTENCE", msg)
+            results <- c(results, paste0("EXISTENCE|", msg))
+        }
+    }
+
+    if (report && length(missing) == 0) {
+        cat(sprintf("  Checked %d BUILT/ANCHOR paths, %d allowlisted: all present\n",
+                    nrow(live_rows), sum(live_rows$file_path %in% allowlist)))
+    }
+
+    results
+}
+
+# =============================================================================
 # DRIVER (exactly matches original output format)
 # =============================================================================
 run_all_checks <- function(root = getwd()) {
@@ -618,7 +673,24 @@ run_all_checks <- function(root = getwd()) {
     v_h <- check_cf_producer(root, report = TRUE)
     if (length(v_h) == 0 && file.exists(cf_path)) cat("  All producer paths resolve: PASS\n")
     cat("\n")
-    
+
+    # (i)
+    cat("=== CHECK (i): Registry existence ===\n")
+    registry_path <- file.path(root, "meta/FILE_REGISTRY.csv")
+    allowlist_path <- file.path(root, "meta/EXISTENCE_ALLOWLIST.txt")
+    if (file.exists(registry_path)) {
+        registry <- fread(registry_path)
+        live_rows <- registry[status %in% c("BUILT", "ANCHOR") & !grepl("^archive/", file_path)]
+        cat(sprintf("  BUILT/ANCHOR rows (non-archive): %d\n", nrow(live_rows)))
+        if (file.exists(allowlist_path)) {
+            al_lines <- readLines(allowlist_path, warn = FALSE)
+            allowlist <- trimws(al_lines[!grepl("^#", al_lines) & al_lines != ""])
+            cat(sprintf("  Allowlisted paths: %d\n", length(allowlist)))
+        }
+    }
+    check_registry_existence(root, report = TRUE)
+    cat("\n")
+
     # OUTPUT VALIDATION
     cat("=== OUTPUT VALIDATION ===\n")
     t19_file <- file.path(root, "output/T19_pleq0_bracket.csv")
@@ -648,3 +720,37 @@ run_all_checks <- function(root = getwd()) {
 }
 
 if (!interactive() && !exists("FIXTURE_MODE")) run_all_checks(getwd())
+
+# =============================================================================
+# FIXTURE: check_registry_existence known-pass and known-fail
+# Run with: FIXTURE_MODE <- TRUE; source("code/enforce.R")
+# =============================================================================
+if (exists("FIXTURE_MODE") && FIXTURE_MODE) {
+    cat("=== FIXTURE TEST: check_registry_existence ===\n")
+    root <- getwd()
+
+    # Known-pass: real registry should have no missing BUILT/ANCHOR files
+    cat("Known-pass (real registry):\n")
+    v_pass <- check_registry_existence(root, report = TRUE)
+    stopifnot(length(v_pass) == 0)
+    cat("  PASS: no violations\n\n")
+
+    # Known-fail: create temp registry with a fake BUILT row for a non-existent file
+    cat("Known-fail (injected missing file):\n")
+    tmp_dir <- tempdir()
+    tmp_meta <- file.path(tmp_dir, "meta")
+    dir.create(tmp_meta, showWarnings = FALSE)
+    registry <- fread(file.path(root, "meta/FILE_REGISTRY.csv"))
+    fake_row <- data.table(file_path = "code/FAKE_NONEXISTENT_SCRIPT.R", status = "BUILT")
+    registry_bad <- rbind(registry, fake_row, fill = TRUE)
+    fwrite(registry_bad, file.path(tmp_meta, "FILE_REGISTRY.csv"))
+    # Copy allowlist if exists
+    al_path <- file.path(root, "meta/EXISTENCE_ALLOWLIST.txt")
+    if (file.exists(al_path)) file.copy(al_path, file.path(tmp_meta, "EXISTENCE_ALLOWLIST.txt"))
+    v_fail <- check_registry_existence(tmp_dir, report = TRUE)
+    stopifnot(length(v_fail) > 0)
+    stopifnot(any(grepl("FAKE_NONEXISTENT_SCRIPT", v_fail)))
+    cat("  PASS: violation correctly fired\n\n")
+
+    cat("=== FIXTURE TEST COMPLETE ===\n")
+}

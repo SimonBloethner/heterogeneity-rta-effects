@@ -19,6 +19,7 @@ Amended: 2026-08-03 (SYNC-21: T42/T43 scale-invariance finding ledgered; quintil
 Amended: 2026-08-03 (SYNC-22: R9 body annotations added; 58 numeric literals annotated on 23 lines; R8 annotation splits fixed)
 Amended: 2026-08-04 (SYNC-23: R11 check (f) enforcement extended to body; in_remark removed; fixture pair added)
 Amended: 2026-08-04 (SYNC-24: R11 close-out; S47 parse fix; PDF rebuild; three sites synchronized to 4325590)
+Amended: 2026-08-04 (SYNC-25: R12 registry existence reconciliation; 26 absent rows resolved; check (i) added; INV-046 CLOSED)
 Status: NO OPEN INVESTIGATIONS. enforce.R reports zero violations at commit 4325590, measured on a clean tree at origin/main.
 
 ## Population
@@ -203,9 +204,11 @@ and no producer disagreement is to be inferred from the gap.
 | "27.25x GE range" | 27.25 | un-indexed by arm | INV-028 |
 | P_HI = 0.433 | 0.433 | normal form exceeds raw share | INV-029 |
 
-## QUARANTINED (INV-029)
+## QUARANTINED (INV-029) — RETIRED
 
-T14, T15, T16, T17, T18 outputs.
+L1-L5 scripts and T14-T18 outputs were quarantined under INV-029. Under INV-046,
+all QUARANTINE rows were recoded to ARCHIVED and files moved to
+archive/quarantine_inv029/. QUARANTINE is no longer an active status.
 
 ## AUDIT
 
@@ -857,6 +860,37 @@ Fixed: (1) `check_sha256()` extended to search `c("output", "data", "article", "
 and to handle `FILE:` fields that contain a path; (2) sidecar renamed back to
 `meta/gravity_functions.R.sidecar`; (3) real `stopifnot` gates added to both consumer
 scripts; (4) fixture pair `tests/fixtures/check_e_code_{pass,fail}.sidecar` added.
+
+Status: CLOSED.
+
+### INV-046: Registry existence reconciliation (CLOSED)
+FILE_REGISTRY.csv contained 26 rows pointing to files absent from the committed
+tree. Investigation found three categories:
+
+**Category 1 (DELETE ROW, 11 rows):** Files that never belonged in the registry.
+- S15_seed_*.R scripts (6 rows): temp scripts on /scratch for seed search
+- log_S15_*.txt logs (2 rows): associated output logs
+- data/S11_baseline_comparison.rds, data/S17_se_cf.rds, meta/S17_se_cf.rds.sidecar
+  (3 rows): never existed anywhere on Festus; likely planned but never built
+
+**Category 2 (ALLOWLIST, 1 row):** External dependency too large to commit.
+- data/ITPDE_total.rds (15.9 MB): lives on Festus at
+  /groups/m-larch/bt307958/tails/data/ITPDE_total.rds. Added to
+  meta/EXISTENCE_ALLOWLIST.txt.
+
+**Category 3 (RECODE→ARCHIVED, 14 rows):** QUARANTINE files (INV-029).
+- L1-L5 scripts and T14-T18 outputs: produced under superseded premise
+- Files copied from Festus to archive/quarantine_inv029/
+- Status recoded from QUARANTINE to ARCHIVED
+
+Registry row count: 391 → 381 (10 deleted; 1 allowlisted).
+
+Check (i) added to enforce.R: BUILT/ANCHOR files must exist or appear on the
+allowlist. Fixture pair discriminates: known-pass on real registry, known-fail
+on registry with injected fake BUILT row.
+
+Status vocabulary written to README.md: BUILT, ANCHOR, ARCHIVED, AUDIT. QUARANTINE
+documented as historical (retired under this investigation).
 
 Status: CLOSED.
 

@@ -1,0 +1,6 @@
+# EXISTENCE_ALLOWLIST.txt
+# Files listed here are ANCHOR dependencies that exist on Festus but are too
+# large (>10 MB) to commit. check_registry_existence() skips these paths.
+# Format: one path per line, relative to repo root.
+
+data/ITPDE_total.rds

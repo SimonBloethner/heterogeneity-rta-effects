@@ -1,0 +1,16 @@
+quantity,value
+decision,SCALE
+decision_reason,Clear scaling factor identified
+ratio_11plus_point,0.427156
+ratio_11plus_ci_lo,0.338815
+ratio_11plus_ci_hi,0.527527
+ratio_11plus_ci_width,0.188712
+ci_includes_1,FALSE
+ci_too_wide,FALSE
+arm_A_bins,"2-3,4-5,6-10,11+"
+arm_A_n,5548
+arm_A_var,0.495533
+arm_C_bins,"4-5,6-10,11+"
+arm_C_n,5211
+arm_C_var,0.305386
+arm_C_definition,Scaled 11+ (factor=0.4272)
