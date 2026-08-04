@@ -3,8 +3,7 @@
 # N3_deconv_arms.R - Deconvolution with Three Arms
 # =============================================================================
 # OUTPUTS: output/T12_N3_deconv.csv
-# INPUTS:  data/S5R_bhat.rds, data/S17_se_cf.rds, data/N1_oos_null.rds,
-#          data/N2_placebo.rds
+# INPUTS:  data/S5R_bhat.rds, data/N1_oos_null.rds, data/N2_placebo.rds
 # SEED:    20260719
 # B:       500 (pair-level bootstrap)
 # =============================================================================
@@ -32,16 +31,11 @@ say("================================================================")
 S5R <- readRDS("data/S5R_bhat.rds")
 baseline <- S5R$baseline
 
-# Check if S17_se_cf.rds exists
-if (file.exists("data/S17_se_cf.rds")) {
-    S17 <- readRDS("data/S17_se_cf.rds")
-    mean_se_total_sq <- S17$mean_se_total_sq
-    say("Loaded S17_se_cf.rds: mean(se_total^2) = %.6f", mean_se_total_sq)
-} else {
-    # Use values from T11
-    mean_se_total_sq <- 0.2612
-    say("Using hardcoded mean(se_total^2) = %.6f", mean_se_total_sq)
-}
+# Arm A noise variance: mean(se_total^2) from archive/retired_2026-07-29/output/T11_se_decomposition.csv
+# This constant was live under a silent fallback from script creation until INV-047 (2026-08-04).
+# The file S17_se_cf.rds never existed; the fallback always fired. See INV-047 in canonical_facts.md.
+mean_se_total_sq <- 0.2612  # ID: ARM_A_VAR_NULL (ledger: Arm A Var_null = 0.261)
+say("Arm A noise: mean(se_total^2) = %.6f (ledgered constant, INV-047)", mean_se_total_sq)
 
 N1 <- readRDS("data/N1_oos_null.rds")
 N2 <- readRDS("data/N2_placebo.rds")
@@ -218,7 +212,7 @@ writeLines(c(
     "FILE:      T12_N3_deconv.csv",
     sprintf("SHA256:    %s", get_sha256("output/T12_N3_deconv.csv")),
     sprintf("PRODUCER:  code/N3_deconv_arms.R (SHA256: %s)", code_sha),
-    "INPUTS:    data/S5R_bhat.rds, data/S17_se_cf.rds, data/N1_oos_null.rds, data/N2_placebo.rds",
+    "INPUTS:    data/S5R_bhat.rds, data/N1_oos_null.rds, data/N2_placebo.rds",
     sprintf("SEED:      %d", SEED),
     sprintf("B:         %d", B),
     "",

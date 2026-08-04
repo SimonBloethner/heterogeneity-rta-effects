@@ -1,5 +1,5 @@
 # MANIFEST.txt - Replication Package
-# Updated: 2026-08-04 (SYNC-25)
+# Updated: 2026-08-04 (SYNC-26)
 # Repository: heterogeneity-rta-effects
 
 ## Directory Structure
@@ -66,6 +66,7 @@ not significant. See canonical_facts.md, Gradient section, shape note.
 | INV-038 | CLOSED | Check (d) never fired; SUPERSEDED carried two meanings |
 | INV-039 | CLOSED | archive/retired_pack/ enrolled (77 rows); check (d) additionally structural against archive/ |
 | INV-046 | CLOSED | Registry existence reconciliation; 26 absent rows resolved, check (i) added |
+| INV-047 | CLOSED | S17 silent fallback; Arm A provenance corrected (N1 -> T11) |
 
 ## Residuals
 

@@ -20,6 +20,7 @@ Amended: 2026-08-03 (SYNC-22: R9 body annotations added; 58 numeric literals ann
 Amended: 2026-08-04 (SYNC-23: R11 check (f) enforcement extended to body; in_remark removed; fixture pair added)
 Amended: 2026-08-04 (SYNC-24: R11 close-out; S47 parse fix; PDF rebuild; three sites synchronized to 4325590)
 Amended: 2026-08-04 (SYNC-25: R12 registry existence reconciliation; 26 absent rows resolved; check (i) added; INV-046 CLOSED)
+Amended: 2026-08-04 (SYNC-26: R13 S17 silent fallback; INV-047 opened and CLOSED; Arm A provenance corrected)
 Status: NO OPEN INVESTIGATIONS. enforce.R reports zero violations at commit 4325590, measured on a clean tree at origin/main.
 
 ## Population
@@ -236,7 +237,7 @@ The true-effect SD is identified only up to an interval [0.74, 1.48], indexed by
 **Arm definitions:**
 | Arm | Name | Var_null | SD_true | Producer |
 |-----|------|----------|---------|----------|
-| A | Noise-only | 0.261 | 1.475 | code/N1_oos_null.R (horizon-matched) |
+| A | Noise-only | 0.261 | 1.475 | archive/retired_2026-07-29/output/T11_se_decomposition.csv (mean_se_total_sq row); see INV-047 |
 | B | Placebo | 0.680 | 1.326 | code/N2_placebo_benchmark.R (in-sample) |
 | C | OOS drift | 1.887 | 0.742 | code/S24_arms_canonical.R (N1b variances x symmetric weights) |
 
@@ -891,6 +892,42 @@ on registry with injected fake BUILT row.
 
 Status vocabulary written to README.md: BUILT, ANCHOR, ARCHIVED, AUDIT. QUARANTINE
 documented as historical (retired under this investigation).
+
+Status: CLOSED.
+
+### INV-047: S17 silent fallback and Arm A provenance (CLOSED)
+Scripts `code/N3_deconv_arms.R` and `code/N4_distribution.R` declared `data/S17_se_cf.rds`
+as an input and contained silent guards that fell back to hardcoded constants when the
+file was absent. The file never existed. The fallback always fired. Both scripts were
+created in this state and remained so until this investigation.
+
+**Timeline:**
+- Script creation: fallback live from day one
+- 2026-08-04 (SYNC-25/R13): discovered; fallback replaced with explicit ledgered constant
+
+**The constants:**
+- `mean_se_total_sq = 0.2612` (N3): from `archive/retired_2026-07-29/output/T11_se_decomposition.csv`
+- `mean_sd_cf_sq = 0.0894` (N4): from the same T11, row `mean_sd_cf_sq`
+
+**The provenance error:**
+The INV-027 arm table attributed Arm A's Var_null = 0.261 to `code/N1_oos_null.R
+(horizon-matched)`. This was wrong. N1$Var_null_matched = 1.539349, which is Arm C's
+noise contribution under the OOS-drift assumption. The 0.261 that N3 actually used came
+from the silent fallback reading T11. The ledger row has been corrected to cite T11.
+
+**What changed:**
+- N3/N4 now carry explicit ledgered constants with comments citing INV-047
+- S17_se_cf.rds removed from INPUTS headers of both scripts
+- INV-027 Arm A producer corrected: T11, not N1
+
+**What did not change:**
+- No numeric output changed. The fallback constants were correct; only their provenance
+  attribution was wrong.
+- SD_THETA_TRUE = [0.74, 1.48] stands. Arm A's endpoint depends on the T11 constant,
+  which is what it always used.
+
+Class: wrong-object attribution (not wrong-object value). The ledger said one thing
+produced the value while a different thing actually did.
 
 Status: CLOSED.
 

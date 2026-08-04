@@ -4,7 +4,7 @@
 # =============================================================================
 # OUTPUTS: output/T12_N4_distribution.csv, output/T12_N4_mixture.csv,
 #          output/T12_N4_gradient.csv
-# INPUTS:  data/S5R_bhat.rds, data/N3_deconv.rds, data/S17_se_cf.rds
+# INPUTS:  data/S5R_bhat.rds, data/N3_deconv.rds
 # EXPECTED_N: 4182
 # SEED:    20260719
 # =============================================================================
@@ -35,25 +35,12 @@ N3 <- readRDS("data/N3_deconv.rds")
 say("Baseline pairs: %d", nrow(baseline))
 say("Columns: %s", paste(names(baseline), collapse = ", "))
 
-# Add se_total if available
-if (file.exists("data/S17_se_cf.rds")) {
-    S17 <- readRDS("data/S17_se_cf.rds")
-    # S17 contains sd_cf per pair
-    if (!is.null(S17$sd_cf) && length(S17$sd_cf) == nrow(baseline)) {
-        baseline$sd_cf <- S17$sd_cf
-        baseline$se_total <- sqrt(baseline$se_B^2 + baseline$sd_cf^2)
-        say("Added se_total from S17")
-    } else {
-        # Use average
-        mean_sd_cf_sq <- S17$mean_sd_cf_sq
-        baseline$se_total <- sqrt(baseline$se_B^2 + mean_sd_cf_sq)
-        say("Added se_total using mean(sd_cf^2)")
-    }
-} else {
-    # Fallback
-    baseline$se_total <- sqrt(baseline$se_B^2 + 0.0894)
-    say("Added se_total using hardcoded mean(sd_cf^2) = 0.0894")
-}
+# Add se_total using mean(sd_cf^2) from archive/retired_2026-07-29/output/T11_se_decomposition.csv
+# This constant was live under a silent fallback from script creation until INV-047 (2026-08-04).
+# The file S17_se_cf.rds never existed; the fallback always fired. See INV-047 in canonical_facts.md.
+mean_sd_cf_sq <- 0.0894  # ID: MEAN_SD_CF_SQ (T11 row: mean_sd_cf_sq = 0.0894473839133736)
+baseline$se_total <- sqrt(baseline$se_B^2 + mean_sd_cf_sq)
+say("Added se_total using ledgered mean(sd_cf^2) = %.4f (INV-047)", mean_sd_cf_sq)
 
 # =============================================================================
 # QUANTILE SKEW
