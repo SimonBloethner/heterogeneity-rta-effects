@@ -1,12 +1,12 @@
 FILE:      S47_ge_gradient.rds
-SHA256:    67e3a716c29f2b80788011640cb9562212330355c111aa3364379fb0a1dad6df
-PRODUCER:  code/S47_ge_gradient.R (SHA256: c54c771b88597543e21a3f200a5726d4838410a9485c05d079d5879ad4dc72dd)
+SHA256:    80f8c16670b4256cb4c791780ccf6dd1f6b92f48215d7fd010a4a77e7a910102
+PRODUCER:  code/S47_ge_gradient.R (SHA256: cb91562b95eda838c69fc127ffe1190dd741ea7212c5010b42b1e5445f880043)
 INPUTS:    data/S5R_bhat.rds, code/vendor/gravity_functions.R, ITPDE_total.rds, meta/canonical_facts.md
 SEED:      20260803
 N_DRAWS:   500
 SIGMA:     5
-DYAD_Q1:   LUX_ATG (quintile 1, pre_trade=0.4635, mean_theta=0.0760)
-DYAD_Q5:   NLD_CRI (quintile 5, pre_trade=1946.6291, mean_theta=0.0277)
+DYAD_Q1:   LUX_ATG (quintile 1, pre_trade=0.4635, mean_theta=0.8554)
+DYAD_Q5:   NLD_CRI (quintile 5, pre_trade=1946.6291, mean_theta=-0.0583)
 ARMS:      lo(SD=0.74), hi(SD=1.48)
 SCENARIO:  Conditional GE (Y, E held at data values)
 GATE:      G1_plumbing [PASS]
@@ -23,4 +23,4 @@ NOTE:      cost_eq is built from PPML coefficients, already in tau^(1-sigma) uni
            Multiplying by exp(theta) adds a log TRADE effect to log trade-equivalent
            resistance, which is dimensionally correct.
 R_VERSION: 4.4.1
-CREATED:   2026-08-03 18:33:22
+CREATED:   2026-08-04 08:05:53

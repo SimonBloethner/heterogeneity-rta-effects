@@ -16,8 +16,9 @@ Amended: 2026-08-03 (SYNC-18: check (e) extended to article/; INV-044 opened and
 Amended: 2026-08-03 (SYNC-19: Round 2 completion; R1-R5 tasks; enforce zero at 8012510)
 Amended: 2026-08-03 (SYNC-20: R6 check (e) extended to code/; solver sidecar restored; INV-045 CLOSED)
 Amended: 2026-08-03 (SYNC-21: T42/T43 scale-invariance finding ledgered; quintile-conditional GE propagation)
-Amended: 2026-08-03 (SYNC-22: R9 check (f) extended to body; 58 violations measured (23 lines), all resolved; R8 annotation splits fixed)
-Status: NO OPEN INVESTIGATIONS. enforce.R reports zero violations at commit 2745576, measured on a clean tree at origin/main.
+Amended: 2026-08-03 (SYNC-22: R9 body annotations added; 58 numeric literals annotated on 23 lines; R8 annotation splits fixed)
+Amended: 2026-08-04 (SYNC-23: R11 check (f) enforcement extended to body; in_remark removed; fixture pair added)
+Status: NO OPEN INVESTIGATIONS. enforce.R reports zero violations at commit PENDING, measured on a clean tree at origin/main.
 
 ## Population
 
@@ -57,28 +58,27 @@ Note: TW_MEAN uses pre_trade weights (INV-034). total_trade weights yield 0.304;
 
 Transmission is flat across the size distribution; the outcome gradient is a theta gradient.
 
-T42 shows that for a given SD_true, RANGE_1090 is invariant across dyad size quintiles: the
-median dyad in Q1 (smallest pre-trade) and the median dyad in Q5 (largest pre-trade) have
-nearly identical RANGE_1090 values (6.34 vs 6.30 at SD_true=0.74; 39.8 vs 39.1 at SD_true=1.48).
-What differs is the q50 (median trade change): Q1's is higher than Q5's because Q1 pairs have
-a higher mean theta_D (0.0760) than Q5 pairs (-0.0583 -> ledgered as 0.0277 absolute value but
-note the sign).
+T42 establishes that transmission (RANGE_1090) is flat: for a given SD_true, RANGE_1090 is
+nearly identical across dyad size quintiles (6.28 vs 6.31 at SD_true=0.74; 38.79 vs 39.22 at
+SD_true=1.48). T42 draws both dyads from the same N(MEAN_THETA_D, SD_true), so q50 is also
+nearly identical. The transmission being flat is the T42 result.
 
-T43 propagates this finding through the conditional GE solver with quintile-conditional draws:
-each dyad draws from N(GRADIENT_Qi, SD_true) rather than N(MEAN_THETA_D, SD_true). Gate G5
-confirms that the q50 difference (Q1 - Q5) is at least 0.05, consistent with the theta gradient
-propagating through the outcome while the transmission remains flat.
+T43 establishes that the outcome gradient is a theta gradient. Each dyad draws from its
+quintile-specific mean: Q1 from N(0.8554, SD_true), Q5 from N(-0.0583, SD_true). The
+difference in q50 (1.44 at SD_true=0.74, 1.48 at SD_true=1.48) reflects the difference in
+input means (0.8554 - (-0.0583) = 0.9137). Gate G5 confirms the q50 difference is at least
+0.05, ruling out Monte Carlo noise as the source.
 
 | ID | Quantity | Value | Producer |
 |----|----------|-------|----------|
-| SCALE_INV_RANGE_Q1_LO | RANGE_1090, Q1 median dyad, SD_true=0.74 | 6.337 | code/S47_ge_gradient.R -> output/T43_ge_gradient.csv |
-| SCALE_INV_RANGE_Q5_LO | RANGE_1090, Q5 median dyad, SD_true=0.74 | 6.298 | code/S47_ge_gradient.R -> output/T43_ge_gradient.csv |
-| SCALE_INV_RANGE_Q1_HI | RANGE_1090, Q1 median dyad, SD_true=1.48 | 39.827 | code/S47_ge_gradient.R -> output/T43_ge_gradient.csv |
-| SCALE_INV_RANGE_Q5_HI | RANGE_1090, Q5 median dyad, SD_true=1.48 | 39.082 | code/S47_ge_gradient.R -> output/T43_ge_gradient.csv |
-| SCALE_INV_Q50_Q1_LO | q50 (median trade change), Q1, SD_true=0.74 | 0.1083 | code/S47_ge_gradient.R -> output/T43_ge_gradient.csv |
-| SCALE_INV_Q50_Q5_LO | q50 (median trade change), Q5, SD_true=0.74 | 0.0560 | code/S47_ge_gradient.R -> output/T43_ge_gradient.csv |
-| SCALE_INV_Q50_DIFF_LO | Q1-Q5 q50 difference, SD_true=0.74 | 0.0523 | code/S47_ge_gradient.R (Gate G5) |
-| SCALE_INV_Q50_DIFF_HI | Q1-Q5 q50 difference, SD_true=1.48 | 0.0538 | code/S47_ge_gradient.R (Gate G5) |
+| SCALE_INV_RANGE_Q1_LO | RANGE_1090, Q1 median dyad, SD_true=0.74 | 6.282 | code/S47_ge_gradient.R -> output/T43_ge_gradient.csv |
+| SCALE_INV_RANGE_Q5_LO | RANGE_1090, Q5 median dyad, SD_true=0.74 | 6.305 | code/S47_ge_gradient.R -> output/T43_ge_gradient.csv |
+| SCALE_INV_RANGE_Q1_HI | RANGE_1090, Q1 median dyad, SD_true=1.48 | 38.789 | code/S47_ge_gradient.R -> output/T43_ge_gradient.csv |
+| SCALE_INV_RANGE_Q5_HI | RANGE_1090, Q5 median dyad, SD_true=1.48 | 39.215 | code/S47_ge_gradient.R -> output/T43_ge_gradient.csv |
+| SCALE_INV_Q50_Q1_LO | q50 (median trade change), Q1, SD_true=0.74 | 1.4067 | code/S47_ge_gradient.R -> output/T43_ge_gradient.csv |
+| SCALE_INV_Q50_Q5_LO | q50 (median trade change), Q5, SD_true=0.74 | -0.0305 | code/S47_ge_gradient.R -> output/T43_ge_gradient.csv |
+| SCALE_INV_Q50_DIFF_LO | Q1-Q5 q50 difference, SD_true=0.74 | 1.4372 | code/S47_ge_gradient.R (Gate G5) |
+| SCALE_INV_Q50_DIFF_HI | Q1-Q5 q50 difference, SD_true=1.48 | 1.4765 | code/S47_ge_gradient.R (Gate G5) |
 
 Note (binding on prose): the scale-invariance finding is conditional on the assumption that
 within-quintile SD_true equals the population SD_true. This is stated explicitly in the T43
@@ -86,8 +86,9 @@ sidecar. If within-quintile dispersion differs from the population, the transmis
 not be exactly flat; the finding establishes that the gradient observed in outcomes is
 primarily a gradient in means, not a gradient in transmissions.
 
-Note (dyads): Q1 median dyad is LUX_ATG (pre_trade=0.46); Q5 median dyad is NLD_CRI
-(pre_trade=1946.63). These reproduce T42's dyad selection (gate assertion in S47).
+Note (dyads): Q1 median dyad is LUX_ATG (pre_trade=0.46, mean_theta=0.8554); Q5 median dyad
+is NLD_CRI (pre_trade=1946.63, mean_theta=-0.0583). These reproduce T42's dyad selection
+(gate assertion in S47).
 
 ## Gradient
 
@@ -985,9 +986,10 @@ that every ID is found, that each emitted value round-trips against the ledger,
 and that exactly seven macros are defined.
 
 Four serve Remark 4 in the propositions appendix, where check (f) forbids typed
-literals. Three serve Section 6, which is body text. Check (f) was extended to
-body text (lines 100-2200) in R9 (SYNC-22); 58 violations on 23 lines were measured
-and resolved by adding fact-comments within ±1 line of each numeric literal.
+literals. Three serve Section 6, which is body text. R9 (SYNC-22) added annotations
+to 58 numeric literals on 23 body lines. R11 (SYNC-23) extended check (f) enforcement
+to the body by removing the in_remark restriction; body literals now require
+fact-comments within ±1 line, enforced by check_appendix_literal().
 
 Any change to one of those seven ledger rows must be followed by re-running the
 generator. The article will otherwise carry a stale value that no check reports.

@@ -34,18 +34,26 @@ SD_TRUE_LO <- 0.74
 SD_TRUE_HI <- 1.48
 
 # Quintile-specific means from canonical_facts.md [GRADIENT_Q1, GRADIENT_Q5]
-# Parse from canonical_facts.md to avoid hardcoding
+# Parse from canonical_facts.md using positional split (matches S45_ledger_constants.R)
 parse_ledger_value <- function(id) {
     facts <- readLines("meta/canonical_facts.md")
-    pattern <- sprintf("\\| %s \\|.*\\| ([0-9.-]+) \\|", id)
-    matches <- grep(pattern, facts, value = TRUE)
-    if (length(matches) == 0) stop(sprintf("ID %s not found in canonical_facts.md", id))
-    val <- as.numeric(gsub(sprintf(".*\\| %s \\|.*\\| ([0-9.-]+) \\|.*", id), "\\1", matches[1]))
-    return(val)
+    row   <- grep(sprintf("^\\|\\s*%s\\s*\\|", id), facts, value = TRUE)
+    stopifnot("ID must match exactly one ledger row" = length(row) == 1L)
+    parts <- trimws(strsplit(row[1], "\\|")[[1]])
+    val   <- suppressWarnings(as.numeric(parts[4]))
+    stopifnot("Value column must parse to a number" = !is.na(val))
+    val
 }
 
 GRADIENT_Q1 <- parse_ledger_value("GRADIENT_Q1")
 GRADIENT_Q5 <- parse_ledger_value("GRADIENT_Q5")
+
+# Gates: verify parsed values match expected (would have caught greedy-regex bug)
+stopifnot(
+    "GRADIENT_Q1 must parse to 0.8554"  = abs(GRADIENT_Q1 - 0.8554)  < 1e-9,
+    "GRADIENT_Q5 must parse to -0.0583" = abs(GRADIENT_Q5 - (-0.0583)) < 1e-9,
+    "Q5 mean must be negative"          = GRADIENT_Q5 < 0
+)
 
 # Draw SD tolerance for Gate E
 DRAW_SD_TOL <- 0.05
