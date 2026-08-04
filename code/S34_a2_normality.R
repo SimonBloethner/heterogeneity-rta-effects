@@ -14,9 +14,9 @@ cat("========================================================================\n\
 set.seed(20260731)
 START_TIME <- Sys.time()
 
-if (!grepl("Simon", getwd())) {
-    .libPaths(c("/groups/m-larch/bt307958/Rlibs", .libPaths()))
-}
+RTA_ROOT <- Sys.getenv("RTA_ROOT", unset = ".")
+stopifnot("RTA_ROOT must contain meta/FILE_REGISTRY.csv" =
+              file.exists(file.path(RTA_ROOT, "meta/FILE_REGISTRY.csv")))
 
 library(data.table)
 
@@ -27,7 +27,7 @@ library(data.table)
 cat("Loading data...\n")
 
 # Use the authoritative S1R_ppml.rds from the enforce chain
-INPUT_PATH <- "/scratch/bt307958/ENFORCE_ROOT/data/S1R_ppml.rds"
+INPUT_PATH <- file.path(RTA_ROOT, "data/S1R_ppml.rds")
 INPUT_SHA <- "45c937cd78805d7b13b4c43f4bc4888e93a2ff15e787ad4fb41d77b51f837d89"
 
 get_sha256 <- function(p) {
@@ -456,7 +456,7 @@ for (i in 1:nrow(ctrl_quant_year)) {
 }
 
 t38 <- rbindlist(t38_rows)
-write.csv(t38, "output/T38_a2_normality.csv", row.names = FALSE)
+write.csv(t38, file.path(RTA_ROOT, "output/T38_a2_normality.csv"), row.names = FALSE)
 cat(sprintf("  Wrote output/T38_a2_normality.csv (%d rows)\n", nrow(t38)))
 
 # =============================================================================
@@ -486,7 +486,7 @@ t39_summary[, r_squared := c(summary(real_fit)$r.squared, summary(ctrl_fit)$r.sq
 t39_pairs[, `:=`(intercept_se = NA_real_, slope_se = NA_real_, r_squared = NA_real_)]
 
 t39 <- rbind(t39_pairs, t39_summary)
-write.csv(t39, "output/T39_a2_jensen_identity.csv", row.names = FALSE)
+write.csv(t39, file.path(RTA_ROOT, "output/T39_a2_jensen_identity.csv"), row.names = FALSE)
 cat(sprintf("  Wrote output/T39_a2_jensen_identity.csv (%d rows)\n", nrow(t39)))
 
 # =============================================================================
@@ -507,7 +507,7 @@ if (length(real_z_sorted) != length(ctrl_z_sorted)) {
 }
 
 # PDF
-pdf("output/F5_a2_normality_qq.pdf", width = 8, height = 8)
+pdf(file.path(RTA_ROOT, "output/F5_a2_normality_qq.pdf"), width = 8, height = 8)
 par(mfrow = c(1, 1))
 
 # Main plot
@@ -531,7 +531,7 @@ abline(0, 1, col = "red", lwd = 1)
 dev.off()
 
 # PNG (use cairo for headless server)
-png("output/F5_a2_normality_qq.png", width = 800, height = 800, type = "cairo")
+png(file.path(RTA_ROOT, "output/F5_a2_normality_qq.png"), width = 800, height = 800, type = "cairo")
 par(mfrow = c(1, 1))
 
 plot(ctrl_z_sorted, real_z_sorted,

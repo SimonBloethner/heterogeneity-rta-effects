@@ -10,16 +10,16 @@
 #          H3: Bin verification
 # =============================================================================
 
-.libPaths(c("/groups/m-larch/bt307958/Rlibs", .libPaths()))
-suppressPackageStartupMessages(library(dplyr))
+RTA_ROOT <- Sys.getenv("RTA_ROOT", unset = ".")
+stopifnot("RTA_ROOT must contain meta/FILE_REGISTRY.csv" =
+              file.exists(file.path(RTA_ROOT, "meta/FILE_REGISTRY.csv")))
 
-REBUILD_DIR <- "/scratch/bt307958/REBUILD_V2"
-setwd(REBUILD_DIR)
+suppressPackageStartupMessages(library(dplyr))
 
 SEED <- 20260719
 set.seed(SEED)
 
-get_sha256 <- function(p) strsplit(system2("sha256sum", args = shQuote(p), stdout = TRUE), " ")[[1]][1]
+get_sha256 <- function(p) strsplit(system2("sha256sum", args = shQuote(file.path(RTA_ROOT, p)), stdout = TRUE), " ")[[1]][1]
 say <- function(...) cat(sprintf(...), "\n", sep = "")
 
 say("================================================================")
@@ -28,10 +28,10 @@ say("Start: %s", format(Sys.time()))
 say("================================================================")
 
 # Load data
-S1R <- readRDS("data/S1R_ppml.rds")
-S5R <- readRDS("data/S5R_bhat.rds")
+S1R <- readRDS(file.path(RTA_ROOT, "data/S1R_ppml.rds"))
+S5R <- readRDS(file.path(RTA_ROOT, "data/S5R_bhat.rds"))
 baseline <- S5R$baseline
-S18 <- readRDS("data/S18_null_stack.rds")
+S18 <- readRDS(file.path(RTA_ROOT, "data/S18_null_stack.rds"))
 
 pseudo <- S18$pseudo_results
 
@@ -154,7 +154,7 @@ results <- bind_rows(
         select(item, value = ratio_pre_post)
 )
 
-write.csv(results, "output/V3_horizon_cohort.csv", row.names = FALSE)
+write.csv(results, file.path(RTA_ROOT, "output/V3_horizon_cohort.csv"), row.names = FALSE)
 
 # Sidecar
 code_sha <- get_sha256("code/validation/V3_horizon_cohort.R")
@@ -177,7 +177,7 @@ writeLines(c(
     "",
     "INV-025: Horizon-cohort disjunction documented",
     sprintf("CREATED:   %s", format(Sys.time()))
-), "meta/V3_horizon_cohort.csv.sidecar")
+), file.path(RTA_ROOT, "meta/V3_horizon_cohort.csv.sidecar"))
 
 say("")
 say("Wrote output/V3_horizon_cohort.csv")

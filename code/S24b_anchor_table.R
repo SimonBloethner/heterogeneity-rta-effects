@@ -21,8 +21,11 @@
 #   B: theta_B = log(sum(trade_post) / sum(y_hat_0_post))
 #   D: theta_D = theta_B - b_hat (bias-corrected)
 
+RTA_ROOT <- Sys.getenv("RTA_ROOT", unset = ".")
+stopifnot("RTA_ROOT must contain meta/FILE_REGISTRY.csv" =
+              file.exists(file.path(RTA_ROOT, "meta/FILE_REGISTRY.csv")))
+
 suppressPackageStartupMessages(library(data.table))
-setwd("/scratch/bt307958/REBUILD_V2")
 
 EXPECTED_N_TREATED <- 4182
 EXPECTED_N_PLACEBO <- 17200
@@ -31,7 +34,7 @@ EXPECTED_N_PLACEBO <- 17200
 # Load data
 # -----------------------------------------------------------------------------
 cat("=== LOADING DATA ===\n")
-S5R <- readRDS("data/S5R_bhat.rds")
+S5R <- readRDS(file.path(RTA_ROOT, "data/S5R_bhat.rds"))
 
 base <- as.data.table(S5R[["baseline"]])
 stopifnot(nrow(base) == EXPECTED_N_TREATED)
@@ -42,8 +45,8 @@ stopifnot(nrow(plac) == EXPECTED_N_PLACEBO)
 cat(sprintf("G2 Placebo n = %d: PASS\n", nrow(plac)))
 
 # Load T22 per-pair theta_A files (produced by S24_reliability.R)
-theta_A_treated <- fread("output/T22_theta_A_treated.csv")
-theta_A_placebo <- fread("output/T22_theta_A_placebo.csv")
+theta_A_treated <- fread(file.path(RTA_ROOT, "output/T22_theta_A_treated.csv"))
+theta_A_placebo <- fread(file.path(RTA_ROOT, "output/T22_theta_A_placebo.csv"))
 cat(sprintf("T22 theta_A: treated n=%d, placebo n=%d\n",
             nrow(theta_A_treated), nrow(theta_A_placebo)))
 
@@ -132,11 +135,11 @@ anchor <- data.frame(
 cat("\nAnchor Table (D2):\n")
 print(anchor)
 
-write.csv(anchor, "output/T23_anchor.csv", row.names = FALSE)
+write.csv(anchor, file.path(RTA_ROOT, "output/T23_anchor.csv"), row.names = FALSE)
 cat("\nSaved: output/T23_anchor.csv\n")
 
 # Sidecar
-sha <- system("sha256sum output/T23_anchor.csv | cut -d' ' -f1", intern = TRUE)
+sha <- system(sprintf("sha256sum %s | cut -d' ' -f1", file.path(RTA_ROOT, "output/T23_anchor.csv")), intern = TRUE)
 writeLines(c(
   "PRODUCER: S24b_anchor_table.R v2",
   "INPUTS: data/S5R_bhat.rds, output/T22_theta_A_treated.csv, output/T22_theta_A_placebo.csv",
@@ -167,7 +170,7 @@ writeLines(c(
   "  Supersedes INV-033 partial (pseudo-population now resolved for placebo).",
   "",
   sprintf("SHA256: %s", sha)
-), "meta/T23_anchor.csv.sidecar")
+), file.path(RTA_ROOT, "meta/T23_anchor.csv.sidecar"))
 cat("Saved: meta/T23_anchor.csv.sidecar\n")
 
 cat("\n=== SUMMARY ===\n")

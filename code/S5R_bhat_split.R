@@ -6,12 +6,11 @@
 # EXPECTED_N: NA (computes b_hat from S3R_theta.rds placebo pairs)
 # =============================================================================
 
-.libPaths(c("/groups/m-larch/bt307958/Rlibs", .libPaths()))
+RTA_ROOT <- Sys.getenv("RTA_ROOT", unset = ".")
+stopifnot("RTA_ROOT must contain meta/FILE_REGISTRY.csv" =
+              file.exists(file.path(RTA_ROOT, "meta/FILE_REGISTRY.csv")))
 
 suppressPackageStartupMessages(library(dplyr))
-
-REBUILD_DIR <- "/scratch/bt307958/REBUILD_V2"
-setwd(REBUILD_DIR)
 
 SEED      <- 20260719
 ANTICIP   <- 1
@@ -28,9 +27,9 @@ say("S5R: b_hat WITH HELD-OUT PLACEBO VALIDATION")
 say("Start: %s", format(Sys.time()))
 say("================================================================")
 
-d     <- readRDS("data/S1R_ppml.rds")
-theta <- readRDS("data/S3R_theta.rds")
-popn  <- readRDS("data/S6R_population.rds")
+d     <- readRDS(file.path(RTA_ROOT, "data/S1R_ppml.rds"))
+theta <- readRDS(file.path(RTA_ROOT, "data/S3R_theta.rds"))
+popn  <- readRDS(file.path(RTA_ROOT, "data/S6R_population.rds"))
 
 # Size deciles on total trade
 pair_trade <- d %>%
@@ -147,7 +146,7 @@ write.csv(rbind(
     data.frame(size_decile = NA_integer_, n_val = nrow(val),
                mean_corrected = holdout_mean,
                se = sd(val$corrected) / sqrt(nrow(val))),
-    as.data.frame(by_dec)), "output/T9_placebo_holdout.csv", row.names = FALSE)
+    as.data.frame(by_dec)), file.path(RTA_ROOT, "output/T9_placebo_holdout.csv"), row.names = FALSE)
 
 # Gates
 stopifnot(abs(holdout_mean) < GATE_ALL)
@@ -195,13 +194,13 @@ say("BASELINE n=%d   mean theta_D %.6f   sd %.6f",
     nrow(base), mean(base$theta_D, na.rm = TRUE), sd(base$theta_D, na.rm = TRUE))
 
 saveRDS(list(bhat = bhat, placebo = pl_theta, holdout = by_dec,
-             theta = th, baseline = base), "data/S5R_bhat.rds")
-osha <- get_sha256("data/S5R_bhat.rds")
+             theta = th, baseline = base), file.path(RTA_ROOT, "data/S5R_bhat.rds"))
+osha <- get_sha256(file.path(RTA_ROOT, "data/S5R_bhat.rds"))
 
 writeLines(c(
     "FILE:      S5R_bhat.rds",
     sprintf("SHA256:    %s", osha),
-    sprintf("PRODUCER:  code/S5R_bhat_split.R (SHA256: %s)", get_sha256("code/S5R_bhat_split.R")),
+    sprintf("PRODUCER:  code/S5R_bhat_split.R (SHA256: %s)", get_sha256(file.path(RTA_ROOT, "code/S5R_bhat_split.R"))),
     "INPUTS:    data/S1R_ppml.rds, data/S3R_theta.rds, data/S6R_population.rds",
     sprintf("SEED:      %d", SEED),
     "MATCHING CELL: size_decile  (SELECTED)",
@@ -216,7 +215,7 @@ writeLines(c(
     sprintf("BASELINE_MEAN_THETA_D:    %.6f", mean(base$theta_D, na.rm = TRUE)),
     sprintf("R_VERSION: %s", paste(R.version$major, R.version$minor, sep = ".")),
     sprintf("CREATED:   %s", format(Sys.time()))
-), "meta/S5R_bhat.rds.sidecar")
+), file.path(RTA_ROOT, "meta/S5R_bhat.rds.sidecar"))
 
 say("Wrote data/S5R_bhat.rds and output/T9_placebo_holdout.csv")
 say("Done: %s", format(Sys.time()))

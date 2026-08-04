@@ -8,11 +8,11 @@
 # =============================================================================
 # EXPECTED_N: 4182
 
-.libPaths(c("/groups/m-larch/bt307958/Rlibs", .libPaths()))
-suppressPackageStartupMessages(library(dplyr))
+RTA_ROOT <- Sys.getenv("RTA_ROOT", unset = ".")
+stopifnot("RTA_ROOT must contain meta/FILE_REGISTRY.csv" =
+              file.exists(file.path(RTA_ROOT, "meta/FILE_REGISTRY.csv")))
 
-REBUILD_DIR <- "/scratch/bt307958/REBUILD_V2"
-setwd(REBUILD_DIR)
+suppressPackageStartupMessages(library(dplyr))
 
 get_sha256 <- function(p) strsplit(system2("sha256sum", args = shQuote(p), stdout = TRUE), " ")[[1]][1]
 say <- function(...) cat(sprintf(...), "\n", sep = "")
@@ -23,7 +23,7 @@ say("Start: %s", format(Sys.time()))
 say("================================================================")
 
 write_exhibit <- function(df, filename, description) {
-  path <- file.path("output", filename)
+  path <- file.path(RTA_ROOT, "output", filename)
   write.csv(df, path, row.names = FALSE)
   sha <- get_sha256(path)
   say("  %s: %s", filename, sha)
@@ -31,11 +31,11 @@ write_exhibit <- function(df, filename, description) {
   sidecar <- c(
     sprintf("FILE:      %s", filename),
     sprintf("SHA256:    %s", sha),
-    sprintf("PRODUCER:  code/S10R_exhibits.R (SHA256: %s)", get_sha256("code/S10R_exhibits.R")),
+    sprintf("PRODUCER:  code/S10R_exhibits.R (SHA256: %s)", get_sha256(file.path(RTA_ROOT, "code/S10R_exhibits.R"))),
     sprintf("DESCRIPTION: %s", description),
     sprintf("CREATED:   %s", format(Sys.time()))
   )
-  writeLines(sidecar, file.path("meta", paste0(filename, ".sidecar")))
+  writeLines(sidecar, file.path(RTA_ROOT, "meta", paste0(filename, ".sidecar")))
 }
 
 # =============================================================================
@@ -44,7 +44,7 @@ write_exhibit <- function(df, filename, description) {
 say("")
 say("=== T1R: Specification Spread ===")
 
-S9R <- readRDS("data/S9R_spec.rds")
+S9R <- readRDS(file.path(RTA_ROOT, "data/S9R_spec.rds"))
 T1R <- S9R$results[, c("spec", "published", "estimate", "se")]
 names(T1R) <- c("Specification", "Published", "REBUILD", "SE")
 T1R$Difference <- T1R$REBUILD - T1R$Published
@@ -57,7 +57,7 @@ write_exhibit(T1R, "T1R_spec_spread.csv", "Four-specification RTA coefficient co
 say("")
 say("=== T2R: Variance Decomposition ===")
 
-S7R <- readRDS("data/S7R_deconv.rds")
+S7R <- readRDS(file.path(RTA_ROOT, "data/S7R_deconv.rds"))
 
 T2R <- data.frame(
   Population = "BASELINE",
@@ -89,7 +89,7 @@ write_exhibit(T3R, "T3R_size_gradient.csv", "Mean theta_D by pre-adoption trade 
 say("")
 say("=== T4R: GE Propagation ===")
 
-S8R <- readRDS("data/S8R_ge.rds")
+S8R <- readRDS(file.path(RTA_ROOT, "data/S8R_ge.rds"))
 
 T4R <- data.frame(
   Quantity = c("Dyad", "Sigma", "N_draws", "N_valid",
@@ -118,7 +118,7 @@ write_exhibit(T4R, "T4R_ge_propagation.csv", "GE trade cost change quantiles sig
 say("")
 say("=== T5R: Theta Summary ===")
 
-S5R <- readRDS("data/S5R_bhat.rds")
+S5R <- readRDS(file.path(RTA_ROOT, "data/S5R_bhat.rds"))
 base <- S5R$baseline
 stopifnot(nrow(base) == 4182)
 

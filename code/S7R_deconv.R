@@ -9,11 +9,11 @@
 # NOTE: Uses dplyr (no data.table) for Festus compatibility.
 # =============================================================================
 
-.libPaths(c("/groups/m-larch/bt307958/Rlibs", .libPaths()))
-suppressPackageStartupMessages(library(dplyr))
+RTA_ROOT <- Sys.getenv("RTA_ROOT", unset = ".")
+stopifnot("RTA_ROOT must contain meta/FILE_REGISTRY.csv" =
+              file.exists(file.path(RTA_ROOT, "meta/FILE_REGISTRY.csv")))
 
-REBUILD_DIR <- "/scratch/bt307958/REBUILD_V2"
-setwd(REBUILD_DIR)
+suppressPackageStartupMessages(library(dplyr))
 
 SEED <- 20260719
 N_BOOT <- 500
@@ -28,9 +28,9 @@ say("Start: %s", format(Sys.time()))
 say("================================================================")
 
 # Load inputs (S*R versions)
-S5R <- readRDS("data/S5R_bhat.rds")
-theta_raw <- readRDS("data/S3R_theta.rds")
-popn <- readRDS("data/S6R_population.rds")
+S5R <- readRDS(file.path(RTA_ROOT, "data/S5R_bhat.rds"))
+theta_raw <- readRDS(file.path(RTA_ROOT, "data/S3R_theta.rds"))
+popn <- readRDS(file.path(RTA_ROOT, "data/S6R_population.rds"))
 
 base <- S5R$baseline
 stopifnot(nrow(base) == 4182)
@@ -100,7 +100,7 @@ say("SE(mean_theta_D):  %.6f", se_mean_theta_D)
 say("")
 say("=== TRADE-WEIGHTED MEAN ===")
 
-d <- readRDS("data/S1R_ppml.rds")
+d <- readRDS(file.path(RTA_ROOT, "data/S1R_ppml.rds"))
 tw <- base %>%
     left_join(d %>% filter(in_model == TRUE) %>% group_by(pair) %>%
               summarise(w = sum(trade), .groups = "drop"), by = "pair")
@@ -198,13 +198,13 @@ output <- list(
     q1_q5_from_b_hat = spread_bh
 )
 
-saveRDS(output, "data/S7R_deconv.rds")
-osha <- get_sha256("data/S7R_deconv.rds")
+saveRDS(output, file.path(RTA_ROOT, "data/S7R_deconv.rds"))
+osha <- get_sha256(file.path(RTA_ROOT, "data/S7R_deconv.rds"))
 
 writeLines(c(
     "FILE:      S7R_deconv.rds",
     sprintf("SHA256:    %s", osha),
-    sprintf("PRODUCER:  code/S7R_deconv.R (SHA256: %s)", get_sha256("code/S7R_deconv.R")),
+    sprintf("PRODUCER:  code/S7R_deconv.R (SHA256: %s)", get_sha256(file.path(RTA_ROOT, "code/S7R_deconv.R"))),
     "INPUTS:    data/S5R_bhat.rds, data/S3R_theta.rds, data/S6R_population.rds, data/S1R_ppml.rds",
     sprintf("SEED:      %d", SEED),
     sprintf("N_BOOT:    %d", N_BOOT),
@@ -218,7 +218,7 @@ writeLines(c(
     sprintf("Q1_Q5_SPREAD:    %.6f (SE %.6f)", spread, spread_se),
     sprintf("R_VERSION: %s", paste(R.version$major, R.version$minor, sep = ".")),
     sprintf("CREATED:   %s", format(Sys.time()))
-), "meta/S7R_deconv.rds.sidecar")
+), file.path(RTA_ROOT, "meta/S7R_deconv.rds.sidecar"))
 
 say("")
 say("Wrote data/S7R_deconv.rds  SHA %s", osha)

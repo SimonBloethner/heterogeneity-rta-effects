@@ -2,15 +2,14 @@
 # X1: Corrected Fitted-H Lognormal Anchor - Four Gravity Specifications (v2)
 # ==============================================================================
 
+RTA_ROOT <- Sys.getenv("RTA_ROOT", unset = ".")
+stopifnot("RTA_ROOT must contain meta/FILE_REGISTRY.csv" =
+              file.exists(file.path(RTA_ROOT, "meta/FILE_REGISTRY.csv")))
+
 cat("========================================================================\n")
 cat("X1: CORRECTED FITTED-H LOGNORMAL ANCHOR (v2)\n")
 cat(sprintf("Start: %s\n", format(Sys.time(), "%Y-%m-%d %H:%M:%S")))
 cat("========================================================================\n\n")
-
-# Setup
-if (!grepl("Simon", getwd())) {
-    .libPaths(c("/groups/m-larch/bt307958/Rlibs", .libPaths()))
-}
 
 library(fixest)
 setFixest_nthreads(4)
@@ -22,7 +21,7 @@ setFixest_nthreads(4)
 cat("STEP 0: Loading data...\n")
 
 # Full panel for PPML estimation (includes zeros, has distance)
-df_full <- readRDS("/groups/m-larch/bt307958/tails/data/ITPDE_total.rds")
+df_full <- readRDS(file.path(RTA_ROOT, "data/ITPDE_total.rds"))
 df_full <- df_full[df_full$exporter != df_full$importer, ]
 cat(sprintf("  Full panel (excl. domestic): %d observations\n", nrow(df_full)))
 
@@ -409,10 +408,10 @@ cat(sprintf("%-25s %15s %15.4f\n", "SD", "N/A", sd(anchor_table$omega, na.rm=TRU
 saveRDS(list(
     anchor_table = anchor_table,
     results = results
-), "output/X1_results.rds")
+), file.path(RTA_ROOT, "output/X1_results.rds"))
 
-write.csv(anchor_table, "output/T30_tail_anchor.csv", row.names = FALSE)
-sha_anchor <- system("sha256sum output/T30_tail_anchor.csv | cut -d\" \" -f1", intern = TRUE)
+write.csv(anchor_table, file.path(RTA_ROOT, "output/T30_tail_anchor.csv"), row.names = FALSE)
+sha_anchor <- system(sprintf("sha256sum %s | cut -d\" \" -f1", file.path(RTA_ROOT, "output/T30_tail_anchor.csv")), intern = TRUE)
 
 cat("\n========================================================================\n")
 cat("LEDGER ENTRIES\n")

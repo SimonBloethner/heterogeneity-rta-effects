@@ -16,6 +16,10 @@
 #   B2: |disatt_slope_ctrlc + 0.5| < 0.10     (control recovers -0.5)
 #   B3: |predicted - observed| < 0.01         (slope prediction)
 
+RTA_ROOT <- Sys.getenv("RTA_ROOT", unset = ".")
+stopifnot("RTA_ROOT must contain meta/FILE_REGISTRY.csv" =
+              file.exists(file.path(RTA_ROOT, "meta/FILE_REGISTRY.csv")))
+
 library(data.table)
 
 cat("========================================\n")
@@ -26,8 +30,8 @@ cat("========================================\n\n")
 # 1. READ INPUTS
 # =============================================================================
 
-T39 <- fread("output/T39_a2_jensen_identity.csv")
-T40 <- fread("output/T40_jensen_control.csv")
+T39 <- fread(file.path(RTA_ROOT, "output/T39_a2_jensen_identity.csv"))
+T40 <- fread(file.path(RTA_ROOT, "output/T40_jensen_control.csv"))
 
 cat("T39 loaded:", nrow(T39), "rows\n")
 cat("T40 loaded:", nrow(T40), "rows\n\n")
@@ -182,7 +186,7 @@ out <- data.table(
   )
 )
 
-fwrite(out, "output/T41_drift_inflation.csv")
+fwrite(out, file.path(RTA_ROOT, "output/T41_drift_inflation.csv"))
 cat("\nWritten: output/T41_drift_inflation.csv\n")
 
 cat("\n========================================\n")

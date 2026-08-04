@@ -19,11 +19,11 @@ cat(sprintf("Start: %s\n", format(Sys.time())))
 cat(sprintf("Node: %s\n", Sys.info()[["nodename"]]))
 cat("=============================================================================\n\n")
 
-suppressPackageStartupMessages(library(data.table))
+RTA_ROOT <- Sys.getenv("RTA_ROOT", unset = ".")
+stopifnot("RTA_ROOT must contain meta/FILE_REGISTRY.csv" =
+              file.exists(file.path(RTA_ROOT, "meta/FILE_REGISTRY.csv")))
 
-# Paths
-REBUILD_DIR <- "/scratch/bt307958/REBUILD_V2"
-SCRATCH_DIR <- "/scratch/bt307958/V1C_PAIRLEVEL"
+suppressPackageStartupMessages(library(data.table))
 
 # SHA256 verification function
 get_sha256 <- function(p) {
@@ -35,10 +35,10 @@ get_sha256 <- function(p) {
 # =============================================================================
 cat("=== VERIFYING INPUT SHA256 ===\n")
 
-sha_S5R <- get_sha256(file.path(REBUILD_DIR, "data/S5R_bhat.rds"))
-sha_S1R <- get_sha256(file.path(REBUILD_DIR, "data/S1R_ppml.rds"))
-sha_T25 <- get_sha256(file.path(SCRATCH_DIR, "T25_prop_verification.csv"))
-sha_T22 <- get_sha256(file.path(SCRATCH_DIR, "T22_theta_A_placebo.csv"))
+sha_S5R <- get_sha256(file.path(RTA_ROOT, "data/S5R_bhat.rds"))
+sha_S1R <- get_sha256(file.path(RTA_ROOT, "data/S1R_ppml.rds"))
+sha_T25 <- get_sha256(file.path(RTA_ROOT, "T25_prop_verification.csv"))
+sha_T22 <- get_sha256(file.path(RTA_ROOT, "T22_theta_A_placebo.csv"))
 
 expected_sha_S5R <- "d46910ef55f0a22018baf8bd218dac5548bde98150d798ad85aa1914af8d12d8"
 expected_sha_S1R <- "45c937cd78805d7b13b4c43f4bc4888e93a2ff15e787ad4fb41d77b51f837d89"
@@ -73,19 +73,19 @@ cat("All input SHA256 verified: PASS\n\n")
 # =============================================================================
 cat("=== LOADING DATA ===\n")
 
-S5R <- readRDS(file.path(REBUILD_DIR, "data/S5R_bhat.rds"))
+S5R <- readRDS(file.path(RTA_ROOT, "data/S5R_bhat.rds"))
 placebo_meta <- as.data.table(S5R[["placebo"]])
 cat(sprintf("Placebo pairs in S5R: %d\n", nrow(placebo_meta)))
 
-ppml <- readRDS(file.path(REBUILD_DIR, "data/S1R_ppml.rds"))
+ppml <- readRDS(file.path(RTA_ROOT, "data/S1R_ppml.rds"))
 setDT(ppml)
 cat(sprintf("PPML rows: %d\n", nrow(ppml)))
 
-T22 <- fread(file.path(SCRATCH_DIR, "T22_theta_A_placebo.csv"))
+T22 <- fread(file.path(RTA_ROOT, "T22_theta_A_placebo.csv"))
 cat(sprintf("T22 rows: %d\n", nrow(T22)))
 cat(sprintf("T22 columns: %s\n", paste(names(T22), collapse = ", ")))
 
-T25 <- fread(file.path(SCRATCH_DIR, "T25_prop_verification.csv"))
+T25 <- fread(file.path(RTA_ROOT, "T25_prop_verification.csv"))
 cat(sprintf("T25 rows: %d\n", nrow(T25)))
 
 # =============================================================================
@@ -330,11 +330,11 @@ out <- data.frame(
   stringsAsFactors = FALSE
 )
 
-write.csv(out, file.path(SCRATCH_DIR, "T28_v1c_pairlevel.csv"), row.names = FALSE)
-cat(sprintf("Wrote: %s/T28_v1c_pairlevel.csv\n", SCRATCH_DIR))
+write.csv(out, file.path(RTA_ROOT, "output/T28_v1c_pairlevel.csv"), row.names = FALSE)
+cat("Wrote: output/T28_v1c_pairlevel.csv\n")
 
 # SHA256 of output
-sha_T28 <- get_sha256(file.path(SCRATCH_DIR, "T28_v1c_pairlevel.csv"))
+sha_T28 <- get_sha256(file.path(RTA_ROOT, "output/T28_v1c_pairlevel.csv"))
 
 # Sidecar
 sidecar_lines <- c(
@@ -387,8 +387,8 @@ sidecar_lines <- c(
   sprintf("CREATED: %s", format(Sys.time()))
 )
 
-writeLines(sidecar_lines, file.path(SCRATCH_DIR, "T28_v1c_pairlevel.csv.sidecar"))
-cat(sprintf("Wrote: %s/T28_v1c_pairlevel.csv.sidecar\n", SCRATCH_DIR))
+writeLines(sidecar_lines, file.path(RTA_ROOT, "meta/T28_v1c_pairlevel.csv.sidecar"))
+cat("Wrote: meta/T28_v1c_pairlevel.csv.sidecar\n")
 
 # =============================================================================
 # TERMINAL GATE G5

@@ -11,6 +11,10 @@
 #
 # INV-032: MEAN_THETA_D = 0.2473, not 0.2138.
 
+RTA_ROOT <- Sys.getenv("RTA_ROOT", unset = ".")
+stopifnot("RTA_ROOT must contain meta/FILE_REGISTRY.csv" =
+              file.exists(file.path(RTA_ROOT, "meta/FILE_REGISTRY.csv")))
+
 set.seed(20260726)
 
 MEAN_THETA_D <- 0.2473
@@ -65,5 +69,5 @@ cat(sprintf("  C_hardened (SD=%.3f):   q50=%.1f%%, RANGE=%.2f\n",
 cat(sprintf("  A_noise_only (SD=%.3f): q50=%.1f%%, RANGE=%.2f\n",
             SD_TRUE_HI, ge_A$q50, ge_A$RANGE_1090))
 
-write.csv(out, "output/T20_ge_bracket.csv", row.names = FALSE)
+write.csv(out, file.path(RTA_ROOT, "output/T20_ge_bracket.csv"), row.names = FALSE)
 cat("\nSaved: output/T20_ge_bracket.csv\n")

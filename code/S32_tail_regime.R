@@ -2,6 +2,10 @@
 # Determines whether trade flow right tails are better described by
 # lognormal or GPD, with validation on synthetic controls.
 
+RTA_ROOT <- Sys.getenv("RTA_ROOT", unset = ".")
+stopifnot("RTA_ROOT must contain meta/FILE_REGISTRY.csv" =
+              file.exists(file.path(RTA_ROOT, "meta/FILE_REGISTRY.csv")))
+
 cat("========================================================================\n")
 cat("S32: SCALE-FREE OR LOGNORMAL — COMPARATIVE TAIL TEST\n")
 cat(sprintf("Start: %s\n", format(Sys.time(), "%Y-%m-%d %H:%M:%S")))
@@ -9,10 +13,6 @@ cat("========================================================================\n\
 
 # Setup
 set.seed(20260730)
-
-if (!grepl("Simon", getwd())) {
-    .libPaths(c("/groups/m-larch/bt307958/Rlibs", .libPaths()))
-}
 
 library(data.table)
 library(POT)
@@ -177,7 +177,7 @@ rpareto_truncated <- function(n, alpha, L) {
 # =============================================================================
 
 cat("STEP 0: Loading data...\n")
-df <- readRDS("/groups/m-larch/bt307958/tails/data/ITPDE_total.rds")
+df <- readRDS(file.path(RTA_ROOT, "data/ITPDE_total.rds"))
 df <- df[df$exporter != df$importer & df$trade > 0, ]
 setDT(df)
 cat(sprintf("  Positive bilateral flows: %d\n", nrow(df)))
@@ -460,11 +460,11 @@ cat("\n========================================================================\
 cat("STEP 6: SAVING OUTPUTS\n")
 cat("========================================================================\n")
 
-write.csv(all_results, "output/T33_tail_verdicts.csv", row.names = FALSE)
-write.csv(hill_results, "output/T34_hill_curves.csv", row.names = FALSE)
+write.csv(all_results, file.path(RTA_ROOT, "output/T33_tail_verdicts.csv"), row.names = FALSE)
+write.csv(hill_results, file.path(RTA_ROOT, "output/T34_hill_curves.csv"), row.names = FALSE)
 
-cat("  Saved: output/T33_tail_verdicts.csv\n")
-cat("  Saved: output/T34_hill_curves.csv\n")
+cat(sprintf("  Saved: %s\n", file.path(RTA_ROOT, "output/T33_tail_verdicts.csv")))
+cat(sprintf("  Saved: %s\n", file.path(RTA_ROOT, "output/T34_hill_curves.csv")))
 
 # =============================================================================
 # FINAL SUMMARY

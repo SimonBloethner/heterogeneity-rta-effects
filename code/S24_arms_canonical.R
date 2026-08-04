@@ -18,14 +18,17 @@
 # INV-022: Arm A noise-only Var_null = 0.261145
 # INV-034: TW_MEAN = 0.0897 (pre_trade weights, canonical)
 
+RTA_ROOT <- Sys.getenv("RTA_ROOT", unset = ".")
+stopifnot("RTA_ROOT must contain meta/FILE_REGISTRY.csv" =
+              file.exists(file.path(RTA_ROOT, "meta/FILE_REGISTRY.csv")))
+
 suppressPackageStartupMessages(library(data.table))
-setwd("/scratch/bt307958/REBUILD_V2")
 
 EXPECTED_N <- 4182
 VAR_THETA_D_CANON <- 2.4380
 
 # Load baseline for verification
-S5R <- readRDS("data/S5R_bhat.rds")
+S5R <- readRDS(file.path(RTA_ROOT, "data/S5R_bhat.rds"))
 base <- as.data.table(S5R$baseline)
 stopifnot(nrow(base) == EXPECTED_N)
 
@@ -42,11 +45,11 @@ cat("G1 Var(theta_D) matches canonical: PASS\n")
 cat("\n=== G4: Arm C explicit computation ===\n")
 
 # Load N1b OOS variances per horizon bin
-N1b <- read.csv("output/T12_N1b_horizon.csv", stringsAsFactors = FALSE)
+N1b <- read.csv(file.path(RTA_ROOT, "output/T12_N1b_horizon.csv"), stringsAsFactors = FALSE)
 cat("Loaded T12_N1b_horizon.csv\n")
 
 # Load symmetric weights from T12_N1_oos_null.csv
-N1_weights <- read.csv("output/T12_N1_oos_null.csv", stringsAsFactors = FALSE)
+N1_weights <- read.csv(file.path(RTA_ROOT, "output/T12_N1_oos_null.csv"), stringsAsFactors = FALSE)
 sym_weights <- data.frame(
   horizon_bin = c("2-3", "4-5", "6-10", "11+"),
   weight = c(
@@ -170,11 +173,11 @@ tw_row <- data.frame(
 out <- rbind(out, tw_row)
 out$value[out$arm == "TW_MEAN"] <- tw_mean_pre
 
-write.csv(out, "output/T21_arms.csv", row.names = FALSE)
+write.csv(out, file.path(RTA_ROOT, "output/T21_arms.csv"), row.names = FALSE)
 cat("\nSaved: output/T21_arms.csv\n")
 
 # Sidecar
-sha <- system("sha256sum output/T21_arms.csv | cut -d' ' -f1", intern = TRUE)
+sha <- system(sprintf("sha256sum %s | cut -d' ' -f1", file.path(RTA_ROOT, "output/T21_arms.csv")), intern = TRUE)
 writeLines(c(
   "PRODUCER: S24_arms_canonical.R",
   "INPUTS: data/S5R_bhat.rds, output/T12_N1b_horizon.csv, output/T12_N1_oos_null.csv",
@@ -199,7 +202,7 @@ writeLines(c(
   "   retired pack used unknown weights (0.141). C4 adjudicated pre_trade as canonical",
   "   since total_trade is endogenous to the effect.",
   sprintf("SHA256: %s", sha)
-), "meta/T21_arms.csv.sidecar")
+), file.path(RTA_ROOT, "meta/T21_arms.csv.sidecar"))
 cat("Saved: meta/T21_arms.csv.sidecar\n")
 
 cat(sprintf("\n=== SUMMARY ===\n"))

@@ -11,8 +11,11 @@
 # theta_B is computed on the fixed S5R$placebo population with their fixed
 # pseudo-adoption years; no seed enters this computation.
 
+RTA_ROOT <- Sys.getenv("RTA_ROOT", unset = ".")
+stopifnot("RTA_ROOT must contain meta/FILE_REGISTRY.csv" =
+              file.exists(file.path(RTA_ROOT, "meta/FILE_REGISTRY.csv")))
+
 suppressPackageStartupMessages(library(data.table))
-setwd("/scratch/bt307958/REBUILD_V2")
 
 EXPECTED_N <- 17200
 THRESHOLD <- 0.05
@@ -22,7 +25,7 @@ THRESHOLD <- 0.05
 # -----------------------------------------------------------------------------
 cat("=== LOADING DATA ===\n")
 
-S5R <- readRDS("data/S5R_bhat.rds")
+S5R <- readRDS(file.path(RTA_ROOT, "data/S5R_bhat.rds"))
 plac <- as.data.table(S5R[["placebo"]])
 stopifnot(nrow(plac) == EXPECTED_N)
 cat(sprintf("G1 Placebo pairs n = %d: PASS\n", nrow(plac)))
@@ -100,11 +103,11 @@ cat("Reproduction gates: PASS\n")
 
 print(out)
 
-write.csv(out, "output/T24_placebo_uncorr.csv", row.names = FALSE)
+write.csv(out, file.path(RTA_ROOT, "output/T24_placebo_uncorr.csv"), row.names = FALSE)
 cat("\nSaved: output/T24_placebo_uncorr.csv\n")
 
 # Sidecar
-sha <- system("sha256sum output/T24_placebo_uncorr.csv | cut -d' ' -f1", intern = TRUE)
+sha <- system(sprintf("sha256sum %s | cut -d' ' -f1", file.path(RTA_ROOT, "output/T24_placebo_uncorr.csv")), intern = TRUE)
 writeLines(c(
   "PRODUCER: S25_placebo_uncorrected.R",
   "INPUTS: data/S5R_bhat.rds",
@@ -127,7 +130,7 @@ writeLines(c(
   "STATUS: BUILT",
   sprintf("DATE: %s", Sys.Date()),
   sprintf("SHA256: %s", sha)
-), "meta/T24_placebo_uncorr.csv.sidecar")
+), file.path(RTA_ROOT, "meta/T24_placebo_uncorr.csv.sidecar"))
 cat("Saved: meta/T24_placebo_uncorr.csv.sidecar\n")
 
 cat("\n=== SUMMARY ===\n")

@@ -2,7 +2,7 @@
 # gates_lib.R — Heterogeneity Gates Analysis Function Library
 # Created: 2026-07-19
 # Updated: 2026-07-19 (v2 - Jensen correction)
-# 
+#
 # DISCIPLINE: Each estimator/transformation is defined ONCE here.
 #             All analysis scripts source this file and call these functions.
 #             Never re-implement a computation inline.
@@ -19,8 +19,11 @@ library(data.table)
 GATES_SEED <- 20260719
 GATES_LIB_VERSION <- 2
 
-# Use source file directly since filtered version has filesystem issues
-DATA_SOURCE_PATH <- "/groups/m-larch/bt307958/tails/data/ITPDE_total.rds"
+# RTA_ROOT should be set by the calling script; default to "." if not set
+if (!exists("RTA_ROOT")) {
+    RTA_ROOT <- Sys.getenv("RTA_ROOT", unset = ".")
+}
+DATA_SOURCE_PATH <- file.path(RTA_ROOT, "data/ITPDE_total.rds")
 
 FROZEN_FACTS <- list(
     n_obs = 794720,

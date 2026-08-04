@@ -3,7 +3,7 @@
 # S9R_spec_spread.R - Four-Specification Comparison (FIXED CHAIN)
 # =============================================================================
 # OUTPUTS: data/S9R_spec.rds, output/T1R_spec_spread.csv
-# INPUTS:  ITPDE_total.rds (full panel with zeros)
+# INPUTS:  data/ITPDE_total.rds (full panel with zeros)
 # SEED:    none
 # NOTE: Under S1R (untreated-only), the FULL spec will NOT match because
 #       S1R excludes treated cells from estimation. The spec spread measures
@@ -11,12 +11,12 @@
 #       heterogeneity analysis.
 # =============================================================================
 
-.libPaths(c("/groups/m-larch/bt307958/Rlibs", .libPaths()))
+RTA_ROOT <- Sys.getenv("RTA_ROOT", unset = ".")
+stopifnot("RTA_ROOT must contain meta/FILE_REGISTRY.csv" =
+              file.exists(file.path(RTA_ROOT, "meta/FILE_REGISTRY.csv")))
+
 suppressPackageStartupMessages(library(dplyr))
 suppressPackageStartupMessages(library(fixest))
-
-REBUILD_DIR <- "/scratch/bt307958/REBUILD_V2"
-setwd(REBUILD_DIR)
 
 get_sha256 <- function(p) strsplit(system2("sha256sum", args = shQuote(p), stdout = TRUE), " ")[[1]][1]
 say <- function(...) cat(sprintf(...), "\n", sep = "")
@@ -27,7 +27,7 @@ say("Start: %s", format(Sys.time()))
 say("================================================================")
 
 # Load full panel with zeros
-data_path <- "/groups/m-larch/bt307958/tails/data/ITPDE_total.rds"
+data_path <- file.path(RTA_ROOT, "data/ITPDE_total.rds")
 df <- readRDS(data_path)
 
 # Exclude domestic
@@ -154,17 +154,17 @@ output <- list(
     gates = list(A_monotonic = monotonic)
 )
 
-saveRDS(output, "data/S9R_spec.rds")
-osha <- get_sha256("data/S9R_spec.rds")
+saveRDS(output, file.path(RTA_ROOT, "data/S9R_spec.rds"))
+osha <- get_sha256(file.path(RTA_ROOT, "data/S9R_spec.rds"))
 
 # CSV output
-write.csv(results, "output/T1R_spec_spread.csv", row.names = FALSE)
+write.csv(results, file.path(RTA_ROOT, "output/T1R_spec_spread.csv"), row.names = FALSE)
 
 writeLines(c(
     "FILE:      S9R_spec.rds",
     sprintf("SHA256:    %s", osha),
-    sprintf("PRODUCER:  code/S9R_spec_spread.R (SHA256: %s)", get_sha256("code/S9R_spec_spread.R")),
-    "INPUTS:    ITPDE_total.rds (full panel)",
+    sprintf("PRODUCER:  code/S9R_spec_spread.R (SHA256: %s)", get_sha256(file.path(RTA_ROOT, "code/S9R_spec_spread.R"))),
+    "INPUTS:    data/ITPDE_total.rds (full panel)",
     "SEED:      NONE",
     "CONFIG:    pooled RTA estimator (NOT untreated-only)",
     "GATE:      A_monotonic [PASS]",
@@ -175,7 +175,7 @@ writeLines(c(
     sprintf("SPREAD:        %.4f (pack %.3f, dev %+.4f)", spread, pack_spread, spread - pack_spread),
     sprintf("R_VERSION: %s", paste(R.version$major, R.version$minor, sep = ".")),
     sprintf("CREATED:   %s", format(Sys.time()))
-), "meta/S9R_spec.rds.sidecar")
+), file.path(RTA_ROOT, "meta/S9R_spec.rds.sidecar"))
 
 say("")
 say("Wrote data/S9R_spec.rds and output/T1R_spec_spread.csv")

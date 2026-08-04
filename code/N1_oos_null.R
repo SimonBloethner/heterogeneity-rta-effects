@@ -7,18 +7,18 @@
 # SEED:    20260719
 # =============================================================================
 
-.libPaths(c("/groups/m-larch/bt307958/Rlibs", .libPaths()))
+RTA_ROOT <- Sys.getenv("RTA_ROOT", unset = ".")
+stopifnot("RTA_ROOT must contain meta/FILE_REGISTRY.csv" =
+              file.exists(file.path(RTA_ROOT, "meta/FILE_REGISTRY.csv")))
+
 suppressPackageStartupMessages(library(fixest))
 suppressPackageStartupMessages(library(dplyr))
 setFixest_nthreads(4)
 
-REBUILD_DIR <- "/scratch/bt307958/REBUILD_V2"
-setwd(REBUILD_DIR)
-
 SEED <- 20260719
 set.seed(SEED)
 
-get_sha256 <- function(p) strsplit(system2("sha256sum", args = shQuote(p), stdout = TRUE), " ")[[1]][1]
+get_sha256 <- function(p) strsplit(system2("sha256sum", args = shQuote(file.path(RTA_ROOT, p)), stdout = TRUE), " ")[[1]][1]
 say <- function(...) cat(sprintf(...), "\n", sep = "")
 
 say("================================================================")
@@ -27,7 +27,7 @@ say("Start: %s", format(Sys.time()))
 say("================================================================")
 
 # Load data
-d <- readRDS("data/S1R_ppml.rds")
+d <- readRDS(file.path(RTA_ROOT, "data/S1R_ppml.rds"))
 say("S1R rows: %d", nrow(d))
 
 # Identify pair types
@@ -180,7 +180,7 @@ n1_results <- data.frame(
               NA),
     note = c("", "", "", "", gate_status)
 )
-write.csv(n1_results, "output/T12_N1_oos_null.csv", row.names = FALSE)
+write.csv(n1_results, file.path(RTA_ROOT, "output/T12_N1_oos_null.csv"), row.names = FALSE)
 
 # =============================================================================
 # N1b: HORIZON MATCHING
@@ -212,7 +212,7 @@ say("Var(pseudo_theta_B) by LATE-window length:")
 print(horizon_var)
 
 # Get treated post-window lengths for the 4,182 baseline pairs
-S5R <- readRDS("data/S5R_bhat.rds")
+S5R <- readRDS(file.path(RTA_ROOT, "data/S5R_bhat.rds"))
 baseline <- S5R$baseline
 say("")
 say("Baseline pairs: %d", nrow(baseline))
@@ -278,7 +278,7 @@ n1b_results <- rbind(
         weight = 1.0
     )
 )
-write.csv(n1b_results, "output/T12_N1b_horizon.csv", row.names = FALSE)
+write.csv(n1b_results, file.path(RTA_ROOT, "output/T12_N1b_horizon.csv"), row.names = FALSE)
 
 # Save workspace for downstream
 saveRDS(list(
@@ -288,7 +288,7 @@ saveRDS(list(
     horizon_var = horizon_var,
     treated_dist = treated_dist,
     seed = SEED
-), "data/N1_oos_null.rds")
+), file.path(RTA_ROOT, "data/N1_oos_null.rds"))
 
 # Sidecars
 code_sha <- get_sha256("code/N1_oos_null.R")
@@ -304,7 +304,7 @@ writeLines(c(
     sprintf("G3_STATUS: %s", gate_status),
     "METHOD:    Split pre-period at midpoint, refit on EARLY, predict LATE",
     sprintf("CREATED:   %s", format(Sys.time()))
-), "meta/T12_N1_oos_null.csv.sidecar")
+), file.path(RTA_ROOT, "meta/T12_N1_oos_null.csv.sidecar"))
 
 writeLines(c(
     "FILE:      T12_N1b_horizon.csv",
@@ -314,7 +314,7 @@ writeLines(c(
     sprintf("SEED:      %d", SEED),
     sprintf("VAR_NULL_MATCHED: %.6f", Var_null_matched),
     sprintf("CREATED:   %s", format(Sys.time()))
-), "meta/T12_N1b_horizon.csv.sidecar")
+), file.path(RTA_ROOT, "meta/T12_N1b_horizon.csv.sidecar"))
 
 say("")
 say("Wrote output/T12_N1_oos_null.csv")

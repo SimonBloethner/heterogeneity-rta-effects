@@ -18,7 +18,9 @@ cat(sprintf("Start: %s\n", format(Sys.time())))
 cat(sprintf("Node: %s\n", Sys.info()[["nodename"]]))
 cat("=============================================================================\n\n")
 
-SCRATCH_DIR <- "/scratch/bt307958/V1C_ARM1P"
+RTA_ROOT <- Sys.getenv("RTA_ROOT", unset = ".")
+stopifnot("RTA_ROOT must contain meta/FILE_REGISTRY.csv" =
+              file.exists(file.path(RTA_ROOT, "meta/FILE_REGISTRY.csv")))
 
 # SHA256 verification function
 get_sha256 <- function(p) {
@@ -30,9 +32,9 @@ get_sha256 <- function(p) {
 # =============================================================================
 cat("=== VERIFYING INPUT SHA256 ===\n")
 
-sha_T28 <- get_sha256(file.path(SCRATCH_DIR, "T28_v1c_pairlevel.csv"))
-sha_T25 <- get_sha256(file.path(SCRATCH_DIR, "T25_prop_verification.csv"))
-sha_T22 <- get_sha256(file.path(SCRATCH_DIR, "T22_theta_A_placebo.csv"))
+sha_T28 <- get_sha256(file.path(RTA_ROOT, "output/T28_v1c_pairlevel.csv"))
+sha_T25 <- get_sha256(file.path(RTA_ROOT, "output/T25_prop_verification.csv"))
+sha_T22 <- get_sha256(file.path(RTA_ROOT, "output/T22_theta_A_placebo.csv"))
 
 expected_sha_T28 <- "06047099424126dc10b3c3239c2b90055403857ed2148bc06bc6d98d557f797c"
 expected_sha_T25 <- "e729b79152f302e245dc63145282d08b92c990860d6eb28564a36457fcbee855"
@@ -61,7 +63,7 @@ cat("All input SHA256 verified: PASS\n\n")
 # =============================================================================
 cat("=== LOADING COMMITTED VALUES FROM T28 ===\n")
 
-T28 <- read.csv(file.path(SCRATCH_DIR, "T28_v1c_pairlevel.csv"), stringsAsFactors = FALSE)
+T28 <- read.csv(file.path(RTA_ROOT, "output/T28_v1c_pairlevel.csv"), stringsAsFactors = FALSE)
 
 # Helper to extract value by quantity name
 get_val <- function(q) T28$value[T28$quantity == q]
@@ -180,11 +182,11 @@ out <- data.frame(
   stringsAsFactors = FALSE
 )
 
-write.csv(out, file.path(SCRATCH_DIR, "T28b_v1c_arm1p.csv"), row.names = FALSE)
-cat(sprintf("Wrote: %s/T28b_v1c_arm1p.csv\n", SCRATCH_DIR))
+write.csv(out, file.path(RTA_ROOT, "output/T28b_v1c_arm1p.csv"), row.names = FALSE)
+cat("Wrote: output/T28b_v1c_arm1p.csv\n")
 
 # SHA256 of output
-sha_out <- get_sha256(file.path(SCRATCH_DIR, "T28b_v1c_arm1p.csv"))
+sha_out <- get_sha256(file.path(RTA_ROOT, "output/T28b_v1c_arm1p.csv"))
 
 # Sidecar
 sidecar_lines <- c(
@@ -220,8 +222,8 @@ sidecar_lines <- c(
   sprintf("CREATED: %s", format(Sys.time()))
 )
 
-writeLines(sidecar_lines, file.path(SCRATCH_DIR, "T28b_v1c_arm1p.csv.sidecar"))
-cat(sprintf("Wrote: %s/T28b_v1c_arm1p.csv.sidecar\n", SCRATCH_DIR))
+writeLines(sidecar_lines, file.path(RTA_ROOT, "meta/T28b_v1c_arm1p.csv.sidecar"))
+cat("Wrote: meta/T28b_v1c_arm1p.csv.sidecar\n")
 
 # =============================================================================
 # TERMINAL GATE G4

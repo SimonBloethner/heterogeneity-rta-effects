@@ -5,12 +5,11 @@
 # NOTE: Uses dplyr (no data.table) for Festus compatibility.
 # =============================================================================
 
-.libPaths(c("/groups/m-larch/bt307958/Rlibs", .libPaths()))
+RTA_ROOT <- Sys.getenv("RTA_ROOT", unset = ".")
+stopifnot("RTA_ROOT must contain meta/FILE_REGISTRY.csv" =
+              file.exists(file.path(RTA_ROOT, "meta/FILE_REGISTRY.csv")))
 
 suppressPackageStartupMessages(library(dplyr))
-
-REBUILD_DIR <- "/scratch/bt307958/REBUILD_V2"
-setwd(REBUILD_DIR)
 
 SEED    <- 20260719
 ANTICIP <- 1
@@ -24,8 +23,8 @@ say("S3R: PAIR EFFECTS, SYMMETRIC WINDOW")
 say("Start: %s", format(Sys.time()))
 say("================================================================")
 
-d <- readRDS("data/S1R_ppml.rds")
-say("Input rows: %d  SHA %s", nrow(d), get_sha256("data/S1R_ppml.rds"))
+d <- readRDS(file.path(RTA_ROOT, "data/S1R_ppml.rds"))
+say("Input rows: %d  SHA %s", nrow(d), get_sha256(file.path(RTA_ROOT, "data/S1R_ppml.rds")))
 
 sw <- d %>% filter(classification == "single_switcher", in_model == TRUE, trade > 0, !is.na(adoption_year))
 
@@ -82,14 +81,14 @@ say("Pairs with a computable theta: %d of %d switchers", nrow(retained), length(
 say("theta_A  mean %.6f  sd %.6f", mean(retained$theta_A), sd(retained$theta_A))
 say("theta_B  mean %.6f  sd %.6f", mean(retained$theta_B), sd(retained$theta_B))
 
-saveRDS(theta, "data/S3R_theta.rds")
-osha <- get_sha256("data/S3R_theta.rds")
+saveRDS(theta, file.path(RTA_ROOT, "data/S3R_theta.rds"))
+osha <- get_sha256(file.path(RTA_ROOT, "data/S3R_theta.rds"))
 
 writeLines(c(
     "FILE:      S3R_theta.rds",
     sprintf("SHA256:    %s", osha),
-    sprintf("PRODUCER:  code/S3R_theta.R (SHA256: %s)", get_sha256("code/S3R_theta.R")),
-    sprintf("INPUTS:    data/S1R_ppml.rds (SHA256: %s)", get_sha256("data/S1R_ppml.rds")),
+    sprintf("PRODUCER:  code/S3R_theta.R (SHA256: %s)", get_sha256(file.path(RTA_ROOT, "code/S3R_theta.R"))),
+    sprintf("INPUTS:    data/S1R_ppml.rds (SHA256: %s)", get_sha256(file.path(RTA_ROOT, "data/S1R_ppml.rds"))),
     sprintf("SEED:      %d", SEED),
     "WINDOW:    pre = year < adoption_year - 1 ; post = year > adoption_year + 1",
     "GATE:      G1_post_cells [PASS]",
@@ -100,7 +99,7 @@ writeLines(c(
     sprintf("R_VERSION: %s", paste(R.version$major, R.version$minor, sep = ".")),
     sprintf("ROWS:      %d", nrow(theta)),
     sprintf("CREATED:   %s", format(Sys.time()))
-), "meta/S3R_theta.rds.sidecar")
+), file.path(RTA_ROOT, "meta/S3R_theta.rds.sidecar"))
 
 say("Wrote data/S3R_theta.rds  SHA %s", osha)
 say("Done: %s", format(Sys.time()))

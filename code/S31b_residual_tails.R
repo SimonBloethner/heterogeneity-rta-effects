@@ -1,11 +1,13 @@
 # X2: Re-adjudicate Residual Tail Family Without Hill (v5 - FIXED)
 
+RTA_ROOT <- Sys.getenv("RTA_ROOT", unset = ".")
+stopifnot("RTA_ROOT must contain meta/FILE_REGISTRY.csv" =
+              file.exists(file.path(RTA_ROOT, "meta/FILE_REGISTRY.csv")))
+
 cat("========================================================================\n")
 cat("X2: RESIDUAL TAIL FAMILY RE-ADJUDICATION (v5)\n")
 cat(sprintf("Start: %s\n", format(Sys.time(), "%Y-%m-%d %H:%M:%S")))
 cat("========================================================================\n\n")
-
-if (!grepl("Simon", getwd())) .libPaths(c("/groups/m-larch/bt307958/Rlibs", .libPaths()))
 
 library(fixest)
 library(POT)
@@ -79,7 +81,7 @@ vuong_test <- function(x, L, gpd_fit, ln_fit) {
 
 # Load data exactly as reference script
 cat("STEP 0: Loading data...\n")
-df <- readRDS("/groups/m-larch/bt307958/tails/data/ITPDE_total.rds")
+df <- readRDS(file.path(RTA_ROOT, "data/ITPDE_total.rds"))
 df <- df[df$exporter != df$importer, ]
 df$pair <- paste0(df$exporter, "_", df$importer)
 df$orig_year <- paste0(df$exporter, "_", df$year)
@@ -219,5 +221,5 @@ for (i in 1:nrow(verdict_table)) {
     cat(sprintf("RESID_TAIL_VERDICT_%s = %s (Vuong=%.3f, p=%.4f)\n", toupper(r$object), r$winner, r$vuong_stat, r$vuong_p))
 }
 
-saveRDS(list(hill = results_hill, verdict = verdict_table, stability = stability_results), "output/X2_results.rds")
+saveRDS(list(hill = results_hill, verdict = verdict_table, stability = stability_results), file.path(RTA_ROOT, "output/X2_results.rds"))
 cat(sprintf("\nX2 COMPLETE: %s\n", format(Sys.time(), "%Y-%m-%d %H:%M:%S")))

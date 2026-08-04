@@ -9,16 +9,16 @@
 #          is a LOWER BOUND on the null.
 # =============================================================================
 
-.libPaths(c("/groups/m-larch/bt307958/Rlibs", .libPaths()))
-suppressPackageStartupMessages(library(dplyr))
+RTA_ROOT <- Sys.getenv("RTA_ROOT", unset = ".")
+stopifnot("RTA_ROOT must contain meta/FILE_REGISTRY.csv" =
+              file.exists(file.path(RTA_ROOT, "meta/FILE_REGISTRY.csv")))
 
-REBUILD_DIR <- "/scratch/bt307958/REBUILD_V2"
-setwd(REBUILD_DIR)
+suppressPackageStartupMessages(library(dplyr))
 
 SEED <- 20260719
 set.seed(SEED)
 
-get_sha256 <- function(p) strsplit(system2("sha256sum", args = shQuote(p), stdout = TRUE), " ")[[1]][1]
+get_sha256 <- function(p) strsplit(system2("sha256sum", args = shQuote(file.path(RTA_ROOT, p)), stdout = TRUE), " ")[[1]][1]
 say <- function(...) cat(sprintf(...), "\n", sep = "")
 
 say("================================================================")
@@ -27,7 +27,7 @@ say("Start: %s", format(Sys.time()))
 say("================================================================")
 
 # Load S5R data which has placebo results
-S5R <- readRDS("data/S5R_bhat.rds")
+S5R <- readRDS(file.path(RTA_ROOT, "data/S5R_bhat.rds"))
 
 # Check structure
 say("S5R components: %s", paste(names(S5R), collapse = ", "))
@@ -93,7 +93,7 @@ n2_results <- data.frame(
     note = c("", "", "", "", "",
              "Placebo pairs are INSIDE estimation sample; dispersion is LOWER BOUND")
 )
-write.csv(n2_results, "output/T12_N2_placebo.csv", row.names = FALSE)
+write.csv(n2_results, file.path(RTA_ROOT, "output/T12_N2_placebo.csv"), row.names = FALSE)
 
 # Save for downstream
 saveRDS(list(
@@ -102,7 +102,7 @@ saveRDS(list(
     var_placebo = var_placebo,
     n_placebo = n_placebo,
     seed = SEED
-), "data/N2_placebo.rds")
+), file.path(RTA_ROOT, "data/N2_placebo.rds"))
 
 # Sidecar
 code_sha <- get_sha256("code/N2_placebo_benchmark.R")
@@ -117,7 +117,7 @@ writeLines(c(
     "NOTE:      Placebo pairs are INSIDE estimation sample (IN-SAMPLE benchmark)",
     "           Dispersion is a LOWER BOUND on the true null variance",
     sprintf("CREATED:   %s", format(Sys.time()))
-), "meta/T12_N2_placebo.csv.sidecar")
+), file.path(RTA_ROOT, "meta/T12_N2_placebo.csv.sidecar"))
 
 say("")
 say("Wrote output/T12_N2_placebo.csv")

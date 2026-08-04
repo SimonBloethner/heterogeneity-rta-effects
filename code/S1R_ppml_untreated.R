@@ -4,19 +4,18 @@
 # =============================================================================
 # OUTPUTS: data/S1R_ppml.rds
 #          meta/S1R_ppml.rds.sidecar
-# INPUTS:  ITPDE_total.rds (external, SHA-verified)
+# INPUTS:  data/ITPDE_total.rds (SHA-verified)
 # NOTE: Uses dplyr + fixest (no data.table) for Festus compatibility.
 # =============================================================================
 
-.libPaths(c("/groups/m-larch/bt307958/Rlibs", .libPaths()))
+RTA_ROOT <- Sys.getenv("RTA_ROOT", unset = ".")
+stopifnot("RTA_ROOT must contain meta/FILE_REGISTRY.csv" =
+              file.exists(file.path(RTA_ROOT, "meta/FILE_REGISTRY.csv")))
 
 suppressPackageStartupMessages({
     library(dplyr)
     library(fixest)
 })
-
-REBUILD_DIR <- "/scratch/bt307958/REBUILD_V2"
-setwd(REBUILD_DIR)
 
 ANTICIP <- 1
 
@@ -29,7 +28,7 @@ say("Start: %s", format(Sys.time()))
 say("================================================================")
 
 # ---------------------------------------------------------------- input gate
-INPUT_PATH <- "/groups/m-larch/bt307958/tails/data/ITPDE_total.rds"
+INPUT_PATH <- file.path(RTA_ROOT, "data/ITPDE_total.rds")
 INPUT_SHA  <- "e488c36afdf7c9fd1d38667a18b7855eb39e4085430ef96eab946e2d89fe4c01"
 actual <- get_sha256(INPUT_PATH)
 if (actual != INPUT_SHA) stop(sprintf("HALT: input SHA mismatch\n  expected %s\n  actual   %s", INPUT_SHA, actual))
@@ -138,14 +137,14 @@ if (n_post_bad > 0) {
 out <- d %>% select(exporter, importer, pair, year, trade, rta,
                     classification, adoption_year, y_hat_0, in_model, est_sample, is_post)
 
-saveRDS(out, "data/S1R_ppml.rds")
-osha <- get_sha256("data/S1R_ppml.rds")
+saveRDS(out, file.path(RTA_ROOT, "data/S1R_ppml.rds"))
+osha <- get_sha256(file.path(RTA_ROOT, "data/S1R_ppml.rds"))
 
 writeLines(c(
     "FILE:      S1R_ppml.rds",
     sprintf("SHA256:    %s", osha),
-    sprintf("PRODUCER:  code/S1R_ppml_untreated.R (SHA256: %s)", get_sha256("code/S1R_ppml_untreated.R")),
-    sprintf("INPUTS:    %s (SHA256: %s)", INPUT_PATH, INPUT_SHA),
+    sprintf("PRODUCER:  code/S1R_ppml_untreated.R (SHA256: %s)", get_sha256(file.path(RTA_ROOT, "code/S1R_ppml_untreated.R"))),
+    sprintf("INPUTS:    data/ITPDE_total.rds (SHA256: %s)", INPUT_SHA),
     "SEED:      NONE",
     "ESTIMATION SAMPLE:",
     "  never_treated pairs: all years",
@@ -161,7 +160,7 @@ writeLines(c(
     sprintf("R_VERSION: %s", paste(R.version$major, R.version$minor, sep = ".")),
     sprintf("ROWS:      %d", nrow(out)),
     sprintf("CREATED:   %s", format(Sys.time()))
-), "meta/S1R_ppml.rds.sidecar")
+), file.path(RTA_ROOT, "meta/S1R_ppml.rds.sidecar"))
 
 say("")
 say("Wrote data/S1R_ppml.rds  SHA %s", osha)

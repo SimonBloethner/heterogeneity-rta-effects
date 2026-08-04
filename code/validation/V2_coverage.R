@@ -7,16 +7,16 @@
 # PURPOSE: Check post-window coverage for theta estimation
 # =============================================================================
 
-.libPaths(c("/groups/m-larch/bt307958/Rlibs", .libPaths()))
-suppressPackageStartupMessages(library(dplyr))
+RTA_ROOT <- Sys.getenv("RTA_ROOT", unset = ".")
+stopifnot("RTA_ROOT must contain meta/FILE_REGISTRY.csv" =
+              file.exists(file.path(RTA_ROOT, "meta/FILE_REGISTRY.csv")))
 
-REBUILD_DIR <- "/scratch/bt307958/REBUILD_V2"
-setwd(REBUILD_DIR)
+suppressPackageStartupMessages(library(dplyr))
 
 SEED <- 20260719
 set.seed(SEED)
 
-get_sha256 <- function(p) strsplit(system2("sha256sum", args = shQuote(p), stdout = TRUE), " ")[[1]][1]
+get_sha256 <- function(p) strsplit(system2("sha256sum", args = shQuote(file.path(RTA_ROOT, p)), stdout = TRUE), " ")[[1]][1]
 say <- function(...) cat(sprintf(...), "\n", sep = "")
 
 say("================================================================")
@@ -25,8 +25,8 @@ say("Start: %s", format(Sys.time()))
 say("================================================================")
 
 # Load data
-S1R <- readRDS("data/S1R_ppml.rds")
-S5R <- readRDS("data/S5R_bhat.rds")
+S1R <- readRDS(file.path(RTA_ROOT, "data/S1R_ppml.rds"))
+S5R <- readRDS(file.path(RTA_ROOT, "data/S5R_bhat.rds"))
 baseline <- S5R$baseline
 
 say("Baseline pairs: %d", nrow(baseline))
@@ -96,7 +96,7 @@ results <- data.frame(
 )
 results$value[8] <- G5_status
 
-write.csv(results, "output/V2_coverage.csv", row.names = FALSE)
+write.csv(results, file.path(RTA_ROOT, "output/V2_coverage.csv"), row.names = FALSE)
 
 # Sidecar
 code_sha <- get_sha256("code/validation/V2_coverage.R")
@@ -110,7 +110,7 @@ writeLines(c(
     sprintf("FULL COVERAGE: %.1f%%", 100 * sum(post_coverage$coverage == 1) / nrow(post_coverage)),
     sprintf("G5 GATE: %s", G5_status),
     sprintf("CREATED:   %s", format(Sys.time()))
-), "meta/V2_coverage.csv.sidecar")
+), file.path(RTA_ROOT, "meta/V2_coverage.csv.sidecar"))
 
 say("")
 say("Wrote output/V2_coverage.csv")

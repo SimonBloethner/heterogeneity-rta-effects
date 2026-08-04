@@ -13,11 +13,11 @@
 # WINDOW:  SYMMETRIC (year > adoption + 1)
 # =============================================================================
 
-.libPaths(c("/groups/m-larch/bt307958/Rlibs", .libPaths()))
-suppressPackageStartupMessages(library(dplyr))
+RTA_ROOT <- Sys.getenv("RTA_ROOT", unset = ".")
+stopifnot("RTA_ROOT must contain meta/FILE_REGISTRY.csv" =
+              file.exists(file.path(RTA_ROOT, "meta/FILE_REGISTRY.csv")))
 
-REBUILD_DIR <- "/scratch/bt307958/REBUILD_V2"
-setwd(REBUILD_DIR)
+suppressPackageStartupMessages(library(dplyr))
 
 SEED <- 20260719
 set.seed(SEED)
@@ -31,8 +31,8 @@ say("Start: %s", format(Sys.time()))
 say("================================================================")
 
 # Load data
-S1R <- readRDS("data/S1R_ppml.rds")
-S5R <- readRDS("data/S5R_bhat.rds")
+S1R <- readRDS(file.path(RTA_ROOT, "data/S1R_ppml.rds"))
+S5R <- readRDS(file.path(RTA_ROOT, "data/S5R_bhat.rds"))
 baseline <- S5R$baseline
 stopifnot(nrow(baseline) == 4182)
 
@@ -355,7 +355,7 @@ say("  Unweighted pooled var: %.6f", var_pooled_4244)
 say("  Per-bin counts:")
 print(as.data.frame(var_by_bin_4244 %>% select(horizon_bin, n, var_pseudo_D, mean_pseudo_D)))
 
-write.csv(t26, "output/T26_null_stack.csv", row.names = FALSE)
+write.csv(t26, file.path(RTA_ROOT, "output/T26_null_stack.csv"), row.names = FALSE)
 say("Wrote output/T26_null_stack.csv")
 say("T26 contents:")
 print(t26)
@@ -368,7 +368,7 @@ say("Gate: T26 TOTAL (%.6f) matches Var_null_matched (%.6f) to 3 decimals: PASS"
 # Write T26 sidecar
 writeLines(c(
     "FILE:      T26_null_stack.csv",
-    sprintf("SHA256:    %s", get_sha256("output/T26_null_stack.csv")),
+    sprintf("SHA256:    %s", get_sha256(file.path(RTA_ROOT, "output/T26_null_stack.csv"))),
     sprintf("PRODUCER:  code/S18_null_stack.R (SHA256: %s)", code_sha),
     "INPUTS:    data/S1R_ppml.rds, data/S5R_bhat.rds",
     sprintf("SEED:      %d", SEED),
@@ -391,7 +391,7 @@ writeLines(c(
     "  Arm C is computed in S24_arms_canonical.R, not here.",
     "",
     sprintf("CREATED:   %s", format(Sys.time()))
-), "meta/T26_null_stack.csv.sidecar")
+), file.path(RTA_ROOT, "meta/T26_null_stack.csv.sidecar"))
 
 # N1 output
 n1_results <- data.frame(
@@ -406,7 +406,7 @@ n1_results <- data.frame(
 )
 n1_results$value[n1_results$quantity == "G3_status"] <- G3_status
 
-write.csv(n1_results, "output/T12_N1_oos_null.csv", row.names = FALSE)
+write.csv(n1_results, file.path(RTA_ROOT, "output/T12_N1_oos_null.csv"), row.names = FALSE)
 
 # N2 output
 n2_results <- data.frame(
@@ -414,7 +414,7 @@ n2_results <- data.frame(
     value = c(n_placebo, mean_placebo, sd_placebo, var_placebo)
 )
 
-write.csv(n2_results, "output/T12_N2_placebo.csv", row.names = FALSE)
+write.csv(n2_results, file.path(RTA_ROOT, "output/T12_N2_placebo.csv"), row.names = FALSE)
 
 # Combined RDS for downstream
 saveRDS(list(
@@ -433,14 +433,14 @@ saveRDS(list(
     # Meta
     seed = SEED,
     window = "SYMMETRIC"
-), "data/S18_null_stack.rds")
+), file.path(RTA_ROOT, "data/S18_null_stack.rds"))
 
 # Sidecars
-code_sha <- get_sha256("code/S18_null_stack.R")
+code_sha <- get_sha256(file.path(RTA_ROOT, "code/S18_null_stack.R"))
 
 writeLines(c(
     "FILE:      T12_N1_oos_null.csv",
-    sprintf("SHA256:    %s", get_sha256("output/T12_N1_oos_null.csv")),
+    sprintf("SHA256:    %s", get_sha256(file.path(RTA_ROOT, "output/T12_N1_oos_null.csv"))),
     sprintf("PRODUCER:  code/S18_null_stack.R (SHA256: %s)", code_sha),
     "INPUTS:    data/S1R_ppml.rds, data/S5R_bhat.rds",
     sprintf("SEED:      %d", SEED),
@@ -458,11 +458,11 @@ writeLines(c(
     sprintf("  6-10: %.4f", weights_sym$weight[3]),
     sprintf("  11+:  %.4f", weights_sym$weight[4]),
     sprintf("CREATED:   %s", format(Sys.time()))
-), "meta/T12_N1_oos_null.csv.sidecar")
+), file.path(RTA_ROOT, "meta/T12_N1_oos_null.csv.sidecar"))
 
 writeLines(c(
     "FILE:      T12_N2_placebo.csv",
-    sprintf("SHA256:    %s", get_sha256("output/T12_N2_placebo.csv")),
+    sprintf("SHA256:    %s", get_sha256(file.path(RTA_ROOT, "output/T12_N2_placebo.csv"))),
     sprintf("PRODUCER:  code/S18_null_stack.R (SHA256: %s)", code_sha),
     "INPUTS:    data/S5R_bhat.rds",
     "",
@@ -472,7 +472,7 @@ writeLines(c(
     sprintf("N_PLACEBO: %d", n_placebo),
     sprintf("VAR_PLACEBO: %.4f", var_placebo),
     sprintf("CREATED:   %s", format(Sys.time()))
-), "meta/T12_N2_placebo.csv.sidecar")
+), file.path(RTA_ROOT, "meta/T12_N2_placebo.csv.sidecar"))
 
 say("")
 say("Wrote output/T12_N1_oos_null.csv")

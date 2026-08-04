@@ -28,14 +28,17 @@
 # file named S6R_population.rds were reading a stray W1 copy, since
 # renamed STRAY_W1_COPY_DO_NOT_USE.rds. This script reads S5R.
 
+RTA_ROOT <- Sys.getenv("RTA_ROOT", unset = ".")
+stopifnot("RTA_ROOT must contain meta/FILE_REGISTRY.csv" =
+              file.exists(file.path(RTA_ROOT, "meta/FILE_REGISTRY.csv")))
+
 suppressPackageStartupMessages(library(data.table))
-setwd("/scratch/bt307958/REBUILD_V2")
 
 EXPECTED_N  <- 4182
 MEAN_LEDGER <- 0.2473
 
 # Read SD_true values from T21_arms.csv (not hardcoded)
-arms <- fread("output/T21_arms.csv")
+arms <- fread(file.path(RTA_ROOT, "output/T21_arms.csv"))
 SD_TRUE_LO <- arms[arm == "C_OOS", SD_true]
 SD_TRUE_HI <- arms[arm == "A_noise_only", SD_true]
 
@@ -45,7 +48,7 @@ stopifnot(abs(SD_TRUE_HI - 1.4754) < 1e-3)  # canonical from T21
 cat(sprintf("SD_TRUE_LO = %.4f (from T21_arms.csv, arm C_OOS)\n", SD_TRUE_LO))
 cat(sprintf("SD_TRUE_HI = %.4f (from T21_arms.csv, arm A_noise_only)\n", SD_TRUE_HI))
 
-S5R  <- readRDS("data/S5R_bhat.rds")
+S5R  <- readRDS(file.path(RTA_ROOT, "data/S5R_bhat.rds"))
 base <- as.data.table(S5R$baseline)
 
 stopifnot(nrow(base) == EXPECTED_N)
@@ -93,4 +96,4 @@ cat(sprintf("\nRAW_SHARE = %.4f (n = %d, from S5R_bhat.rds$baseline)\n",
             RAW_SHARE, n_ok))
 cat(sprintf("P(theta <= 0) reported bracket: [%.3f, %.3f]\n", P_LO, P_HI))
 
-write.csv(out, "output/T19_pleq0_bracket.csv", row.names = FALSE)
+write.csv(out, file.path(RTA_ROOT, "output/T19_pleq0_bracket.csv"), row.names = FALSE)

@@ -9,16 +9,16 @@
 # SEED:    20260719
 # =============================================================================
 
-.libPaths(c("/groups/m-larch/bt307958/Rlibs", .libPaths()))
-suppressPackageStartupMessages(library(dplyr))
+RTA_ROOT <- Sys.getenv("RTA_ROOT", unset = ".")
+stopifnot("RTA_ROOT must contain meta/FILE_REGISTRY.csv" =
+              file.exists(file.path(RTA_ROOT, "meta/FILE_REGISTRY.csv")))
 
-REBUILD_DIR <- "/scratch/bt307958/REBUILD_V2"
-setwd(REBUILD_DIR)
+suppressPackageStartupMessages(library(dplyr))
 
 SEED <- 20260719
 set.seed(SEED)
 
-get_sha256 <- function(p) strsplit(system2("sha256sum", args = shQuote(p), stdout = TRUE), " ")[[1]][1]
+get_sha256 <- function(p) strsplit(system2("sha256sum", args = shQuote(file.path(RTA_ROOT, p)), stdout = TRUE), " ")[[1]][1]
 say <- function(...) cat(sprintf(...), "\n", sep = "")
 
 say("================================================================")
@@ -27,10 +27,10 @@ say("Start: %s", format(Sys.time()))
 say("================================================================")
 
 # Load inputs
-S5R <- readRDS("data/S5R_bhat.rds")
+S5R <- readRDS(file.path(RTA_ROOT, "data/S5R_bhat.rds"))
 baseline <- S5R$baseline
 stopifnot(nrow(baseline) == 4182)
-N3 <- readRDS("data/N3_deconv.rds")
+N3 <- readRDS(file.path(RTA_ROOT, "data/N3_deconv.rds"))
 
 say("Baseline pairs: %d", nrow(baseline))
 say("Columns: %s", paste(names(baseline), collapse = ", "))
@@ -244,7 +244,7 @@ dist_results <- data.frame(
               p_theta_D_neg, p_true_neg_A, p_true_neg_C,
               Q1 - Q5, tw_mean)
 )
-write.csv(dist_results, "output/T12_N4_distribution.csv", row.names = FALSE)
+write.csv(dist_results, file.path(RTA_ROOT, "output/T12_N4_distribution.csv"), row.names = FALSE)
 
 # Mixture table
 mix_results <- data.frame(
@@ -254,10 +254,10 @@ mix_results <- data.frame(
     mu = c(mix2$mu, mix3$mu),
     sigma = c(mix2$sigma, mix3$sigma)
 )
-write.csv(mix_results, "output/T12_N4_mixture.csv", row.names = FALSE)
+write.csv(mix_results, file.path(RTA_ROOT, "output/T12_N4_mixture.csv"), row.names = FALSE)
 
 # Gradient table
-write.csv(gradient, "output/T12_N4_gradient.csv", row.names = FALSE)
+write.csv(gradient, file.path(RTA_ROOT, "output/T12_N4_gradient.csv"), row.names = FALSE)
 
 # Save for downstream
 saveRDS(list(
@@ -273,7 +273,7 @@ saveRDS(list(
     mix3 = mix3,
     shrunk_C = shrunk_C,
     seed = SEED
-), "data/N4_distribution.rds")
+), file.path(RTA_ROOT, "data/N4_distribution.rds"))
 
 # Sidecars
 code_sha <- get_sha256("code/N4_distribution.R")
@@ -287,7 +287,7 @@ writeLines(c(
     sprintf("Q1_Q5_SPREAD: %.4f", Q1 - Q5),
     sprintf("TW_MEAN:   %.4f", tw_mean),
     sprintf("CREATED:   %s", format(Sys.time()))
-), "meta/T12_N4_distribution.csv.sidecar")
+), file.path(RTA_ROOT, "meta/T12_N4_distribution.csv.sidecar"))
 
 writeLines(c(
     "FILE:      T12_N4_mixture.csv",
@@ -297,7 +297,7 @@ writeLines(c(
     sprintf("K2_mu:     %.3f, %.3f", mix2$mu[1], mix2$mu[2]),
     sprintf("K3_mu:     %.3f, %.3f, %.3f", mix3$mu[1], mix3$mu[2], mix3$mu[3]),
     sprintf("CREATED:   %s", format(Sys.time()))
-), "meta/T12_N4_mixture.csv.sidecar")
+), file.path(RTA_ROOT, "meta/T12_N4_mixture.csv.sidecar"))
 
 writeLines(c(
     "FILE:      T12_N4_gradient.csv",
@@ -305,7 +305,7 @@ writeLines(c(
     sprintf("PRODUCER:  code/N4_distribution.R (SHA256: %s)", code_sha),
     sprintf("Q1_Q5_SPREAD: %.4f", Q1 - Q5),
     sprintf("CREATED:   %s", format(Sys.time()))
-), "meta/T12_N4_gradient.csv.sidecar")
+), file.path(RTA_ROOT, "meta/T12_N4_gradient.csv.sidecar"))
 
 say("")
 say("Wrote output/T12_N4_distribution.csv")

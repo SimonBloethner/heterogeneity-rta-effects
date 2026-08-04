@@ -15,14 +15,14 @@
 #          assumption, not a measurement.
 # =============================================================================
 
-.libPaths(c("/groups/m-larch/bt307958/Rlibs", .libPaths()))
+RTA_ROOT <- Sys.getenv("RTA_ROOT", unset = ".")
+stopifnot("RTA_ROOT must contain meta/FILE_REGISTRY.csv" =
+              file.exists(file.path(RTA_ROOT, "meta/FILE_REGISTRY.csv")))
+
 suppressPackageStartupMessages(library(dplyr))
 suppressPackageStartupMessages(library(fixest))
 suppressPackageStartupMessages(library(parallel))
 setFixest_nthreads(1)
-
-REBUILD_DIR <- "/scratch/bt307958/REBUILD_V2"
-setwd(REBUILD_DIR)
 
 SEED <- 20260803
 N_DRAWS <- 500
@@ -36,7 +36,7 @@ SD_TRUE_HI <- 1.48
 # Quintile-specific means from canonical_facts.md [GRADIENT_Q1, GRADIENT_Q5]
 # Parse from canonical_facts.md using positional split (matches S45_ledger_constants.R)
 parse_ledger_value <- function(id) {
-    facts <- readLines("meta/canonical_facts.md")
+    facts <- readLines(file.path(RTA_ROOT, "meta/canonical_facts.md"))
     row   <- grep(sprintf("^\\|\\s*%s\\s*\\|", id), facts, value = TRUE)
     stopifnot("ID must match exactly one ledger row" = length(row) == 1L)
     parts <- trimws(strsplit(row[1], "\\|")[[1]])
@@ -80,7 +80,7 @@ say("Available cores: %d", N_CORES)
 # =============================================================================
 say("")
 say("=== LOAD SOLVER ===")
-solver_path <- file.path(REBUILD_DIR, "code/vendor/gravity_functions.R")
+solver_path <- file.path(RTA_ROOT, "code/vendor/gravity_functions.R")
 source(solver_path)
 solver_sha <- get_sha256(solver_path)
 say("Solver SHA: %s", solver_sha)
@@ -93,7 +93,7 @@ stopifnot("solver hash does not match the vendored copy" =
 # =============================================================================
 say("")
 say("=== LOAD ADOPTING POPULATION ===")
-S5R <- readRDS("data/S5R_bhat.rds")
+S5R <- readRDS(file.path(RTA_ROOT, "data/S5R_bhat.rds"))
 base <- S5R$baseline
 stopifnot("Adopting population must be n=4182" = nrow(base) == 4182)
 
@@ -166,7 +166,7 @@ say("Dyad assertions (T42 reproduction): PASS")
 # =============================================================================
 say("")
 say("=== PREPARE DATA ===")
-df_full <- readRDS("/groups/m-larch/bt307958/tails/data/ITPDE_total.rds")
+df_full <- readRDS(file.path(RTA_ROOT, "data/ITPDE_total.rds"))
 df_full <- df_full %>% rename(iso_x = exporter, iso_i = importer)
 df_2019 <- df_full %>% filter(year == 2019)
 df_2019 <- df_2019 %>%
@@ -401,9 +401,9 @@ rownames(summary_table) <- NULL
 print(summary_table)
 
 # Write CSV
-if (!dir.exists("output")) dir.create("output")
-write.csv(summary_table, "output/T43_ge_gradient.csv", row.names = FALSE)
-csv_sha <- get_sha256("output/T43_ge_gradient.csv")
+if (!dir.exists(file.path(RTA_ROOT, "output"))) dir.create(file.path(RTA_ROOT, "output"))
+write.csv(summary_table, file.path(RTA_ROOT, "output/T43_ge_gradient.csv"), row.names = FALSE)
+csv_sha <- get_sha256(file.path(RTA_ROOT, "output/T43_ge_gradient.csv"))
 say("Wrote output/T43_ge_gradient.csv  SHA %s", csv_sha)
 
 # Full output object
@@ -437,15 +437,15 @@ output <- list(
     solver_sha = solver_sha
 )
 
-saveRDS(output, "data/S47_ge_gradient.rds")
-rds_sha <- get_sha256("data/S47_ge_gradient.rds")
+saveRDS(output, file.path(RTA_ROOT, "data/S47_ge_gradient.rds"))
+rds_sha <- get_sha256(file.path(RTA_ROOT, "data/S47_ge_gradient.rds"))
 say("Wrote data/S47_ge_gradient.rds  SHA %s", rds_sha)
 
 # Sidecar for CSV
 writeLines(c(
     "FILE:      T43_ge_gradient.csv",
     sprintf("SHA256:    %s", csv_sha),
-    sprintf("PRODUCER:  code/S47_ge_gradient.R (SHA256: %s)", get_sha256("code/S47_ge_gradient.R")),
+    sprintf("PRODUCER:  code/S47_ge_gradient.R (SHA256: %s)", get_sha256(file.path(RTA_ROOT, "code/S47_ge_gradient.R"))),
     "INPUTS:    data/S5R_bhat.rds, code/vendor/gravity_functions.R, ITPDE_total.rds, meta/canonical_facts.md",
     sprintf("SEED:      %d", SEED),
     sprintf("N_DRAWS:   %d", N_DRAWS),
@@ -469,13 +469,13 @@ writeLines(c(
     "           resistance, which is dimensionally correct.",
     sprintf("R_VERSION: %s", paste(R.version$major, R.version$minor, sep = ".")),
     sprintf("CREATED:   %s", format(Sys.time()))
-), "meta/T43_ge_gradient.csv.sidecar")
+), file.path(RTA_ROOT, "meta/T43_ge_gradient.csv.sidecar"))
 
 # Sidecar for RDS
 writeLines(c(
     "FILE:      S47_ge_gradient.rds",
     sprintf("SHA256:    %s", rds_sha),
-    sprintf("PRODUCER:  code/S47_ge_gradient.R (SHA256: %s)", get_sha256("code/S47_ge_gradient.R")),
+    sprintf("PRODUCER:  code/S47_ge_gradient.R (SHA256: %s)", get_sha256(file.path(RTA_ROOT, "code/S47_ge_gradient.R"))),
     "INPUTS:    data/S5R_bhat.rds, code/vendor/gravity_functions.R, ITPDE_total.rds, meta/canonical_facts.md",
     sprintf("SEED:      %d", SEED),
     sprintf("N_DRAWS:   %d", N_DRAWS),
@@ -499,7 +499,7 @@ writeLines(c(
     "           resistance, which is dimensionally correct.",
     sprintf("R_VERSION: %s", paste(R.version$major, R.version$minor, sep = ".")),
     sprintf("CREATED:   %s", format(Sys.time()))
-), "meta/S47_ge_gradient.rds.sidecar")
+), file.path(RTA_ROOT, "meta/S47_ge_gradient.rds.sidecar"))
 
 say("")
 say("=== ALL GATES PASSED ===")

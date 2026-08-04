@@ -19,8 +19,9 @@ cat(sprintf("Node: %s\n", Sys.info()[["nodename"]]))
 cat("=============================================================================\n\n")
 
 # Paths
-REBUILD_DIR <- "/scratch/bt307958/REBUILD_V2"
-SCRATCH_DIR <- "/scratch/bt307958/S28_gradient_B"
+RTA_ROOT <- Sys.getenv("RTA_ROOT", unset = ".")
+stopifnot("RTA_ROOT must contain meta/FILE_REGISTRY.csv" =
+              file.exists(file.path(RTA_ROOT, "meta/FILE_REGISTRY.csv")))
 
 # SHA256 verification function
 get_sha256 <- function(p) {
@@ -32,9 +33,9 @@ get_sha256 <- function(p) {
 # =============================================================================
 cat("=== VERIFYING INPUT SHA256 ===\n")
 
-sha_S5R <- get_sha256(file.path(REBUILD_DIR, "data/S5R_bhat.rds"))
-sha_T12 <- get_sha256(file.path(REBUILD_DIR, "output/T12_N4_gradient.csv"))
-sha_T5R <- get_sha256(file.path(REBUILD_DIR, "output/T5R_theta_summary.csv"))
+sha_S5R <- get_sha256(file.path(RTA_ROOT, "data/S5R_bhat.rds"))
+sha_T12 <- get_sha256(file.path(RTA_ROOT, "output/T12_N4_gradient.csv"))
+sha_T5R <- get_sha256(file.path(RTA_ROOT, "output/T5R_theta_summary.csv"))
 
 expected_sha_S5R <- "d46910ef55f0a22018baf8bd218dac5548bde98150d798ad85aa1914af8d12d8"
 expected_sha_T12 <- "1bcf1f815ce0bf45466c0e2146ce171bda443d475c8d4cd195901a419f4b8bf8"
@@ -63,10 +64,10 @@ cat("All input SHA256 verified: PASS\n\n")
 # =============================================================================
 cat("=== LOADING DATA ===\n")
 
-S5R <- readRDS(file.path(REBUILD_DIR, "data/S5R_bhat.rds"))
+S5R <- readRDS(file.path(RTA_ROOT, "data/S5R_bhat.rds"))
 baseline <- S5R$baseline
-T12 <- read.csv(file.path(REBUILD_DIR, "output/T12_N4_gradient.csv"), stringsAsFactors = FALSE)
-T5R <- read.csv(file.path(REBUILD_DIR, "output/T5R_theta_summary.csv"), stringsAsFactors = FALSE)
+T12 <- read.csv(file.path(RTA_ROOT, "output/T12_N4_gradient.csv"), stringsAsFactors = FALSE)
+T5R <- read.csv(file.path(RTA_ROOT, "output/T5R_theta_summary.csv"), stringsAsFactors = FALSE)
 
 cat(sprintf("baseline rows: %d\n", nrow(baseline)))
 cat(sprintf("T12 rows: %d\n", nrow(T12)))
@@ -230,8 +231,8 @@ cat("G9 PASS\n")
 cat("\n=== WRITING OUTPUT FILES ===\n")
 
 # T27_gradient_B.csv
-write.csv(results, file.path(SCRATCH_DIR, "T27_gradient_B.csv"), row.names = FALSE)
-cat(sprintf("Wrote: %s/T27_gradient_B.csv\n", SCRATCH_DIR))
+write.csv(results, file.path(RTA_ROOT, "output/T27_gradient_B.csv"), row.names = FALSE)
+cat("Wrote: output/T27_gradient_B.csv\n")
 
 # T27_gradient_B_spread.csv
 spread_df <- data.frame(
@@ -239,12 +240,12 @@ spread_df <- data.frame(
   value = c(spread_B_value, spread_D_value, share_B_of_D),
   se = c(spread_B_se, spread_D_se, NA)
 )
-write.csv(spread_df, file.path(SCRATCH_DIR, "T27_gradient_B_spread.csv"), row.names = FALSE)
-cat(sprintf("Wrote: %s/T27_gradient_B_spread.csv\n", SCRATCH_DIR))
+write.csv(spread_df, file.path(RTA_ROOT, "output/T27_gradient_B_spread.csv"), row.names = FALSE)
+cat("Wrote: output/T27_gradient_B_spread.csv\n")
 
 # T27_gradient_B.csv.sidecar
-sha_T27 <- get_sha256(file.path(SCRATCH_DIR, "T27_gradient_B.csv"))
-sha_T27_spread <- get_sha256(file.path(SCRATCH_DIR, "T27_gradient_B_spread.csv"))
+sha_T27 <- get_sha256(file.path(RTA_ROOT, "output/T27_gradient_B.csv"))
+sha_T27_spread <- get_sha256(file.path(RTA_ROOT, "output/T27_gradient_B_spread.csv"))
 
 sidecar_lines <- c(
   "FILE:      T27_gradient_B.csv",
@@ -281,8 +282,8 @@ sidecar_lines <- c(
   sprintf("CREATED: %s", format(Sys.time()))
 )
 
-writeLines(sidecar_lines, file.path(SCRATCH_DIR, "T27_gradient_B.csv.sidecar"))
-cat(sprintf("Wrote: %s/T27_gradient_B.csv.sidecar\n", SCRATCH_DIR))
+writeLines(sidecar_lines, file.path(RTA_ROOT, "meta/T27_gradient_B.csv.sidecar"))
+cat("Wrote: meta/T27_gradient_B.csv.sidecar\n")
 
 # =============================================================================
 # FINAL OUTPUT SHA256
@@ -290,7 +291,7 @@ cat(sprintf("Wrote: %s/T27_gradient_B.csv.sidecar\n", SCRATCH_DIR))
 cat("\n=== OUTPUT SHA256 ===\n")
 cat(sprintf("T27_gradient_B.csv:        %s\n", sha_T27))
 cat(sprintf("T27_gradient_B_spread.csv: %s\n", sha_T27_spread))
-sha_sidecar <- get_sha256(file.path(SCRATCH_DIR, "T27_gradient_B.csv.sidecar"))
+sha_sidecar <- get_sha256(file.path(RTA_ROOT, "meta/T27_gradient_B.csv.sidecar"))
 cat(sprintf("T27_gradient_B.csv.sidecar: %s\n", sha_sidecar))
 
 # =============================================================================

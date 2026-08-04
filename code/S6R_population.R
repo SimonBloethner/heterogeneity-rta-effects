@@ -10,12 +10,11 @@
 # Output assertion: stopifnot(nrow(popn) == length(k))
 # NOTE: Uses dplyr (no data.table) for Festus compatibility.
 
-.libPaths(c("/groups/m-larch/bt307958/Rlibs", .libPaths()))
+RTA_ROOT <- Sys.getenv("RTA_ROOT", unset = ".")
+stopifnot("RTA_ROOT must contain meta/FILE_REGISTRY.csv" =
+              file.exists(file.path(RTA_ROOT, "meta/FILE_REGISTRY.csv")))
 
 suppressPackageStartupMessages(library(dplyr))
-
-REBUILD_DIR <- "/scratch/bt307958/REBUILD_V2"
-setwd(REBUILD_DIR)
 
 MIN_PRE  <- 3
 MIN_POST <- 3
@@ -30,8 +29,8 @@ say("================================================================")
 say("S6R: POPULATION CENSUS, SYMMETRIC WINDOW")
 say("================================================================")
 
-d     <- readRDS("data/S1R_ppml.rds")
-theta <- readRDS("data/S3R_theta.rds")
+d     <- readRDS(file.path(RTA_ROOT, "data/S1R_ppml.rds"))
+theta <- readRDS(file.path(RTA_ROOT, "data/S3R_theta.rds"))
 
 all_pairs <- unique(d$pair)
 census <- list()
@@ -77,14 +76,14 @@ say("")
 say("FINAL n = %d      ledgered exhibit pack = %d      residual = %+d",
     length(k), PACK_N, length(k) - PACK_N)
 
-saveRDS(popn, "data/S6R_population.rds")
-write.csv(TD1R, "output/TD1R_population_census.csv", row.names = FALSE)
-osha <- get_sha256("data/S6R_population.rds")
+saveRDS(popn, file.path(RTA_ROOT, "data/S6R_population.rds"))
+write.csv(TD1R, file.path(RTA_ROOT, "output/TD1R_population_census.csv"), row.names = FALSE)
+osha <- get_sha256(file.path(RTA_ROOT, "data/S6R_population.rds"))
 
 writeLines(c(
     "FILE:      S6R_population.rds",
     sprintf("SHA256:    %s", osha),
-    sprintf("PRODUCER:  code/S6R_population.R (SHA256: %s)", get_sha256("code/S6R_population.R")),
+    sprintf("PRODUCER:  code/S6R_population.R (SHA256: %s)", get_sha256(file.path(RTA_ROOT, "code/S6R_population.R"))),
     sprintf("INPUTS:    data/S1R_ppml.rds, data/S3R_theta.rds"),
     "SEED:      NONE",
     "RULES:     R1 single switchers; R2 adoption in [1991,2016];",
@@ -95,6 +94,6 @@ writeLines(c(
     sprintf("N:         %d  (ledgered pack %d, residual %+d)", length(k), PACK_N, length(k) - PACK_N),
     sprintf("R_VERSION: %s", paste(R.version$major, R.version$minor, sep = ".")),
     sprintf("CREATED:   %s", format(Sys.time()))
-), "meta/S6R_population.rds.sidecar")
+), file.path(RTA_ROOT, "meta/S6R_population.rds.sidecar"))
 
 say("Wrote data/S6R_population.rds and output/TD1R_population_census.csv")

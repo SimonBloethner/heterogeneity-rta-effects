@@ -12,16 +12,16 @@
 # NOTE:    INV-027 - variance discrepancy between this and S18
 # =============================================================================
 
-.libPaths(c("/groups/m-larch/bt307958/Rlibs", .libPaths()))
-suppressPackageStartupMessages(library(dplyr))
+RTA_ROOT <- Sys.getenv("RTA_ROOT", unset = ".")
+stopifnot("RTA_ROOT must contain meta/FILE_REGISTRY.csv" =
+              file.exists(file.path(RTA_ROOT, "meta/FILE_REGISTRY.csv")))
 
-REBUILD_DIR <- "/scratch/bt307958/REBUILD_V2"
-setwd(REBUILD_DIR)
+suppressPackageStartupMessages(library(dplyr))
 
 SEED <- 20260719
 set.seed(SEED)
 
-get_sha256 <- function(p) strsplit(system2("sha256sum", args = shQuote(p), stdout = TRUE), " ")[[1]][1]
+get_sha256 <- function(p) strsplit(system2("sha256sum", args = shQuote(file.path(RTA_ROOT, p)), stdout = TRUE), " ")[[1]][1]
 say <- function(...) cat(sprintf(...), "\n", sep = "")
 
 say("================================================================")
@@ -30,8 +30,8 @@ say("Start: %s", format(Sys.time()))
 say("================================================================")
 
 # Load data
-S1R <- readRDS("data/S1R_ppml.rds")
-S5R <- readRDS("data/S5R_bhat.rds")
+S1R <- readRDS(file.path(RTA_ROOT, "data/S1R_ppml.rds"))
+S5R <- readRDS(file.path(RTA_ROOT, "data/S5R_bhat.rds"))
 baseline <- S5R$baseline
 
 # Identify switcher pairs
@@ -239,7 +239,7 @@ output <- bind_rows(
     )
 )
 
-write.csv(output, "output/V4_split_length.csv", row.names = FALSE)
+write.csv(output, file.path(RTA_ROOT, "output/V4_split_length.csv"), row.names = FALSE)
 
 # Sidecar
 code_sha <- get_sha256("code/validation/V4_split_length.R")
@@ -263,7 +263,7 @@ writeLines(c(
     "  N1b measures OOS null (refits excluding LATE cells)",
     "  Arm C uses N1b. No discrepancy.",
     sprintf("CREATED:   %s", format(Sys.time()))
-), "meta/V4_split_length.csv.sidecar")
+), file.path(RTA_ROOT, "meta/V4_split_length.csv.sidecar"))
 
 say("")
 say("Wrote output/V4_split_length.csv")

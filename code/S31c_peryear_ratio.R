@@ -2,6 +2,10 @@
 # X3: Per-Year Ratio Simulation (Close Caveat)
 # Task: Use each year's own fitted parameters instead of pooling 2019
 
+RTA_ROOT <- Sys.getenv("RTA_ROOT", unset = ".")
+stopifnot("RTA_ROOT must contain meta/FILE_REGISTRY.csv" =
+              file.exists(file.path(RTA_ROOT, "meta/FILE_REGISTRY.csv")))
+
 cat("========================================================================\n")
 cat("X3: PER-YEAR RATIO SIMULATION\n")
 cat("Start:", format(Sys.time()), "\n")
@@ -18,7 +22,7 @@ set.seed(20260721)
 # -----------------------------------------------------------------------------
 cat("STEP 0: Loading X1 anchor file and data...\n")
 
-x1_file <- "output/X1_results.rds"
+x1_file <- file.path(RTA_ROOT, "output/X1_results.rds")
 x1_sha <- system(paste("sha256sum", x1_file), intern = TRUE)
 x1_sha <- strsplit(x1_sha, " ")[[1]][1]
 cat("  X1 SHA:", x1_sha, "\n")
@@ -29,7 +33,7 @@ cat("  Anchor years:", min(anchors$year), "-", max(anchors$year), "\n")
 cat("  Columns:", paste(names(anchors), collapse = ", "), "\n")
 
 # Load data to get n_u per year
-data_file <- "/groups/m-larch/bt307958/tails/outData/filtered_trade.rds"
+data_file <- file.path(RTA_ROOT, "data/filtered_trade.rds")
 data_sha <- system(paste("sha256sum", data_file), intern = TRUE)
 data_sha <- strsplit(data_sha, " ")[[1]][1]
 cat("  Data SHA:", data_sha, "\n")
@@ -274,6 +278,6 @@ saveRDS(list(
     ks_pvalue = ks_test$p.value,
     x1_sha = x1_sha,
     data_sha = data_sha
-), "output/X3_results.rds")
+), file.path(RTA_ROOT, "output/X3_results.rds"))
 
 cat("\nX3 COMPLETE:", format(Sys.time()), "\n")

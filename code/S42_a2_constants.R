@@ -6,8 +6,12 @@
 # =============================================================================
 # Configuration
 # =============================================================================
-LEDGER_PATH <- "meta/canonical_facts.md"
-OUTPUT_PATH <- "article/a2_constants.tex"
+RTA_ROOT <- Sys.getenv("RTA_ROOT", unset = ".")
+stopifnot("RTA_ROOT must contain meta/FILE_REGISTRY.csv" =
+              file.exists(file.path(RTA_ROOT, "meta/FILE_REGISTRY.csv")))
+
+LEDGER_PATH <- file.path(RTA_ROOT, "meta/canonical_facts.md")
+OUTPUT_PATH <- file.path(RTA_ROOT, "article/a2_constants.tex")
 
 # Macro definitions: name -> (ledger_id, precision, is_integer)
 # is_integer = TRUE for counts that should render as bare integers

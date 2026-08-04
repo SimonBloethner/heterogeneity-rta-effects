@@ -15,9 +15,9 @@ cat("========================================================================\n\
 set.seed(20260731)
 START_TIME <- Sys.time()
 
-if (!grepl("Simon", getwd())) {
-    .libPaths(c("/groups/m-larch/bt307958/Rlibs", .libPaths()))
-}
+RTA_ROOT <- Sys.getenv("RTA_ROOT", unset = ".")
+stopifnot("RTA_ROOT must contain meta/FILE_REGISTRY.csv" =
+              file.exists(file.path(RTA_ROOT, "meta/FILE_REGISTRY.csv")))
 
 library(data.table)
 
@@ -64,7 +64,7 @@ r_sas <- function(n, epsilon, delta) {
 cat("\nLoading S34 outputs...\n")
 
 # T39: per-pair means and variances
-t39 <- fread("output/T39_a2_jensen_identity.csv")
+t39 <- fread(file.path(RTA_ROOT, "output/T39_a2_jensen_identity.csv"))
 cat(sprintf("  T39: %d rows\n", nrow(t39)))
 
 # Extract real panel data (exclude summary rows)
@@ -85,7 +85,7 @@ cat(sprintf("  S34 real slope: %.4f, intercept: %.4f\n",
 
 cat("\nLoading original cell-level data...\n")
 
-INPUT_PATH <- "/scratch/bt307958/ENFORCE_ROOT/data/S1R_ppml.rds"
+INPUT_PATH <- file.path(RTA_ROOT, "data/S1R_ppml.rds")
 d <- readRDS(INPUT_PATH)
 setDT(d)
 
@@ -512,7 +512,7 @@ t40 <- data.table(
     var_reliability = c(rel_real["reliability"], rel_normal["reliability"], rel_ctrl_c["reliability"])
 )
 
-write.csv(t40, "output/T40_jensen_control.csv", row.names = FALSE)
+write.csv(t40, file.path(RTA_ROOT, "output/T40_jensen_control.csv"), row.names = FALSE)
 cat(sprintf("  Wrote output/T40_jensen_control.csv (%d rows)\n", nrow(t40)))
 
 # =============================================================================
@@ -546,7 +546,7 @@ png_success <- FALSE
 # Try ragg::agg_png
 if (requireNamespace("ragg", quietly = TRUE)) {
     cat("  Using ragg::agg_png\n")
-    ragg::agg_png("output/F5_a2_normality_qq.png", width = 800, height = 800)
+    ragg::agg_png(file.path(RTA_ROOT, "output/F5_a2_normality_qq.png"), width = 800, height = 800)
 
     par(mfrow = c(1, 1))
     plot(ctrl_z_sorted, real_z_sorted,
@@ -572,7 +572,7 @@ if (requireNamespace("ragg", quietly = TRUE)) {
     # Try cairo PNG
     tryCatch({
         cat("  Trying png with cairo\n")
-        png("output/F5_a2_normality_qq.png", width = 800, height = 800, type = "cairo")
+        png(file.path(RTA_ROOT, "output/F5_a2_normality_qq.png"), width = 800, height = 800, type = "cairo")
 
         par(mfrow = c(1, 1))
         plot(ctrl_z_sorted, real_z_sorted,
@@ -589,10 +589,12 @@ if (requireNamespace("ragg", quietly = TRUE)) {
 }
 
 # If PNG still not created, use pdftoppm on existing PDF
-if (!png_success && file.exists("output/F5_a2_normality_qq.pdf")) {
+if (!png_success && file.exists(file.path(RTA_ROOT, "output/F5_a2_normality_qq.pdf"))) {
     cat("  Converting PDF to PNG with pdftoppm\n")
-    system("pdftoppm -png -r 100 -singlefile output/F5_a2_normality_qq.pdf output/F5_a2_normality_qq")
-    if (file.exists("output/F5_a2_normality_qq.png")) {
+    system(sprintf("pdftoppm -png -r 100 -singlefile %s %s",
+                   shQuote(file.path(RTA_ROOT, "output/F5_a2_normality_qq.pdf")),
+                   shQuote(file.path(RTA_ROOT, "output/F5_a2_normality_qq"))))
+    if (file.exists(file.path(RTA_ROOT, "output/F5_a2_normality_qq.png"))) {
         png_success <- TRUE
     }
 }

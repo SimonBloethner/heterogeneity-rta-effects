@@ -15,11 +15,12 @@
 # Login node guard
 stopifnot(!grepl("login", Sys.info()[["nodename"]]))
 
+RTA_ROOT <- Sys.getenv("RTA_ROOT", unset = ".")
+stopifnot("RTA_ROOT must contain meta/FILE_REGISTRY.csv" =
+              file.exists(file.path(RTA_ROOT, "meta/FILE_REGISTRY.csv")))
+
 suppressPackageStartupMessages(library(data.table))
 set.seed(20260719)
-
-SCRATCH_DIR <- "/scratch/bt307958/S26_VSIG"
-setwd(SCRATCH_DIR)
 
 N_REP <- 4e6L
 T_POST <- 10L
@@ -39,7 +40,7 @@ get_sha256 <- function(p) {
 # VERIFY T28b SHA256
 # =============================================================================
 cat("=== VERIFYING T28b SHA256 ===\n")
-sha_T28b <- get_sha256(file.path(SCRATCH_DIR, "T28b_v1c_arm1p.csv"))
+sha_T28b <- get_sha256(file.path(RTA_ROOT, "output/T28b_v1c_arm1p.csv"))
 expected_sha_T28b <- "7bd76254d80324c2c8189c906383ef9b462d000394c3bb19253aad0fd89dcc4c"
 cat(sprintf("T28b_v1c_arm1p.csv: %s\n", sha_T28b))
 cat(sprintf("Expected:           %s\n", expected_sha_T28b))
@@ -51,10 +52,10 @@ cat("T28b SHA256 verified: PASS\n\n")
 # -----------------------------------------------------------------------------
 cat("=== LOADING FROZEN VALUES ===\n")
 
-T22 <- fread("T22_reliability.csv")
-T24 <- fread("T24_placebo_uncorr.csv")
-T21 <- fread("T21_arms.csv")
-T28b <- fread("T28b_v1c_arm1p.csv")
+T22 <- fread(file.path(RTA_ROOT, "output/T22_reliability.csv"))
+T24 <- fread(file.path(RTA_ROOT, "output/T24_placebo_uncorr.csv"))
+T21 <- fread(file.path(RTA_ROOT, "output/T21_arms.csv"))
+T28b <- fread(file.path(RTA_ROOT, "output/T28b_v1c_arm1p.csv"))
 
 PLACEBO_A_MEAN <- T22[ID == "PLACEBO_A_MEAN", value]
 PLACEBO_A_SD <- T22[ID == "PLACEBO_A_SD", value]
@@ -289,8 +290,8 @@ out <- data.frame(
 
 print(out)
 
-write.csv(out, "T25_prop_verification.csv", row.names = FALSE)
-cat("\nSaved: T25_prop_verification.csv\n")
+write.csv(out, file.path(RTA_ROOT, "output/T25_prop_verification.csv"), row.names = FALSE)
+cat("\nSaved: output/T25_prop_verification.csv\n")
 
 # -----------------------------------------------------------------------------
 # OUTPUT: prop_constants.tex
@@ -345,16 +346,16 @@ tex_lines <- c(
   ""
 )
 
-writeLines(tex_lines, "prop_constants.tex")
-cat("Saved: prop_constants.tex\n")
+writeLines(tex_lines, file.path(RTA_ROOT, "article/prop_constants.tex"))
+cat("Saved: article/prop_constants.tex\n")
 
 # -----------------------------------------------------------------------------
 # Sidecar
 # -----------------------------------------------------------------------------
-sha_out <- get_sha256("T25_prop_verification.csv")
+sha_out <- get_sha256(file.path(RTA_ROOT, "output/T25_prop_verification.csv"))
 writeLines(c(
   "PRODUCER: S26_prop_verification.R v3",
-  "INPUTS: T22_reliability.csv, T24_placebo_uncorr.csv, T21_arms.csv, T28b_v1c_arm1p.csv",
+  "INPUTS: output/T22_reliability.csv, output/T24_placebo_uncorr.csv, output/T21_arms.csv, output/T28b_v1c_arm1p.csv",
   "SEED: 20260719",
   sprintf("N_REP: %d", N_REP),
   "",
@@ -373,7 +374,7 @@ writeLines(c(
   "STATUS: BUILT",
   sprintf("DATE: %s", Sys.Date()),
   sprintf("SHA256: %s", sha_out)
-), "T25_prop_verification.csv.sidecar")
+), file.path(RTA_ROOT, "meta/T25_prop_verification.csv.sidecar"))
 cat("Saved: T25_prop_verification.csv.sidecar\n")
 
 # -----------------------------------------------------------------------------
@@ -454,7 +455,7 @@ if (g5_pass) {
 
 # G6: All main.tex macros resolve
 cat("G6: Checking prop_constants.tex macros...\n")
-tex_content <- readLines("prop_constants.tex")
+tex_content <- readLines(file.path(RTA_ROOT, "article/prop_constants.tex"))
 required_macros <- c("PropEsigsq", "PropSigma", "PropVarEta", "PropVarR",
                      "PropApproxB", "PropMCB", "PropOverstatePct",
                      "PropVsigmasq", "PropCVsigsq", "PropRpred", "PropRgap",

@@ -8,17 +8,17 @@
 # B:       500 (pair-level bootstrap)
 # =============================================================================
 
-.libPaths(c("/groups/m-larch/bt307958/Rlibs", .libPaths()))
-suppressPackageStartupMessages(library(dplyr))
+RTA_ROOT <- Sys.getenv("RTA_ROOT", unset = ".")
+stopifnot("RTA_ROOT must contain meta/FILE_REGISTRY.csv" =
+              file.exists(file.path(RTA_ROOT, "meta/FILE_REGISTRY.csv")))
 
-REBUILD_DIR <- "/scratch/bt307958/REBUILD_V2"
-setwd(REBUILD_DIR)
+suppressPackageStartupMessages(library(dplyr))
 
 SEED <- 20260719
 B <- 500
 set.seed(SEED)
 
-get_sha256 <- function(p) strsplit(system2("sha256sum", args = shQuote(p), stdout = TRUE), " ")[[1]][1]
+get_sha256 <- function(p) strsplit(system2("sha256sum", args = shQuote(file.path(RTA_ROOT, p)), stdout = TRUE), " ")[[1]][1]
 say <- function(...) cat(sprintf(...), "\n", sep = "")
 
 say("================================================================")
@@ -28,7 +28,7 @@ say("B = %d bootstrap draws, seed = %d", B, SEED)
 say("================================================================")
 
 # Load inputs
-S5R <- readRDS("data/S5R_bhat.rds")
+S5R <- readRDS(file.path(RTA_ROOT, "data/S5R_bhat.rds"))
 baseline <- S5R$baseline
 
 # Arm A noise variance: mean(se_total^2) from archive/retired_2026-07-29/output/T11_se_decomposition.csv
@@ -37,8 +37,8 @@ baseline <- S5R$baseline
 mean_se_total_sq <- 0.2612  # ID: ARM_A_VAR_NULL (ledger: Arm A Var_null = 0.261)
 say("Arm A noise: mean(se_total^2) = %.6f (ledgered constant, INV-047)", mean_se_total_sq)
 
-N1 <- readRDS("data/N1_oos_null.rds")
-N2 <- readRDS("data/N2_placebo.rds")
+N1 <- readRDS(file.path(RTA_ROOT, "data/N1_oos_null.rds"))
+N2 <- readRDS(file.path(RTA_ROOT, "data/N2_placebo.rds"))
 
 say("Baseline pairs: %d", nrow(baseline))
 say("N1 Var_null_matched: %.6f", N1$Var_null_matched)
@@ -184,7 +184,7 @@ results_df <- data.frame(
     CI_upper = c(ci_A[2], ci_B[2], ci_C[2], NA, NA)
 )
 
-write.csv(results_df, "output/T12_N3_deconv.csv", row.names = FALSE)
+write.csv(results_df, file.path(RTA_ROOT, "output/T12_N3_deconv.csv"), row.names = FALSE)
 
 # Save for downstream
 saveRDS(list(
@@ -204,7 +204,7 @@ saveRDS(list(
     identified_set = c(SD_true_C, SD_true_A),
     B = B,
     seed = SEED
-), "data/N3_deconv.rds")
+), file.path(RTA_ROOT, "data/N3_deconv.rds"))
 
 # Sidecar
 code_sha <- get_sha256("code/N3_deconv_arms.R")
@@ -232,7 +232,7 @@ writeLines(c(
     "",
     sprintf("IDENTIFIED SET: [%.4f, %.4f]", SD_true_C, SD_true_A),
     sprintf("CREATED:   %s", format(Sys.time()))
-), "meta/T12_N3_deconv.csv.sidecar")
+), file.path(RTA_ROOT, "meta/T12_N3_deconv.csv.sidecar"))
 
 say("Wrote output/T12_N3_deconv.csv")
 say("Wrote data/N3_deconv.rds")

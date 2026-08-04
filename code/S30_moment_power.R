@@ -6,6 +6,10 @@
 #
 # VECTORIZED VERSION for performance
 
+RTA_ROOT <- Sys.getenv("RTA_ROOT", unset = ".")
+stopifnot("RTA_ROOT must contain meta/FILE_REGISTRY.csv" =
+              file.exists(file.path(RTA_ROOT, "meta/FILE_REGISTRY.csv")))
+
 library(data.table)
 library(parallel)
 
@@ -15,7 +19,7 @@ set.seed(20260719)
 # 1. READ CALIBRATION FROM COMMITTED ARTIFACTS
 # =============================================================================
 
-cf_lines <- readLines("meta/canonical_facts.md")
+cf_lines <- readLines(file.path(RTA_ROOT, "meta/canonical_facts.md"))
 
 extract_cf <- function(id) {
   pattern <- paste0("^\\| ", id, " \\|")
@@ -36,7 +40,7 @@ cat("  N =", N, "\n")
 cat("  ESIGMA2 =", ESIGMA2, "\n")
 cat("  VAR_SIGMA2 =", VAR_SIGMA2, "\n")
 
-T22 <- fread("output/T22_theta_A_treated.csv")
+T22 <- fread(file.path(RTA_ROOT, "output/T22_theta_A_treated.csv"))
 stopifnot("n_post_cells" %in% names(T22))
 T_post_empirical <- T22$n_post_cells
 stopifnot(length(T_post_empirical) == N)
@@ -310,7 +314,7 @@ cat("RESULTS TABLE\n")
 cat("========================================\n")
 print(results_dt)
 
-fwrite(results_dt, "output/T29_moment_power.csv")
+fwrite(results_dt, file.path(RTA_ROOT, "output/T29_moment_power.csv"))
 cat("\nWritten: output/T29_moment_power.csv\n")
 
 # =============================================================================

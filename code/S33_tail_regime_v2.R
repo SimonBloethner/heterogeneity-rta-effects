@@ -1,16 +1,16 @@
 # S33: The regime question, settled in one round
 # Two independent instruments: likelihood comparison + model-free diagnostics
 
+RTA_ROOT <- Sys.getenv("RTA_ROOT", unset = ".")
+stopifnot("RTA_ROOT must contain meta/FILE_REGISTRY.csv" =
+              file.exists(file.path(RTA_ROOT, "meta/FILE_REGISTRY.csv")))
+
 cat("========================================================================\n")
 cat("S33: THE REGIME QUESTION — TWO INSTRUMENTS\n")
 cat(sprintf("Start: %s\n", format(Sys.time(), "%Y-%m-%d %H:%M:%S")))
 cat("========================================================================\n\n")
 
 set.seed(20260730)
-
-if (!grepl("Simon", getwd())) {
-    .libPaths(c("/groups/m-larch/bt307958/Rlibs", .libPaths()))
-}
 
 library(data.table)
 library(POT)
@@ -263,7 +263,7 @@ if (fit$converged) {
 c1_pass <- all(!is.na(calibration_results$abs_error) & calibration_results$abs_error <= 0.05)
 cat(sprintf("\n*** Gate C1: %s ***\n", ifelse(c1_pass, "PASS", "FAIL")))
 
-write.csv(calibration_results, "output/T35_fitter_calibration.csv", row.names = FALSE)
+write.csv(calibration_results, file.path(RTA_ROOT, "output/T35_fitter_calibration.csv"), row.names = FALSE)
 
 # =============================================================================
 # LOAD REAL DATA
@@ -273,7 +273,7 @@ cat("\n========================================================================\
 cat("LOADING REAL DATA\n")
 cat("========================================================================\n")
 
-df <- readRDS("/groups/m-larch/bt307958/tails/data/ITPDE_total.rds")
+df <- readRDS(file.path(RTA_ROOT, "data/ITPDE_total.rds"))
 df <- df[df$exporter != df$importer & df$trade > 0, ]
 setDT(df)
 cat(sprintf("  Positive bilateral flows: %d\n", nrow(df)))
@@ -395,14 +395,14 @@ if (c1_pass) {
 
     stage1_valid <- (c2_rate >= 0.90) && (c3_rate >= 0.90)
 
-    write.csv(all_stage1, "output/T36_tail_comparison.csv", row.names = FALSE)
+    write.csv(all_stage1, file.path(RTA_ROOT, "output/T36_tail_comparison.csv"), row.names = FALSE)
 
 } else {
     cat("\n*** Stage 1 SKIPPED: C1 failed ***\n")
     stage1_valid <- FALSE
     # Create empty placeholder
     all_stage1 <- data.table()
-    write.csv(all_stage1, "output/T36_tail_comparison.csv", row.names = FALSE)
+    write.csv(all_stage1, file.path(RTA_ROOT, "output/T36_tail_comparison.csv"), row.names = FALSE)
 }
 
 # =============================================================================
@@ -615,7 +615,7 @@ c5_pass <- ln_me_declining && ln_r_small
 cat(sprintf("\n*** Gate C4 (Pareto: slope>0, R(2) persists): %s ***\n", ifelse(c4_pass, "PASS", "FAIL")))
 cat(sprintf("*** Gate C5 (LN: e/u declines, R(p) small): %s ***\n", ifelse(c5_pass, "PASS", "FAIL")))
 
-write.csv(all_stage2, "output/T37_tail_modelfree.csv", row.names = FALSE)
+write.csv(all_stage2, file.path(RTA_ROOT, "output/T37_tail_modelfree.csv"), row.names = FALSE)
 
 # =============================================================================
 # FINAL SUMMARY

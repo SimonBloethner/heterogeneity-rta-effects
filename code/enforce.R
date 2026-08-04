@@ -554,6 +554,56 @@ check_registry_existence <- function(root, report = FALSE) {
 }
 
 # =============================================================================
+# CHECK (k): No hardcoded absolute paths in R scripts
+# =============================================================================
+check_absolute_paths <- function(root, report = FALSE) {
+    results <- character()
+
+    all_scripts <- list.files(file.path(root, "code"), pattern = "\\.R$", full.names = TRUE, recursive = TRUE)
+    scripts <- all_scripts[!grepl("audit/|archive/|vendor/", all_scripts)]
+
+    # Patterns that indicate hardcoded absolute paths
+    abs_patterns <- c(
+        '"/scratch',           # Scratch filesystem
+        '"/groups',            # Group filesystems
+        '"/home/',             # Home directories
+        '"/tmp/',              # Temporary (excluding variable references)
+        'setwd\\s*\\('         # setwd() calls (except enforce.R)
+    )
+
+    for (script in scripts) {
+        script_name <- basename(script)
+
+        # Skip enforce.R itself (it has legitimate setwd usage)
+        if (script_name == "enforce.R") next
+
+        content <- readLines(script, warn = FALSE)
+
+        for (i in seq_along(content)) {
+            line <- content[i]
+
+            # Skip comment lines
+            if (grepl("^\\s*#", line)) next
+
+            for (pattern in abs_patterns) {
+                if (grepl(pattern, line, perl = TRUE)) {
+                    # Special case: setwd only flagged if not a restore pattern
+                    if (pattern == "setwd\\s*\\(" && grepl("on\\.exit|old_wd", line)) next
+
+                    msg <- sprintf("%s:%d contains hardcoded path or setwd(): %s",
+                                   script_name, i, trimws(substr(line, 1, 80)))
+                    if (report) report_violation("ABS_PATH", msg)
+                    results <- c(results, paste0("ABS_PATH|", msg))
+                    break  # Only report once per line
+                }
+            }
+        }
+    }
+
+    results
+}
+
+# =============================================================================
 # DRIVER (exactly matches original output format)
 # =============================================================================
 run_all_checks <- function(root = getwd()) {
@@ -693,6 +743,15 @@ run_all_checks <- function(root = getwd()) {
         }
     }
     check_registry_existence(root, report = TRUE)
+    cat("\n")
+
+    # (k)
+    cat("=== CHECK (k): Absolute paths in R scripts ===\n")
+    all_scripts <- list.files(file.path(root, "code"), pattern = "\\.R$", full.names = TRUE, recursive = TRUE)
+    scripts <- all_scripts[!grepl("audit/|archive/|vendor/", all_scripts)]
+    cat(sprintf("  Scanning %d R scripts for hardcoded paths...\n", length(scripts)))
+    v_k <- check_absolute_paths(root, report = TRUE)
+    if (length(v_k) == 0) cat("  No hardcoded absolute paths found: PASS\n")
     cat("\n")
 
     # OUTPUT VALIDATION

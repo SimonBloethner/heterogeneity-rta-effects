@@ -6,8 +6,12 @@
 # =============================================================================
 # Configuration
 # =============================================================================
-LEDGER_PATH <- "meta/canonical_facts.md"
-OUTPUT_PATH <- "article/ledger_constants.tex"
+RTA_ROOT <- Sys.getenv("RTA_ROOT", unset = ".")
+stopifnot("RTA_ROOT must contain meta/FILE_REGISTRY.csv" =
+              file.exists(file.path(RTA_ROOT, "meta/FILE_REGISTRY.csv")))
+
+LEDGER_PATH <- file.path(RTA_ROOT, "meta/canonical_facts.md")
+OUTPUT_PATH <- file.path(RTA_ROOT, "article/ledger_constants.tex")
 
 # Macro definitions: name -> (ledger_id, precision, is_integer, is_interval)
 # is_integer = TRUE for counts that should render as bare integers
@@ -247,8 +251,8 @@ cat("G3: PASS - no Prop*/Atwo*/MomPow*/Holdout* collisions\n")
 # =============================================================================
 # Ensure article/ directory exists
 # =============================================================================
-if (!dir.exists("article")) {
-    dir.create("article")
+if (!dir.exists(file.path(RTA_ROOT, "article"))) {
+    dir.create(file.path(RTA_ROOT, "article"))
     cat("Created article/ directory\n")
 }
 

@@ -16,9 +16,12 @@
 #
 # v3 (SYNC-6): Added n column; added TREATED_TH and PLACEBO_TH rows.
 
+RTA_ROOT <- Sys.getenv("RTA_ROOT", unset = ".")
+stopifnot("RTA_ROOT must contain meta/FILE_REGISTRY.csv" =
+              file.exists(file.path(RTA_ROOT, "meta/FILE_REGISTRY.csv")))
+
 suppressPackageStartupMessages(library(data.table))
 set.seed(20260719)
-setwd("/scratch/bt307958/REBUILD_V2")
 
 EXPECTED_N <- 4182
 
@@ -34,7 +37,7 @@ RETIRED <- list(
 # Load data
 # -----------------------------------------------------------------------------
 cat("=== LOADING DATA ===\n")
-S5R <- readRDS("data/S5R_bhat.rds")
+S5R <- readRDS(file.path(RTA_ROOT, "data/S5R_bhat.rds"))
 base <- as.data.table(S5R[["baseline"]])
 stopifnot(nrow(base) == EXPECTED_N)
 cat(sprintf("G1 n = %d: PASS\n", nrow(base)))
@@ -42,7 +45,7 @@ cat(sprintf("G1 n = %d: PASS\n", nrow(base)))
 plac <- as.data.table(S5R[["placebo"]])
 cat(sprintf("Placebo pairs in S5R: %d\n", nrow(plac)))
 
-ppml <- readRDS("data/S1R_ppml.rds")
+ppml <- readRDS(file.path(RTA_ROOT, "data/S1R_ppml.rds"))
 setDT(ppml)
 cat(sprintf("PPML rows: %d, unique pairs: %d\n", nrow(ppml), uniqueN(ppml$pair)))
 
@@ -232,13 +235,13 @@ cat("\n=== SAVING PER-PAIR DATA ===\n")
 
 if (treated_result$n_qualifying > 0) {
   treated_pairs_out <- treated_data[, .(pair, theta_A = theta_A_full, n_post_cells)]
-  write.csv(treated_pairs_out, "output/T22_theta_A_treated.csv", row.names = FALSE)
+  write.csv(treated_pairs_out, file.path(RTA_ROOT, "output/T22_theta_A_treated.csv"), row.names = FALSE)
   cat(sprintf("Saved: output/T22_theta_A_treated.csv (%d pairs)\n", nrow(treated_pairs_out)))
 }
 
 if (placebo_result$n_qualifying > 0) {
   placebo_pairs_out <- placebo_data[, .(pair, theta_A = theta_A_full, n_post_cells)]
-  write.csv(placebo_pairs_out, "output/T22_theta_A_placebo.csv", row.names = FALSE)
+  write.csv(placebo_pairs_out, file.path(RTA_ROOT, "output/T22_theta_A_placebo.csv"), row.names = FALSE)
   cat(sprintf("Saved: output/T22_theta_A_placebo.csv (%d pairs)\n", nrow(placebo_pairs_out)))
 }
 
@@ -298,11 +301,11 @@ cat(sprintf("T_h >= 2 gate: treated=%.2f, placebo=%.2f (both >= 2)\n",
 
 print(out)
 
-write.csv(out, "output/T22_reliability.csv", row.names = FALSE)
+write.csv(out, file.path(RTA_ROOT, "output/T22_reliability.csv"), row.names = FALSE)
 cat("\nSaved: output/T22_reliability.csv\n")
 
 # Sidecar
-sha <- system("sha256sum output/T22_reliability.csv | cut -d' ' -f1", intern = TRUE)
+sha <- system(sprintf("sha256sum %s | cut -d' ' -f1", file.path(RTA_ROOT, "output/T22_reliability.csv")), intern = TRUE)
 writeLines(c(
   "PRODUCER: S24_reliability.R v3",
   "INPUTS: data/S5R_bhat.rds, data/S1R_ppml.rds",
@@ -324,7 +327,7 @@ writeLines(c(
   sprintf("TREATED_QUALIFYING: %d of %d", treated_result$n_qualifying, treated_result$n_total),
   sprintf("PLACEBO_QUALIFYING: %d of %d", placebo_result$n_qualifying, placebo_result$n_total),
   sprintf("SHA256: %s", sha)
-), "meta/T22_reliability.csv.sidecar")
+), file.path(RTA_ROOT, "meta/T22_reliability.csv.sidecar"))
 cat("Saved: meta/T22_reliability.csv.sidecar\n")
 
 # -----------------------------------------------------------------------------
