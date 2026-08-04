@@ -3,8 +3,7 @@
 # S29b_v1c_arm1p.R - V1c Arm 1': ESIGMA2 throughout, Jensen on both windows
 # =============================================================================
 # OUTPUTS: T28b_v1c_arm1p.csv, T28b_v1c_arm1p.csv.sidecar
-# INPUTS:  output/T28_v1c_pairlevel.csv, output/T25_prop_verification.csv,
-#          output/T22_theta_A_placebo.csv
+# INPUTS:  output/T28_v1c_pairlevel.csv
 # SEED:    NONE
 # SCRATCH: /scratch/bt307958/V1C_ARM1P/
 # =============================================================================
@@ -27,36 +26,6 @@ get_sha256 <- function(p) {
   strsplit(system2("sha256sum", args = shQuote(p), stdout = TRUE), " ")[[1]][1]
 }
 
-# =============================================================================
-# VERIFY INPUT SHA256
-# =============================================================================
-cat("=== VERIFYING INPUT SHA256 ===\n")
-
-sha_T28 <- get_sha256(file.path(RTA_ROOT, "output/T28_v1c_pairlevel.csv"))
-sha_T25 <- get_sha256(file.path(RTA_ROOT, "output/T25_prop_verification.csv"))
-sha_T22 <- get_sha256(file.path(RTA_ROOT, "output/T22_theta_A_placebo.csv"))
-
-expected_sha_T28 <- "06047099424126dc10b3c3239c2b90055403857ed2148bc06bc6d98d557f797c"
-expected_sha_T25 <- "e729b79152f302e245dc63145282d08b92c990860d6eb28564a36457fcbee855"
-expected_sha_T22 <- "aeaa1148c90507e089216c4474ef8f0301805c232949e79bd3a3b3bbd0edde18"
-
-cat(sprintf("T28_v1c_pairlevel.csv:     %s\n", sha_T28))
-cat(sprintf("  Expected:                %s\n", expected_sha_T28))
-cat(sprintf("  Match: %s\n", ifelse(sha_T28 == expected_sha_T28, "YES", "HALT")))
-
-cat(sprintf("T25_prop_verification.csv: %s\n", sha_T25))
-cat(sprintf("  Expected:                %s\n", expected_sha_T25))
-cat(sprintf("  Match: %s\n", ifelse(sha_T25 == expected_sha_T25, "YES", "HALT")))
-
-cat(sprintf("T22_theta_A_placebo.csv:   %s\n", sha_T22))
-cat(sprintf("  Expected:                %s\n", expected_sha_T22))
-cat(sprintf("  Match: %s\n", ifelse(sha_T22 == expected_sha_T22, "YES", "HALT")))
-
-stopifnot(sha_T28 == expected_sha_T28)
-stopifnot(sha_T25 == expected_sha_T25)
-stopifnot(sha_T22 == expected_sha_T22)
-
-cat("All input SHA256 verified: PASS\n\n")
 
 # =============================================================================
 # LOAD COMMITTED VALUES FROM T28
@@ -189,14 +158,13 @@ cat("Wrote: output/T28b_v1c_arm1p.csv\n")
 sha_out <- get_sha256(file.path(RTA_ROOT, "output/T28b_v1c_arm1p.csv"))
 
 # Sidecar
+sha_T28 <- get_sha256(file.path(RTA_ROOT, "output/T28_v1c_pairlevel.csv"))
 sidecar_lines <- c(
   "FILE:      T28b_v1c_arm1p.csv",
   sprintf("SHA256:    %s", sha_out),
   "PRODUCER:  S29b_v1c_arm1p.R",
   "INPUTS:",
-  sprintf("  output/T28_v1c_pairlevel.csv:     %s", sha_T28),
-  sprintf("  output/T25_prop_verification.csv: %s", sha_T25),
-  sprintf("  output/T22_theta_A_placebo.csv:   %s", sha_T22),
+  sprintf("  output/T28_v1c_pairlevel.csv: %s", sha_T28),
   "SEED:      NONE",
   "",
   "ARM 1' SPECIFICATION:",

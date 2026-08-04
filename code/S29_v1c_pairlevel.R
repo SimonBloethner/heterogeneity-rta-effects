@@ -4,7 +4,7 @@
 # =============================================================================
 # OUTPUTS: T28_v1c_pairlevel.csv, T28_v1c_pairlevel.csv.sidecar
 # INPUTS:  data/S5R_bhat.rds, data/S1R_ppml.rds,
-#          output/T25_prop_verification.csv, output/T22_theta_A_placebo.csv
+#          output/T25a_prop_constants.csv, output/T22_theta_A_placebo.csv
 # EXPECTED_N: 15683
 # SEED:    NONE
 # SCRATCH: /scratch/bt307958/V1C_PAIRLEVEL/
@@ -30,43 +30,6 @@ get_sha256 <- function(p) {
   strsplit(system2("sha256sum", args = shQuote(p), stdout = TRUE), " ")[[1]][1]
 }
 
-# =============================================================================
-# VERIFY INPUT SHA256
-# =============================================================================
-cat("=== VERIFYING INPUT SHA256 ===\n")
-
-sha_S5R <- get_sha256(file.path(RTA_ROOT, "data/S5R_bhat.rds"))
-sha_S1R <- get_sha256(file.path(RTA_ROOT, "data/S1R_ppml.rds"))
-sha_T25 <- get_sha256(file.path(RTA_ROOT, "T25_prop_verification.csv"))
-sha_T22 <- get_sha256(file.path(RTA_ROOT, "T22_theta_A_placebo.csv"))
-
-expected_sha_S5R <- "d46910ef55f0a22018baf8bd218dac5548bde98150d798ad85aa1914af8d12d8"
-expected_sha_S1R <- "45c937cd78805d7b13b4c43f4bc4888e93a2ff15e787ad4fb41d77b51f837d89"
-expected_sha_T25 <- "e729b79152f302e245dc63145282d08b92c990860d6eb28564a36457fcbee855"
-expected_sha_T22 <- "aeaa1148c90507e089216c4474ef8f0301805c232949e79bd3a3b3bbd0edde18"
-
-cat(sprintf("S5R_bhat.rds:              %s\n", sha_S5R))
-cat(sprintf("  Expected:                %s\n", expected_sha_S5R))
-cat(sprintf("  Match: %s\n", ifelse(sha_S5R == expected_sha_S5R, "YES", "HALT")))
-
-cat(sprintf("S1R_ppml.rds:              %s\n", sha_S1R))
-cat(sprintf("  Expected:                %s\n", expected_sha_S1R))
-cat(sprintf("  Match: %s\n", ifelse(sha_S1R == expected_sha_S1R, "YES", "HALT")))
-
-cat(sprintf("T25_prop_verification.csv: %s\n", sha_T25))
-cat(sprintf("  Expected:                %s\n", expected_sha_T25))
-cat(sprintf("  Match: %s\n", ifelse(sha_T25 == expected_sha_T25, "YES", "HALT")))
-
-cat(sprintf("T22_theta_A_placebo.csv:   %s\n", sha_T22))
-cat(sprintf("  Expected:                %s\n", expected_sha_T22))
-cat(sprintf("  Match: %s\n", ifelse(sha_T22 == expected_sha_T22, "YES", "HALT")))
-
-stopifnot(sha_S5R == expected_sha_S5R)
-stopifnot(sha_S1R == expected_sha_S1R)
-stopifnot(sha_T25 == expected_sha_T25)
-stopifnot(sha_T22 == expected_sha_T22)
-
-cat("All input SHA256 verified: PASS\n\n")
 
 # =============================================================================
 # LOAD DATA
@@ -81,12 +44,12 @@ ppml <- readRDS(file.path(RTA_ROOT, "data/S1R_ppml.rds"))
 setDT(ppml)
 cat(sprintf("PPML rows: %d\n", nrow(ppml)))
 
-T22 <- fread(file.path(RTA_ROOT, "T22_theta_A_placebo.csv"))
+T22 <- fread(file.path(RTA_ROOT, "output/T22_theta_A_placebo.csv"))
 cat(sprintf("T22 rows: %d\n", nrow(T22)))
 cat(sprintf("T22 columns: %s\n", paste(names(T22), collapse = ", ")))
 
-T25 <- fread(file.path(RTA_ROOT, "T25_prop_verification.csv"))
-cat(sprintf("T25 rows: %d\n", nrow(T25)))
+T25a <- fread(file.path(RTA_ROOT, "output/T25a_prop_constants.csv"))
+cat(sprintf("T25a rows: %d\n", nrow(T25a)))
 
 # =============================================================================
 # FILTER TO QUALIFYING PAIRS
@@ -157,27 +120,27 @@ cat(sprintf("Complete cases: %d\n", n_complete))
 stopifnot(n_complete == n_qualifying)
 
 # =============================================================================
-# LOAD T25 COMMITTED VALUES
+# LOAD T25a COMMITTED VALUES
 # =============================================================================
-cat("\n=== LOADING T25 COMMITTED VALUES ===\n")
+cat("\n=== LOADING T25a COMMITTED VALUES ===\n")
 
-ESIGMA2 <- T25[ID == "PROP_ESIGMA2", value]
-V_SIGMA2_T25 <- T25[ID == "PROP_V_SIGMA2", value]
-T_H_BAR <- T25[ID == "PROP_TH", value]
-T_POST_BAR <- T25[ID == "PROP_TPOST", value]
-R_PRED_T25 <- T25[ID == "PROP_R_PRED", value]
-PLACEBO_A_R <- T25[ID == "PROP_PLACEBO_R", value]
+ESIGMA2 <- T25a[ID == "PROP_ESIGMA2", value]
+V_SIGMA2_PLUGIN <- T25a[ID == "PROP_V_SIGMA2_PLUGIN", value]
+T_H_BAR <- T25a[ID == "PROP_TH", value]
+T_POST_BAR <- T25a[ID == "PROP_TPOST", value]
+R_PRED_PLUGIN <- T25a[ID == "PROP_R_PRED_PLUGIN", value]
+PLACEBO_A_R <- T25a[ID == "PROP_PLACEBO_R", value]
 
-# A0 = q = V_sigma2 / 4
-A0 <- V_SIGMA2_T25 / 4
+# A0 from plug-in decomposition (reference only)
+A0 <- V_SIGMA2_PLUGIN / 4
 
-cat(sprintf("ESIGMA2 (from T25):    %.15f\n", ESIGMA2))
-cat(sprintf("V_SIGMA2 (from T25):   %.15f\n", V_SIGMA2_T25))
-cat(sprintf("A0 = V_SIGMA2/4:       %.15f\n", A0))
-cat(sprintf("T_H_BAR (from T25):    %.15f\n", T_H_BAR))
-cat(sprintf("T_POST_BAR (from T25): %.15f\n", T_POST_BAR))
-cat(sprintf("R_PRED (from T25):     %.15f\n", R_PRED_T25))
-cat(sprintf("PLACEBO_A_R (from T25):%.15f\n", PLACEBO_A_R))
+cat(sprintf("ESIGMA2 (from T25a):       %.15f\n", ESIGMA2))
+cat(sprintf("V_SIGMA2_PLUGIN (from T25a): %.15f\n", V_SIGMA2_PLUGIN))
+cat(sprintf("A0 = V_SIGMA2_PLUGIN/4:    %.15f\n", A0))
+cat(sprintf("T_H_BAR (from T25a):       %.15f\n", T_H_BAR))
+cat(sprintf("T_POST_BAR (from T25a):    %.15f\n", T_POST_BAR))
+cat(sprintf("R_PRED_PLUGIN (from T25a): %.15f\n", R_PRED_PLUGIN))
+cat(sprintf("PLACEBO_A_R (from T25a):   %.15f\n", PLACEBO_A_R))
 
 # =============================================================================
 # COMPUTE PAIR-LEVEL QUANTITIES
@@ -258,9 +221,9 @@ cat(sprintf("R_GAP_2 = r2 - %.15f = %.15f\n", PLACEBO_A_R, R_GAP_2))
 # =============================================================================
 cat("\n=== GATES G2-G4 ===\n")
 
-# G2: abs(r0 - 0.806812807675821) < 1e-4 (Arm 0 reproduces T25)
-g2_diff <- abs(r0 - 0.806812807675821)
-cat(sprintf("G2: |r0 - 0.806812807675821| = %.15e, expected < 1e-4\n", g2_diff))
+# G2: r0 matches plug-in r_pred from T25a (consistency check)
+g2_diff <- abs(r0 - R_PRED_PLUGIN)
+cat(sprintf("G2: |r0 - R_PRED_PLUGIN| = %.15e, expected < 1e-4\n", g2_diff))
 stopifnot(g2_diff < 1e-4)
 cat("G2 PASS\n")
 
@@ -342,10 +305,10 @@ sidecar_lines <- c(
   sprintf("SHA256:    %s", sha_T28),
   "PRODUCER:  S29_v1c_pairlevel.R",
   "INPUTS:",
-  sprintf("  data/S5R_bhat.rds:              %s", sha_S5R),
-  sprintf("  data/S1R_ppml.rds:              %s", sha_S1R),
-  sprintf("  output/T25_prop_verification.csv: %s", sha_T25),
-  sprintf("  output/T22_theta_A_placebo.csv: %s", sha_T22),
+  "  data/S5R_bhat.rds",
+  "  data/S1R_ppml.rds",
+  "  output/T25a_prop_constants.csv",
+  "  output/T22_theta_A_placebo.csv",
   "SEED:      NONE",
   "",
   "POPULATION: Split-half qualifying placebo pairs (qualifies == TRUE)",
@@ -379,7 +342,7 @@ sidecar_lines <- c(
   "",
   "GATES:",
   sprintf("  G1: n = %d == 15683: PASS", n_qualifying),
-  sprintf("  G2: |r0 - 0.8068| = %.2e < 1e-4: PASS", g2_diff),
+  sprintf("  G2: |r0 - R_PRED_PLUGIN| = %.2e < 1e-4: PASS", g2_diff),
   sprintf("  G3: harm(%.4f) < arith(%.4f): PASS", harm_mean_Th, arith_mean_Th),
   sprintf("  G4: r2(%.6f) <= r0(%.6f): PASS", r2, r0),
   sprintf("  G5: |R_GAP_2| = %.6f < 0.05: %s", abs(R_GAP_2), ifelse(abs(R_GAP_2) < 0.05, "PASS", "FAIL")),

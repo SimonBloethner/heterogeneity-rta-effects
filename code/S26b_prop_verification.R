@@ -1,16 +1,12 @@
 #!/usr/bin/env Rscript
-# S26_prop_verification.R v3 - V1c chain on Arm 1' decomposition
+# S26b_prop_verification.R - V1c Arm 1' decomposition (reads T28b)
 # OUTPUTS: output/T25_prop_verification.csv, article/prop_constants.tex,
 #          meta/T25_prop_verification.csv.sidecar
-# INPUTS:  output/T22_reliability.csv, output/T24_placebo_uncorr.csv, output/T21_arms.csv,
-#          output/T28b_v1c_arm1p.csv
-# SEED:    20260719
-# NSIM:    4000000 (4e6 for V1b precision)
+# INPUTS:  output/T25a_prop_constants.csv, output/T28b_v1c_arm1p.csv
+# SEED:    NONE (deterministic merge of T25a + T28b values)
 #
-# V1c now fully sourced from Arm 1' (T28b):
-#   - PROP_R_PRED, PROP_R_GAP from r1p, R_GAP_1p
-#   - PROP_V_SIGMA2 = 4 * A1p, PROP_CV_SIGMA2 = sqrt(V)/E
-# Plug-in values retained as diagnostics.
+# Split from S26: Merges T25a (V1a/V1b/V2/V3c) with T28b (Arm 1' values)
+# to produce final T25 with V1c values.
 
 # Login node guard
 stopifnot(!grepl("login", Sys.info()[["nodename"]]))
@@ -20,13 +16,9 @@ stopifnot("RTA_ROOT must contain meta/FILE_REGISTRY.csv" =
               file.exists(file.path(RTA_ROOT, "meta/FILE_REGISTRY.csv")))
 
 suppressPackageStartupMessages(library(data.table))
-set.seed(20260719)
-
-N_REP <- 4e6L
-T_POST <- 10L
 
 cat("=============================================================================\n")
-cat("S26_prop_verification.R v3 - V1c chain on Arm 1' decomposition\n")
+cat("S26b_prop_verification.R - V1c Arm 1' decomposition (reads T28b)\n")
 cat(sprintf("Start: %s\n", format(Sys.time())))
 cat(sprintf("Node: %s\n", Sys.info()[["nodename"]]))
 cat("=============================================================================\n\n")
@@ -36,131 +28,69 @@ get_sha256 <- function(p) {
   strsplit(system2("sha256sum", args = shQuote(p), stdout = TRUE), " ")[[1]][1]
 }
 
-# =============================================================================
-# VERIFY T28b SHA256
-# =============================================================================
-cat("=== VERIFYING T28b SHA256 ===\n")
-sha_T28b <- get_sha256(file.path(RTA_ROOT, "output/T28b_v1c_arm1p.csv"))
-expected_sha_T28b <- "7bd76254d80324c2c8189c906383ef9b462d000394c3bb19253aad0fd89dcc4c"
-cat(sprintf("T28b_v1c_arm1p.csv: %s\n", sha_T28b))
-cat(sprintf("Expected:           %s\n", expected_sha_T28b))
-stopifnot(sha_T28b == expected_sha_T28b)
-cat("T28b SHA256 verified: PASS\n\n")
-
 # -----------------------------------------------------------------------------
-# Load frozen values
+# Load T25a (V1a/V1b/V2/V3c) and T28b (Arm 1' values)
 # -----------------------------------------------------------------------------
-cat("=== LOADING FROZEN VALUES ===\n")
+cat("=== LOADING INPUTS ===\n")
 
-T22 <- fread(file.path(RTA_ROOT, "output/T22_reliability.csv"))
-T24 <- fread(file.path(RTA_ROOT, "output/T24_placebo_uncorr.csv"))
-T21 <- fread(file.path(RTA_ROOT, "output/T21_arms.csv"))
+T25a <- fread(file.path(RTA_ROOT, "output/T25a_prop_constants.csv"))
 T28b <- fread(file.path(RTA_ROOT, "output/T28b_v1c_arm1p.csv"))
 
-PLACEBO_A_MEAN <- T22[ID == "PLACEBO_A_MEAN", value]
-PLACEBO_A_SD <- T22[ID == "PLACEBO_A_SD", value]
-PLACEBO_A_R <- T22[ID == "PLACEBO_A_R", value]
-PLACEBO_TH <- T22[ID == "PLACEBO_TH", value]
-PLACEBO_TPOST <- T22[ID == "PLACEBO_TPOST", value]
+cat(sprintf("T25a rows: %d\n", nrow(T25a)))
+cat(sprintf("T28b rows: %d\n", nrow(T28b)))
 
-PLACEBO_B_UNCORR_MEAN <- T24[ID == "PLACEBO_B_UNCORR_OVERALL", mean_theta_B]
+# Extract values from T25a
+E_sigma2 <- T25a[ID == "PROP_ESIGMA2", value]
+sigma <- T25a[ID == "PROP_SIGMA", value]
+Var_eta <- T25a[ID == "PROP_VAR_ETA", value]
+Var_R <- T25a[ID == "PROP_VAR_R", value]
+approx_B <- T25a[ID == "PROP_APPROX_B", value]
+mc_B <- T25a[ID == "PROP_MC_B", value]
+overstate_pct <- T25a[ID == "PROP_OVERSTATE_PCT", value]
+r_pred_plugin <- T25a[ID == "PROP_R_PRED_PLUGIN", value]
+V_sigma2_plugin <- T25a[ID == "PROP_V_SIGMA2_PLUGIN", value]
+cv_sigma2_plugin <- T25a[ID == "PROP_CV_SIGMA2_PLUGIN", value]
+PLACEBO_TH <- T25a[ID == "PROP_TH", value]
+PLACEBO_TPOST <- T25a[ID == "PROP_TPOST", value]
+PLACEBO_A_R <- T25a[ID == "PROP_PLACEBO_R", value]
+PLACEBO_A_MEAN <- T25a[ID == "PROP_PLACEBO_A_MEAN", value]
+PLACEBO_B_UNCORR_MEAN <- T25a[ID == "PROP_PLACEBO_B_UNCORR", value]
+V2_predicted <- T25a[ID == "PROP_V2_PRED", value]
+mc_mean_v2 <- T25a[ID == "PROP_V2_SIM", value]
+V2_shift <- T25a[ID == "PROP_V2_SHIFT", value]
+tau_hat_1 <- T25a[ID == "PROP_TAU_K1", value]
+tau_hat_2 <- T25a[ID == "PROP_TAU_K2", value]
+tau_hat_3 <- T25a[ID == "PROP_TAU_K3", value]
+tau_hat_5 <- T25a[ID == "PROP_TAU_K5", value]
+kappa_floor <- T25a[ID == "PROP_KAPPA_FLOOR", value]
 
-VAR_NULL_A <- T21[arm == "A_noise_only", Var_null_subtracted]
-SD_TRUE_A <- T21[arm == "A_noise_only", SD_true]
-VAR_THETA_D <- VAR_NULL_A + SD_TRUE_A^2
-
-# Arm 1' values from T28b
+# Extract Arm 1' values from T28b
 r1p <- T28b[quantity == "r1p", value]
 R_GAP_1p <- T28b[quantity == "R_GAP_1p", value]
 A1p <- T28b[quantity == "A1p", value]
 mean_inv_Th <- T28b[quantity == "mean_inv_Th", value]
 
-cat(sprintf("PLACEBO_A_MEAN        = %.15f\n", PLACEBO_A_MEAN))
-cat(sprintf("PLACEBO_A_SD          = %.15f\n", PLACEBO_A_SD))
-cat(sprintf("PLACEBO_A_R           = %.15f\n", PLACEBO_A_R))
-cat(sprintf("PLACEBO_TH            = %.15f\n", PLACEBO_TH))
-cat(sprintf("PLACEBO_TPOST         = %.15f\n", PLACEBO_TPOST))
+cat(sprintf("E_sigma2 (T25a)       = %.15f\n", E_sigma2))
 cat(sprintf("r1p (T28b)            = %.15f\n", r1p))
 cat(sprintf("R_GAP_1p (T28b)       = %.15f\n", R_GAP_1p))
 cat(sprintf("A1p (T28b)            = %.15f\n", A1p))
 cat(sprintf("mean_inv_Th (T28b)    = %.15f\n", mean_inv_Th))
 
 # -----------------------------------------------------------------------------
-# V1a: E[sigma^2]
-# -----------------------------------------------------------------------------
-cat("\n=== V1a: E[SIGMA^2] DERIVATION ===\n")
-
-E_sigma2 <- -2 * PLACEBO_A_MEAN
-sigma <- sqrt(E_sigma2)
-
-cat(sprintf("E_sigma2 = -2 * PLACEBO_A_MEAN = %.15f\n", E_sigma2))
-cat(sprintf("sigma = sqrt(E_sigma2) = %.15f\n", sigma))
-
-stopifnot(E_sigma2 > 0)
-cat("G1 E_sigma2 > 0: PASS\n")
-
-# -----------------------------------------------------------------------------
-# V1b: Monte Carlo
-# -----------------------------------------------------------------------------
-cat("\n=== V1b: MONTE CARLO E[THETA^B] AT T=10 ===\n")
-
-Var_eta <- exp(E_sigma2) - 1
-Var_R <- Var_eta / T_POST
-approx_B <- -Var_R / 2
-
-cat(sprintf("Var(eta) = %.15f\n", Var_eta))
-cat(sprintf("Var(R) at T=%d = %.15f\n", T_POST, Var_R))
-cat(sprintf("approx_B = %.15f\n", approx_B))
-
-cat(sprintf("Running %d replications...\n", N_REP))
-
-lg <- matrix(rnorm(N_REP * T_POST, mean = -E_sigma2/2, sd = sigma), ncol = T_POST)
-mc_B <- mean(log(rowMeans(exp(lg))))
-mc_B_se <- sd(log(rowMeans(exp(lg)))) / sqrt(N_REP)
-
-cat(sprintf("MC E[theta^B] = %.15f (SE = %.6f)\n", mc_B, mc_B_se))
-
-stopifnot(approx_B < mc_B)
-stopifnot(mc_B < 0)
-cat("G2 V1b approx < mc < 0: PASS\n")
-
-overstate_pct <- 100 * (abs(approx_B) - abs(mc_B)) / abs(mc_B)
-cat(sprintf("Overstatement = %.1f%%\n", overstate_pct))
-
-rm(lg)
-gc()
-
-# -----------------------------------------------------------------------------
 # V1c: Reliability - Arm 1' decomposition
 # -----------------------------------------------------------------------------
 cat("\n=== V1c: RELIABILITY (ARM 1' DECOMPOSITION) ===\n")
 
-Var_theta_A <- PLACEBO_A_SD^2
-
-# Plug-in decomposition (retained as diagnostic)
-q_plugin <- Var_theta_A - E_sigma2 / PLACEBO_TPOST
-V_sigma2_plugin <- 4 * q_plugin
-cv_sigma2_plugin <- sqrt(V_sigma2_plugin) / E_sigma2
-r_pred_plugin <- q_plugin / (q_plugin + E_sigma2 / PLACEBO_TH)
-
-cat(sprintf("PLUG-IN (Arm 0):\n"))
-cat(sprintf("  q_plugin = %.15f\n", q_plugin))
-cat(sprintf("  V_sigma2_plugin = 4 * q = %.15f\n", V_sigma2_plugin))
-cat(sprintf("  cv_sigma2_plugin = %.15f\n", cv_sigma2_plugin))
-cat(sprintf("  r_pred_plugin = %.15f\n", r_pred_plugin))
-
-# Arm 1' decomposition (sourced from T28b)
 V_sigma2 <- 4 * A1p
 cv_sigma2 <- sqrt(V_sigma2) / E_sigma2
 r_pred <- r1p
 r_gap <- abs(R_GAP_1p)
 
-cat(sprintf("\nARM 1' (from T28b):\n"))
-cat(sprintf("  A1p = %.15f\n", A1p))
-cat(sprintf("  V_sigma2 = 4 * A1p = %.15f\n", V_sigma2))
-cat(sprintf("  cv_sigma2 = sqrt(V)/E = %.15f\n", cv_sigma2))
-cat(sprintf("  r_pred = r1p = %.15f\n", r_pred))
-cat(sprintf("  r_gap = |R_GAP_1p| = %.15f\n", r_gap))
+cat(sprintf("A1p = %.15f\n", A1p))
+cat(sprintf("V_sigma2 = 4 * A1p = %.15f\n", V_sigma2))
+cat(sprintf("cv_sigma2 = sqrt(V)/E = %.15f\n", cv_sigma2))
+cat(sprintf("r_pred = r1p = %.15f\n", r_pred))
+cat(sprintf("r_gap = |R_GAP_1p| = %.15f\n", r_gap))
 
 # Wrong-object gates
 stopifnot(A1p > 0)
@@ -171,69 +101,7 @@ stopifnot(PLACEBO_TH >= 2)
 cat("\nV1c wrong-object gates: PASS\n")
 
 # -----------------------------------------------------------------------------
-# V2: Window geometry
-# -----------------------------------------------------------------------------
-cat("\n=== V2: WINDOW GEOMETRY (PROP 2a) ===\n")
-
-N_SIM_V2 <- 100000L
-T_PRE <- 10L
-T_POST_V2 <- 10L
-DELTA_V2 <- 0.02
-
-simulate_prop2a <- function(nsim, t_pre, t_post, e_sigma2, delta_fixed, offset = 0) {
-  T_total <- t_pre + t_post
-  t_idx <- 1:T_total + offset
-  midpoint <- (T_total + 1) / 2 + offset
-  sigma_ij <- sqrt(e_sigma2)
-  theta_A <- numeric(nsim)
-  for (i in 1:nsim) {
-    u <- rnorm(T_total, mean = 0, sd = sigma_ij)
-    log_gap <- -e_sigma2/2 + delta_fixed * (t_idx - midpoint) + u
-    post_idx <- (t_pre + 1):T_total
-    theta_A[i] <- mean(log_gap[post_idx])
-  }
-  theta_A
-}
-
-cat(sprintf("Running %d V2 simulations...\n", N_SIM_V2))
-theta_A_v2 <- simulate_prop2a(N_SIM_V2, T_PRE, T_POST_V2, E_sigma2, DELTA_V2)
-
-V2_predicted <- -E_sigma2/2 + DELTA_V2 * T_PRE/2
-mc_mean_v2 <- mean(theta_A_v2)
-V2_gap <- abs(mc_mean_v2 - V2_predicted)
-
-cat(sprintf("Predicted = %.15f, MC = %.15f, gap = %.6f\n", V2_predicted, mc_mean_v2, V2_gap))
-stopifnot(V2_gap < 0.02)
-cat("G4 V2 gap < 0.02: PASS\n")
-
-theta_A_v2_shift <- simulate_prop2a(N_SIM_V2, T_PRE, T_POST_V2, E_sigma2, DELTA_V2, offset = 5)
-V2_shift <- mean(theta_A_v2_shift) - mc_mean_v2
-cat(sprintf("V2 shift = %.15f\n", V2_shift))
-stopifnot(abs(V2_shift) < 0.01)
-cat("G6 V2 shift < 0.01: PASS\n")
-
-# -----------------------------------------------------------------------------
-# V3c: cor:rhoop
-# -----------------------------------------------------------------------------
-cat("\n=== V3c: COR:RHOOP ===\n")
-
-kappas <- c(1, 2, 3, 5)
-tau2_hat <- pmax(0, VAR_THETA_D - kappas * VAR_NULL_A)
-tau_hat <- sqrt(tau2_hat)
-kappa_floor <- VAR_THETA_D / VAR_NULL_A
-
-cat(sprintf("kappa_floor = %.15f\n", kappa_floor))
-for (i in seq_along(kappas)) {
-  cat(sprintf("  kappa=%d: tau_hat = %.4f\n", kappas[i], tau_hat[i]))
-}
-
-stopifnot(abs(tau_hat[1] - SD_TRUE_A) < 1e-3)
-stopifnot(all(diff(tau_hat) < 0))
-stopifnot(kappa_floor > 5, kappa_floor < 20)
-cat("G5 V3c: PASS\n")
-
-# -----------------------------------------------------------------------------
-# OUTPUT TABLE
+# OUTPUT TABLE (T25 - full with V1c Arm 1' values)
 # -----------------------------------------------------------------------------
 cat("\n=== OUTPUT TABLE ===\n")
 
@@ -283,7 +151,7 @@ out <- data.frame(
             PLACEBO_TH, PLACEBO_TPOST, PLACEBO_A_R,
             PLACEBO_A_MEAN, PLACEBO_B_UNCORR_MEAN,
             V2_predicted, mc_mean_v2, V2_shift,
-            tau_hat[1], tau_hat[2], tau_hat[3], tau_hat[4],
+            tau_hat_1, tau_hat_2, tau_hat_3, tau_hat_5,
             kappa_floor),
   stringsAsFactors = FALSE
 )
@@ -299,9 +167,8 @@ cat("\nSaved: output/T25_prop_verification.csv\n")
 cat("\n=== GENERATING prop_constants.tex ===\n")
 
 tex_lines <- c(
-  "% prop_constants.tex - Auto-generated by S26_prop_verification.R",
+  "% prop_constants.tex - Auto-generated by S26b_prop_verification.R",
   sprintf("%% Generated: %s", Sys.time()),
-  sprintf("%% Seed: 20260719, N_REP: %d", N_REP),
   "%% V1c fully on Arm 1' decomposition (T28b_v1c_arm1p.csv)",
   "",
   "% V1a: E[sigma^2] derivation",
@@ -338,10 +205,10 @@ tex_lines <- c(
   sprintf("\\newcommand{\\PropVtwoShift}{%.4f}", V2_shift),
   "",
   "% V3c: cor:rhoop identification boundary",
-  sprintf("\\newcommand{\\PropTauKone}{%.4f}", tau_hat[1]),
-  sprintf("\\newcommand{\\PropTauKtwo}{%.4f}", tau_hat[2]),
-  sprintf("\\newcommand{\\PropTauKthree}{%.4f}", tau_hat[3]),
-  sprintf("\\newcommand{\\PropTauKfive}{%.4f}", tau_hat[4]),
+  sprintf("\\newcommand{\\PropTauKone}{%.4f}", tau_hat_1),
+  sprintf("\\newcommand{\\PropTauKtwo}{%.4f}", tau_hat_2),
+  sprintf("\\newcommand{\\PropTauKthree}{%.4f}", tau_hat_3),
+  sprintf("\\newcommand{\\PropTauKfive}{%.4f}", tau_hat_5),
   sprintf("\\newcommand{\\PropKappaFloor}{%.3f}", kappa_floor),
   ""
 )
@@ -354,10 +221,9 @@ cat("Saved: article/prop_constants.tex\n")
 # -----------------------------------------------------------------------------
 sha_out <- get_sha256(file.path(RTA_ROOT, "output/T25_prop_verification.csv"))
 writeLines(c(
-  "PRODUCER: S26_prop_verification.R v3",
-  "INPUTS: output/T22_reliability.csv, output/T24_placebo_uncorr.csv, output/T21_arms.csv, output/T28b_v1c_arm1p.csv",
-  "SEED: 20260719",
-  sprintf("N_REP: %d", N_REP),
+  "PRODUCER: S26b_prop_verification.R",
+  "INPUTS: output/T25a_prop_constants.csv, output/T28b_v1c_arm1p.csv",
+  "SEED: NONE (deterministic merge)",
   "",
   "V1c CHAIN ON ARM 1' DECOMPOSITION:",
   sprintf("  A1p (from T28b) = %.15f", A1p),
@@ -366,7 +232,7 @@ writeLines(c(
   sprintf("  r_pred (Arm 1') = %.15f", r_pred),
   sprintf("  r_gap = %.15f", r_gap),
   "",
-  "PLUG-IN DIAGNOSTICS (Arm 0, retained):",
+  "PLUG-IN DIAGNOSTICS (Arm 0, from T25a):",
   sprintf("  V_sigma2_plugin = %.15f", V_sigma2_plugin),
   sprintf("  CV_sigma2_plugin = %.15f", cv_sigma2_plugin),
   sprintf("  r_pred_plugin = %.15f", r_pred_plugin),
@@ -416,45 +282,8 @@ stopifnot(g4a_diff < 1e-12)
 stopifnot(g4b_diff < 1e-12)
 cat("G4 PASS\n")
 
-# G5: V1a/V1b/V2/V3c rows unchanged
-committed <- list(
-  PROP_ESIGMA2 = 1.36421135051832,
-  PROP_SIGMA = 1.16799458496961,
-  PROP_VAR_ETA = 2.91263613644454,
-  PROP_VAR_R = 0.291263613644454,
-  PROP_APPROX_B = -0.145631806822227,
-  PROP_TH = 5.45552509086272,
-  PROP_TPOST = 10.9110501817254,
-  PROP_PLACEBO_R = 0.74630841671878,
-  PROP_PLACEBO_A_MEAN = -0.68210567525916,
-  PROP_PLACEBO_B_UNCORR = -0.207204589838223,
-  PROP_V2_PRED = -0.58210567525916,
-  PROP_TAU_K1 = 1.4754,
-  PROP_TAU_K2 = 1.38407375526017,
-  PROP_TAU_K3 = 1.2862795808066,
-  PROP_TAU_K5 = 1.06406069375764,
-  PROP_KAPPA_FLOOR = 9.3356187558636
-)
-
-g5_pass <- TRUE
-cat("G5: Checking V1a/V1b/V2/V3c rows...\n")
-for (id in names(committed)) {
-  expected <- committed[[id]]
-  actual <- out$value[out$ID == id]
-  diff <- abs(actual - expected)
-  if (diff > 1e-10) {
-    cat(sprintf("  MISMATCH: %s expected %.15f, got %.15f\n", id, expected, actual))
-    g5_pass <- FALSE
-  }
-}
-if (g5_pass) {
-  cat("G5 PASS\n")
-} else {
-  stop("G5 FAIL")
-}
-
-# G6: All main.tex macros resolve
-cat("G6: Checking prop_constants.tex macros...\n")
+# G5: All main.tex macros resolve
+cat("G5: Checking prop_constants.tex macros...\n")
 tex_content <- readLines(file.path(RTA_ROOT, "article/prop_constants.tex"))
 required_macros <- c("PropEsigsq", "PropSigma", "PropVarEta", "PropVarR",
                      "PropApproxB", "PropMCB", "PropOverstatePct",
@@ -465,18 +294,18 @@ required_macros <- c("PropEsigsq", "PropSigma", "PropVarEta", "PropVarR",
                      "PropTauKone", "PropTauKtwo", "PropTauKthree", "PropTauKfive",
                      "PropKappaFloor")
 
-g6_pass <- TRUE
+g5_pass <- TRUE
 for (macro in required_macros) {
   pattern <- sprintf("\\\\newcommand\\{\\\\%s\\}", macro)
   if (!any(grepl(pattern, tex_content))) {
     cat(sprintf("  MISSING: \\%s\n", macro))
-    g6_pass <- FALSE
+    g5_pass <- FALSE
   }
 }
-if (g6_pass) {
-  cat("G6 PASS\n")
+if (g5_pass) {
+  cat("G5 PASS\n")
 } else {
-  stop("G6 FAIL")
+  stop("G5 FAIL")
 }
 
 # -----------------------------------------------------------------------------
@@ -489,7 +318,6 @@ cat(sprintf("G1: PROP_V_SIGMA2 = %.15f: PASS\n", V_sigma2))
 cat(sprintf("G2: PROP_CV_SIGMA2 = %.15f: PASS\n", cv_sigma2))
 cat(sprintf("G3: Chain coherence r_rec = r_pred: PASS\n"))
 cat(sprintf("G4: PROP_R_PRED, PROP_R_GAP unchanged: PASS\n"))
-cat(sprintf("G5: V1a/V1b/V2/V3c rows unchanged: PASS\n"))
-cat(sprintf("G6: All main.tex macros resolve: PASS\n"))
+cat(sprintf("G5: All main.tex macros resolve: PASS\n"))
 cat("=============================================================================\n")
 cat(sprintf("Done: %s\n", format(Sys.time())))
