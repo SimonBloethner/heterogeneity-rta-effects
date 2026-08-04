@@ -140,14 +140,14 @@ Derived from Proposition 1 using placebo moments. SYNC-6 correction: E[sigma^2] 
 
 | ID | Quantity | Value | Formula | Producer |
 |----|----------|-------|---------|----------|
-| ESIGMA2 | E[sigma^2] | 1.3642 | -2 * PLACEBO_A_MEAN | code/S26_prop_verification.R -> output/T25_prop_verification.csv |
-| SIGMA | sigma | 1.1680 | sqrt(ESIGMA2) | code/S26_prop_verification.R |
+| ESIGMA2 | E[sigma^2] | 1.3642 | -2 * PLACEBO_A_MEAN | code/S26b_prop_verification.R -> output/T25_prop_verification.csv |
+| SIGMA | sigma | 1.1680 | sqrt(ESIGMA2) | code/S26b_prop_verification.R |
 | VAR_SIGMA2 | Var(sigma^2) | 4.0210 | 4*(Var(theta_A) - ESIGMA2*E[1/T_post,i]) | code/S29b_v1c_arm1p.R -> output/T28b_v1c_arm1p.csv |
 | T_H_PLACEBO | Mean half-length (placebo) | 5.46 | Measured from split-half | code/S24_reliability.R (PLACEBO_TH) |
 | R_PRED | Predicted reliability | 0.7539 | (V/4)/((V/4) + ESIGMA2*E[1/T_h,i]) | code/S29b_v1c_arm1p.R -> output/T28b_v1c_arm1p.csv |
 | R_GAP | R_pred - R_observed | 0.0076 | R_PRED - PLACEBO_A_R | code/S29b_v1c_arm1p.R -> output/T28b_v1c_arm1p.csv |
 | DRIFT_WEDGE | mean(sigma2_hat_i) / ESIGMA2 | 1.3460 | within-window variance vs Prop 1a quantity | code/S29_v1c_pairlevel.R -> output/T28_v1c_pairlevel.csv |
-| VAR_ETA | Var(eta) | 2.9126 | exp(ESIGMA2) - 1 | code/S26_prop_verification.R |
+| VAR_ETA | Var(eta) | 2.9126 | exp(ESIGMA2) - 1 | code/S26b_prop_verification.R |
 
 Note: V1c is evaluated pair-wise (Arm 1'). The noise terms are E[sigma^2_i/T_h,i] and E[sigma^2_i/T_post,i], not ESIGMA2 divided by a mean window length: post windows vary across pairs, 1/T is convex, and the reciprocal of the mean understates the mean of the reciprocals. Values match article/prop_constants.tex (\PropRpred, \PropRgap, \PropVsigmasq); the plug-in values are retained in T25 as PROP_R_PRED_PLUGIN = 0.8068, PROP_V_SIGMA2_PLUGIN = 4.1773, PROP_CV_SIGMA2_PLUGIN = 1.4982. Superseded: 0.7862 / 0.0398 / 3.6772 (SYNC-6, stale) and 0.8068 / 0.0605 / 4.1773 (plug-in, SYNC-7).
 
