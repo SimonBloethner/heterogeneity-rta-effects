@@ -324,44 +324,49 @@ check_sha256 <- function(root, report = FALSE) {
 # =============================================================================
 check_appendix_literal <- function(root, report = FALSE) {
     results <- character()
-    appendix_file <- file.path(root, "article/main.tex")
-    if (!file.exists(appendix_file)) return(results)
-    
-    appendix <- readLines(appendix_file, warn = FALSE)
+    tex_file <- file.path(root, "article/main.tex")
+    if (!file.exists(tex_file)) return(results)
+
+    tex <- readLines(tex_file, warn = FALSE)
     WHITELIST <- c("0", "1", "2", "3", "10", "0.5", "1.0", "2.0")
-    
-    in_remark <- FALSE
-    for (i in seq_along(appendix)) {
-        line <- appendix[i]
-        if (grepl("\\\\begin\\{remark\\}", line)) in_remark <- TRUE
-        if (grepl("\\\\end\\{remark\\}", line)) in_remark <- FALSE
-        
-        if (in_remark) {
-            matches <- gregexpr("\\$-?[0-9]+\\.[0-9]+\\$", line)[[1]]
-            if (matches[1] != -1) {
-                # R2 FIX: Check within one line either side for annotations
-                has_ref <- FALSE
-                for (offset in c(-1, 0, 1)) {
-                    check_idx <- i + offset
-                    if (check_idx >= 1 && check_idx <= length(appendix)) {
-                        check_line <- appendix[check_idx]
-                        if (grepl("%\\s*\\[", check_line) || 
-                            grepl("%\\s*[A-Z][A-Z0-9_]{3,}", check_line) ||
-                            grepl("\\\\Prop[A-Za-z]+", check_line)) {
-                            has_ref <- TRUE
-                            break
-                        }
+
+    # Find appendix boundary for section labeling
+    appendix_line <- grep("^\\\\appendix$", tex)
+    if (length(appendix_line) == 0) appendix_line <- length(tex) + 1
+
+    for (i in seq_along(tex)) {
+        line <- tex[i]
+
+        # Skip pure comment lines and preamble
+        if (grepl("^\\s*%", line)) next
+        if (i < 50) next  # Skip preamble
+
+        matches <- gregexpr("\\$-?[0-9]+\\.[0-9]+\\$", line)[[1]]
+        if (matches[1] != -1) {
+            # Check within one line either side for annotations
+            has_ref <- FALSE
+            for (offset in c(-1, 0, 1)) {
+                check_idx <- i + offset
+                if (check_idx >= 1 && check_idx <= length(tex)) {
+                    check_line <- tex[check_idx]
+                    if (grepl("%\\s*\\[", check_line) ||
+                        grepl("%\\s*[A-Z][A-Z0-9_]{3,}", check_line) ||
+                        grepl("\\\\Prop[A-Za-z]+", check_line) ||
+                        grepl("\\\\Ledger[A-Za-z]+", check_line)) {
+                        has_ref <- TRUE
+                        break
                     }
                 }
-                
-                nums <- regmatches(line, gregexpr("-?[0-9]+\\.[0-9]+", line))[[1]]
-                unlisted <- nums[!nums %in% WHITELIST]
-                if (length(unlisted) > 0 && !has_ref) {
-                    msg <- sprintf("main.tex line %d: numeric literal(s) %s with no resolving ledger ID or macro",
-                                   i, paste(unlisted, collapse = ", "))
-                    if (report) report_violation("APPENDIX_LITERAL", msg)
-                    results <- c(results, paste0("APPENDIX_LITERAL|", msg))
-                }
+            }
+
+            nums <- regmatches(line, gregexpr("-?[0-9]+\\.[0-9]+", line))[[1]]
+            unlisted <- nums[!nums %in% WHITELIST]
+            if (length(unlisted) > 0 && !has_ref) {
+                section <- if (i < appendix_line) "BODY" else "APPENDIX"
+                msg <- sprintf("main.tex line %d (%s): numeric literal(s) %s with no resolving ledger ID or macro",
+                               i, section, paste(unlisted, collapse = ", "))
+                if (report) report_violation("LITERAL", msg)
+                results <- c(results, paste0("LITERAL|", msg))
             }
         }
     }
