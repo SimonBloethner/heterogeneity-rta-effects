@@ -554,6 +554,68 @@ check_registry_existence <- function(root, report = FALSE) {
 }
 
 # =============================================================================
+# CHECK (j): Registry dependency validation
+# Validates: (1) all declared inputs exist in registry, (2) stage ordering
+# =============================================================================
+check_registry_deps <- function(root, report = FALSE) {
+    results <- character()
+    registry_path <- file.path(root, "meta/FILE_REGISTRY.csv")
+    if (!file.exists(registry_path)) return(results)
+
+    registry <- fread(registry_path)
+
+    # Only check BUILT and ANCHOR scripts (not ARCHIVED)
+    active_scripts <- registry[status %in% c("BUILT", "ANCHOR") & kind == "code"]
+
+    # Build lookup of all registered file paths
+    all_paths <- registry$file_path
+
+    for (i in seq_len(nrow(active_scripts))) {
+        script_path <- active_scripts$file_path[i]
+        script_name <- basename(script_path)
+        inputs_str <- active_scripts$inputs[i]
+        script_stage <- as.numeric(active_scripts$stage[i])
+
+        # Skip if no inputs
+        if (is.na(inputs_str) || inputs_str == "" || inputs_str == "NONE") next
+
+        inputs <- trimws(strsplit(inputs_str, ";")[[1]])
+
+        for (inp in inputs) {
+            # Check if input is in registry
+            if (!(inp %in% all_paths)) {
+                # Exception: external files like ITPDE_total.rds might have short names
+                # Also allow meta/canonical_facts.md which may not be tracked
+                if (!grepl("^(ITPDE|meta/canonical)", inp)) {
+                    msg <- sprintf("%s declares unregistered input: %s", script_name, inp)
+                    if (report) report_violation("DEPS", msg)
+                    results <- c(results, paste0("DEPS|", msg))
+                }
+                next
+            }
+
+            # Check stage ordering: input stage must be < script stage
+            inp_row <- registry[file_path == inp]
+            if (nrow(inp_row) > 0) {
+                inp_stage <- as.numeric(inp_row$stage[1])
+                if (!is.na(inp_stage) && !is.na(script_stage) && inp_stage >= script_stage) {
+                    msg <- sprintf("%s (stage %d) depends on %s (stage %d) - invalid order",
+                                   script_name, script_stage, inp, inp_stage)
+                    if (report) report_violation("STAGE_ORDER", msg)
+                    results <- c(results, paste0("STAGE_ORDER|", msg))
+                }
+            }
+        }
+    }
+
+    if (report && length(results) == 0) {
+        cat(sprintf("  Checked %d active scripts: all dependencies valid\n", nrow(active_scripts)))
+    }
+
+    results
+}
+
+# =============================================================================
 # CHECK (k): No hardcoded absolute paths in R scripts
 # =============================================================================
 check_absolute_paths <- function(root, report = FALSE) {
@@ -743,6 +805,17 @@ run_all_checks <- function(root = getwd()) {
         }
     }
     check_registry_existence(root, report = TRUE)
+    cat("\n")
+
+    # (j)
+    cat("=== CHECK (j): Registry dependency validation ===\n")
+    if (file.exists(registry_path)) {
+        registry <- fread(registry_path)
+        active_scripts <- registry[status %in% c("BUILT", "ANCHOR") & kind == "code"]
+        cat(sprintf("  Active scripts to check: %d\n", nrow(active_scripts)))
+    }
+    v_j <- check_registry_deps(root, report = TRUE)
+    if (length(v_j) == 0) cat("  All dependencies and stage ordering valid: PASS\n")
     cat("\n")
 
     # (k)
