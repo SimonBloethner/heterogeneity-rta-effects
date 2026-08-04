@@ -1,0 +1,21 @@
+PRODUCER: S26a_prop_constants.R
+INPUTS: output/T22_reliability.csv, output/T24_placebo_uncorr.csv, output/T21_arms.csv
+SEED: 20260719
+N_REP: 4000000
+
+V1a/V1b/V2/V3c CONSTANTS (no T28b dependency):
+  E_sigma2 = 1.364211350518320
+  sigma = 1.167994584969605
+  Var_eta = 2.912636136444536
+  mc_B = -0.112120137991782
+
+PLUG-IN (Arm 0) REFERENCE VALUES:
+  r_pred_plugin = 0.806812807675821
+  V_sigma2_plugin = 4.177337315329701
+  cv_sigma2_plugin = 1.498194209198825
+
+NOTE: V1c Arm 1' values computed separately in S26b after T28b available.
+
+STATUS: BUILT
+DATE: 2026-08-04
+SHA256: febd2a57dd99b213be16810f312284cf95490fb7d29d785aa83671642e9895d1

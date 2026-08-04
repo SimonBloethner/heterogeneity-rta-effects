@@ -1,0 +1,42 @@
+Rebuild Environment
+===================
+Date: 2026-08-04
+Cluster: Festus HPC (University)
+Node: s61e03
+OS: Rocky Linux 9.6
+Partition: dev (90 min limit)
+
+R Environment:
+--------------
+R version: 4.4.1 (2024-06-14) "Race for Your Life"
+Platform: x86_64-pc-linux-gnu
+Module: R/4.4.1
+
+Working Directory:
+------------------
+/scratch/bt307958/replication_package
+(Note: /groups filesystem had I/O errors; /scratch used per CLAUDE.md guidance)
+
+Memory Allocation:
+------------------
+S26a: 32G (4M Monte Carlo replications)
+S29: 16G (15683 pair-level computations)
+S29b: 8G
+S26b: 8G
+
+Environment Variable:
+---------------------
+RTA_ROOT=/scratch/bt307958/replication_package
+
+Git State (pre-rebuild):
+------------------------
+Commit: f3c3d1a2fd23e4a0212a0dc60dfa8fc2054e3d50
+Branch: main
+Remote: origin/main (synchronized)
+
+Verification:
+-------------
+enforce.R --allow-dirty: ALL CHECKS PASS
+- Check (j): 39 active scripts, all dependencies valid
+- Check (i): 383 registry rows, all BUILT/ANCHOR files present
+- No STAGE_ORDER violations (V1c cycle broken)

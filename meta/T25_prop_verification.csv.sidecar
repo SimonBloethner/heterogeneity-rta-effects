@@ -1,25 +1,19 @@
-FILE:      T25_prop_verification.csv
-SHA256:    36e275bd0c84ef2c4f0374c61ae75510f9a3635eecb4410e8c2a4b2449585db5
-PRODUCER:  code/S26_prop_verification.R
-PRODUCER_SHA256: 69fb1419faa4093fbb05cc4373c6683bee50936e428fe1740d954cbf7371ac69
-INPUTS:
-  output/T22_reliability.csv:     7fbd8fdcdec11ffdbf1ffa960f32a0f1d7f62430f425efca3f9102f492acc3ab
-  output/T24_placebo_uncorr.csv:  3413d36c4aec08cb5cf764ed03be7129da884db04027f68b3c0f6d3c5cbb733e
-  output/T21_arms.csv:            f1722fafc9fd80560e4c088cd087d8c4f21f1b2e547f3ff02bc02494fc293d1c
-SEED:      20260719
+PRODUCER: S26b_prop_verification.R
+INPUTS: output/T25a_prop_constants.csv, output/T28b_v1c_arm1p.csv
+SEED: NONE (deterministic merge)
 
-SPECIFICATION:
-  V1c chain on Arm 1' decomposition
-  Proposition constant verification
-  PROP_R_PRED, PROP_R_GAP from r1p, R_GAP_1p
+V1c CHAIN ON ARM 1' DECOMPOSITION:
+  A1p (from T28b) = 1.005256314737820
+  V_sigma2 = 4 * A1p = 4.021025258951280
+  CV_sigma2 = sqrt(V)/E = 1.469896453257486
+  r_pred (Arm 1') = 0.753863355754621
+  r_gap = 0.007554939035841
 
-GATES:
-  G1: E_sigma2 > 0: PASS
-  G2: approx_B < mc_B < 0: PASS
-  G3: A1p > 0, V_sigma2 > 0, r_pred in (0,1): PASS
-  G4a: V2_gap < 0.02: PASS
-  G4b: |V2_shift| < 0.01: PASS
-  G5: tau_hat monotone decreasing: PASS
-  G6: kappa_floor in (5, 20): PASS
+PLUG-IN DIAGNOSTICS (Arm 0, from T25a):
+  V_sigma2_plugin = 4.177337315329700
+  CV_sigma2_plugin = 1.498194209198830
+  r_pred_plugin = 0.806812807675821
 
-CREATED: 2026-08-02 08:26:32
+STATUS: BUILT
+DATE: 2026-08-04
+SHA256: 36e275bd0c84ef2c4f0374c61ae75510f9a3635eecb4410e8c2a4b2449585db5

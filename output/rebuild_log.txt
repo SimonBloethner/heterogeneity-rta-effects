@@ -1,0 +1,51 @@
+V1c Chain Rebuild Log
+=====================
+Date: 2026-08-04
+Commit: f3c3d1a (pre-rebuild)
+Node: s61e03 (Festus HPC)
+Partition: dev
+
+Execution Order (stage-order DAG):
+----------------------------------
+1. S26a_prop_constants.R (stage 13) -> T25a_prop_constants.csv
+   - Start: 2026-08-04 18:58:02
+   - End: 2026-08-04 18:58:16
+   - Memory: 32G requested (4M replications for Monte Carlo)
+   - Gates: G1 (E_sigma2>0), G2 (V1b approx<mc<0), G4 (V2 gap), G5 (V3c monotone), G6 (V2 shift)
+   - Status: ALL PASS
+
+2. S29_v1c_pairlevel.R (stage 14) -> T28_v1c_pairlevel.csv
+   - Start: 2026-08-04 18:58:27
+   - End: 2026-08-04 18:58:55
+   - Memory: 16G
+   - Gates: G1 (n=15683), G2 (r0 match), G3 (harmonic<arithmetic), G4 (r2<=r0), G5 (|R_GAP_2|<0.05)
+   - Status: G1-G4 PASS, G5 FAIL (expected - Arm 2 rejected on wrong-object grounds)
+
+3. S29b_v1c_arm1p.R (stage 15) -> T28b_v1c_arm1p.csv
+   - Start: 2026-08-04 18:58:55
+   - End: 2026-08-04 18:58:55
+   - Memory: 8G
+   - Gates: G1 (window identity), G2 (A1p), G3 (r1p), G4 (|R_GAP_1p|<0.05)
+   - Status: ALL PASS
+
+4. S26b_prop_verification.R (stage 16) -> T25_prop_verification.csv, prop_constants.tex
+   - Start: 2026-08-04 18:59:06
+   - End: 2026-08-04 18:59:06
+   - Memory: 8G
+   - Gates: G1-G5 (chain coherence, committed values, macro resolution)
+   - Status: ALL PASS
+
+Post-Rebuild Verification:
+--------------------------
+enforce.R --allow-dirty: ALL CHECKS PASS (zero violations)
+
+V1c Cycle Resolution:
+---------------------
+Before R20: S26 -> T25 -> S29 -> T28 -> S29b -> T28b -> S26 (circular)
+After R20:  S26a -> T25a -> S29 -> T28 -> S29b -> T28b -> S26b -> T25 (acyclic)
+
+The cycle was broken by splitting S26 into:
+- S26a (stage 13): V1a/V1b/V2/V3c, no T28b dependency
+- S26b (stage 16): reads T28b, produces final T25
+
+All SHA256 hashes match previous values (IDENTICAL status for T25, T28, T28b).
