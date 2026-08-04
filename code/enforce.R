@@ -499,7 +499,7 @@ check_cf_producer <- function(root, report = FALSE) {
 }
 
 # =============================================================================
-# CHECK (i): Registry existence - BUILT/ANCHOR files must exist or be allowlisted
+# CHECK (i): Registry existence - every registered file must exist or be allowlisted
 # =============================================================================
 check_registry_existence <- function(root, report = FALSE) {
     results <- character()
@@ -521,33 +521,33 @@ check_registry_existence <- function(root, report = FALSE) {
         allowlist <- trimws(al_lines[!grepl("^#", al_lines) & al_lines != ""])
     }
 
-    # Check BUILT and ANCHOR files (excluding archive/ paths)
-    live_rows <- registry[status %in% c("BUILT", "ANCHOR") & !grepl("^archive/", file_path)]
-
-    missing <- character()
-    for (i in seq_len(nrow(live_rows))) {
-        fp <- live_rows$file_path[i]
+    # Check ALL registry rows - every status claims the file exists
+    missing_info <- list()
+    for (i in seq_len(nrow(registry))) {
+        fp <- registry$file_path[i]
+        st <- registry$status[i]
+        prod <- registry$producer_script[i]
 
         # Skip allowlisted files
         if (fp %in% allowlist) next
 
         full_path <- file.path(root, fp)
         if (!file.exists(full_path)) {
-            missing <- c(missing, fp)
+            missing_info[[length(missing_info) + 1]] <- list(path = fp, status = st, producer = prod)
         }
     }
 
-    if (length(missing) > 0) {
-        for (mp in missing) {
-            msg <- sprintf("BUILT/ANCHOR file missing: %s", mp)
+    if (length(missing_info) > 0) {
+        for (m in missing_info) {
+            msg <- sprintf("file missing: %s [status=%s, producer=%s]", m$path, m$status, m$producer)
             if (report) report_violation("EXISTENCE", msg)
             results <- c(results, paste0("EXISTENCE|", msg))
         }
     }
 
-    if (report && length(missing) == 0) {
-        cat(sprintf("  Checked %d BUILT/ANCHOR paths, %d allowlisted: all present\n",
-                    nrow(live_rows), sum(live_rows$file_path %in% allowlist)))
+    if (report && length(missing_info) == 0) {
+        cat(sprintf("  Checked %d registry paths, %d allowlisted: all present\n",
+                    nrow(registry), sum(registry$file_path %in% allowlist)))
     }
 
     results
@@ -680,8 +680,12 @@ run_all_checks <- function(root = getwd()) {
     allowlist_path <- file.path(root, "meta/EXISTENCE_ALLOWLIST.txt")
     if (file.exists(registry_path)) {
         registry <- fread(registry_path)
-        live_rows <- registry[status %in% c("BUILT", "ANCHOR") & !grepl("^archive/", file_path)]
-        cat(sprintf("  BUILT/ANCHOR rows (non-archive): %d\n", nrow(live_rows)))
+        cat(sprintf("  Total registry rows: %d\n", nrow(registry)))
+        cat(sprintf("  By status: BUILT=%d, ANCHOR=%d, ARCHIVED=%d, AUDIT=%d\n",
+                    nrow(registry[status == "BUILT"]),
+                    nrow(registry[status == "ANCHOR"]),
+                    nrow(registry[status == "ARCHIVED"]),
+                    nrow(registry[status == "AUDIT"])))
         if (file.exists(allowlist_path)) {
             al_lines <- readLines(allowlist_path, warn = FALSE)
             allowlist <- trimws(al_lines[!grepl("^#", al_lines) & al_lines != ""])

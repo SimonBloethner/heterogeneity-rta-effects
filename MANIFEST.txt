@@ -88,7 +88,7 @@ all QUARANTINE rows were recoded to ARCHIVED and files moved to archive/quaranti
 
 Run: Rscript code/enforce.R  (from the repository root)
 Pass condition: ZERO violations. No expected-violation list -- see INV-038.
-Registry: meta/FILE_REGISTRY.csv, 381 rows. Statuses present: BUILT / ANCHOR /
+Registry: meta/FILE_REGISTRY.csv, 380 rows. Statuses present: BUILT / ANCHOR /
           ARCHIVED / AUDIT. QUARANTINE was retired under INV-046 (all rows
           recoded to ARCHIVED). Check (d) tests ARCHIVED only; check (i) verifies
           BUILT/ANCHOR files exist (or are allowlisted). Coverage is complete:

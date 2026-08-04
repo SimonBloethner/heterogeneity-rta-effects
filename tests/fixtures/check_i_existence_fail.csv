@@ -1,0 +1,5 @@
+# check_i_existence_fail.csv
+# This fixture row should FAIL check_registry_existence when the path is NOT allowlisted
+# The file does not exist in the tree and is not in EXISTENCE_ALLOWLIST.txt
+file_path,kind,producer_script,inputs,seed,gate,stage,status
+code/FIXTURE_NONEXISTENT_SCRIPT.R,code,code/fixture_producer.R,,,,1,BUILT

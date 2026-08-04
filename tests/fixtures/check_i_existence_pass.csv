@@ -1,0 +1,5 @@
+# check_i_existence_pass.csv
+# This fixture row should PASS check_registry_existence when the path is allowlisted
+# The file does not exist in the tree, but it appears in EXISTENCE_ALLOWLIST.txt
+file_path,kind,producer_script,inputs,seed,gate,stage,status
+data/FIXTURE_ALLOWLISTED_ABSENT.rds,data,code/fixture_producer.R,,,,1,ANCHOR
