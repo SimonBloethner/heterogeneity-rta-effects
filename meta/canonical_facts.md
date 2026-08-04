@@ -18,7 +18,8 @@ Amended: 2026-08-03 (SYNC-20: R6 check (e) extended to code/; solver sidecar res
 Amended: 2026-08-03 (SYNC-21: T42/T43 scale-invariance finding ledgered; quintile-conditional GE propagation)
 Amended: 2026-08-03 (SYNC-22: R9 body annotations added; 58 numeric literals annotated on 23 lines; R8 annotation splits fixed)
 Amended: 2026-08-04 (SYNC-23: R11 check (f) enforcement extended to body; in_remark removed; fixture pair added)
-Status: NO OPEN INVESTIGATIONS. enforce.R reports zero violations at commit PENDING, measured on a clean tree at origin/main.
+Amended: 2026-08-04 (SYNC-24: R11 close-out; S47 parse fix; PDF rebuild; three sites synchronized to 4325590)
+Status: NO OPEN INVESTIGATIONS. enforce.R reports zero violations at commit 4325590, measured on a clean tree at origin/main.
 
 ## Population
 
