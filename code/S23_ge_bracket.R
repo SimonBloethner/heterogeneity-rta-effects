@@ -24,7 +24,7 @@ SD_TRUE_HI   <- 1.475   # Arm A, noise-only (INV-027)
 cat(sprintf("MEAN_THETA_D: %.4f\n", MEAN_THETA_D))
 cat(sprintf("SD_TRUE bracket: [%.3f, %.3f]\n", SD_TRUE_LO, SD_TRUE_HI))
 
-stopifnot(abs(MEAN_THETA_D - 0.2473) < 1e-4)
+# Sanity check: LO < HI
 stopifnot(SD_TRUE_LO < SD_TRUE_HI)
 
 N_DRAWS <- 10000

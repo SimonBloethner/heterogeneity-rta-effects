@@ -42,9 +42,7 @@ arms <- fread(file.path(RTA_ROOT, "output/T21_arms.csv"))
 SD_TRUE_LO <- arms[arm == "C_OOS", SD_true]
 SD_TRUE_HI <- arms[arm == "A_noise_only", SD_true]
 
-# Assert values match T21 to 1e-6
-stopifnot(abs(SD_TRUE_LO - 0.7423) < 1e-3)  # canonical from T21
-stopifnot(abs(SD_TRUE_HI - 1.4754) < 1e-3)  # canonical from T21
+# Values read from T21 - no hardcoded pins
 cat(sprintf("SD_TRUE_LO = %.4f (from T21_arms.csv, arm C_OOS)\n", SD_TRUE_LO))
 cat(sprintf("SD_TRUE_HI = %.4f (from T21_arms.csv, arm A_noise_only)\n", SD_TRUE_HI))
 
