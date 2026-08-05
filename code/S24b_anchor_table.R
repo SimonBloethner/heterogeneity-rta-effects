@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
-# S24b_anchor_table.R v2 - Anchor table for D2 (A, B, D definitions)
+# S24b_anchor_table.R v3 - Anchor table for D2 (A, B, D definitions)
 # OUTPUTS: output/T23_anchor.csv, meta/T23_anchor.csv.sidecar
-# INPUTS:  data/S5R_bhat.rds, output/T22_theta_A_treated.csv, output/T22_theta_A_placebo.csv
+# INPUTS:  data/S5R_bhat.rds, output/T22_theta_A_all.csv, output/T22_theta_A_placebo.csv
 # SEED:    NONE
 # EXPECTED_N: 4182 (treated), 17200 (S5R$placebo)
 #
@@ -45,10 +45,12 @@ stopifnot(nrow(plac) == EXPECTED_N_PLACEBO)
 cat(sprintf("G2 Placebo n = %d: PASS\n", nrow(plac)))
 
 # Load T22 per-pair theta_A files (produced by S24_reliability.R)
-theta_A_treated <- fread(file.path(RTA_ROOT, "output/T22_theta_A_treated.csv"))
+# T22_theta_A_all.csv has all 4182 treated pairs (not just split-half qualifying)
+theta_A_all <- fread(file.path(RTA_ROOT, "output/T22_theta_A_all.csv"))
+stopifnot(nrow(theta_A_all) == EXPECTED_N_TREATED)
 theta_A_placebo <- fread(file.path(RTA_ROOT, "output/T22_theta_A_placebo.csv"))
-cat(sprintf("T22 theta_A: treated n=%d, placebo n=%d\n",
-            nrow(theta_A_treated), nrow(theta_A_placebo)))
+cat(sprintf("T22 theta_A: all treated n=%d, placebo n=%d\n",
+            nrow(theta_A_all), nrow(theta_A_placebo)))
 
 # -----------------------------------------------------------------------------
 # PLACEBO CENSUS (INV-036)
@@ -69,8 +71,8 @@ cat("Other counts arise from filtering (split-half, decile matching, etc.).\n")
 # -----------------------------------------------------------------------------
 cat("\n=== MERGING DEFINITION A FROM T22 ===\n")
 
-# Treated theta_A: merge from T22
-base <- merge(base, theta_A_treated[, .(pair, theta_A_T22 = theta_A)],
+# Treated theta_A: merge from T22 (all 4182 pairs)
+base <- merge(base, theta_A_all[, .(pair, theta_A_T22 = theta_A)],
               by = "pair", all.x = TRUE)
 cat(sprintf("Treated theta_A from T22: %d of %d pairs\n",
             sum(!is.na(base$theta_A_T22)), nrow(base)))
@@ -141,8 +143,8 @@ cat("\nSaved: output/T23_anchor.csv\n")
 # Sidecar
 sha <- system(sprintf("sha256sum %s | cut -d' ' -f1", file.path(RTA_ROOT, "output/T23_anchor.csv")), intern = TRUE)
 writeLines(c(
-  "PRODUCER: S24b_anchor_table.R v2",
-  "INPUTS: data/S5R_bhat.rds, output/T22_theta_A_treated.csv, output/T22_theta_A_placebo.csv",
+  "PRODUCER: S24b_anchor_table.R v3",
+  "INPUTS: data/S5R_bhat.rds, output/T22_theta_A_all.csv, output/T22_theta_A_placebo.csv",
   "SEED: NONE",
   "EXPECTED_N: 4182 (treated), 17200 (placebo)",
   "",

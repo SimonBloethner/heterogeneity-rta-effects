@@ -12,12 +12,56 @@ library(data.table)
 
 args <- commandArgs(trailingOnly = TRUE)
 EXECUTE <- "--execute" %in% args
+ALLOW_DIRTY <- "--allow-dirty" %in% args
 
 cat("================================================================\n")
 cat("run_all.R - Pipeline Orchestrator\n")
 cat(sprintf("Start: %s\n", format(Sys.time())))
 cat(sprintf("Mode: %s\n", if (EXECUTE) "EXECUTE" else "DRY RUN"))
 cat("================================================================\n\n")
+
+# =============================================================================
+# PREFLIGHT: Refuse to execute on unverified tree
+# =============================================================================
+if (EXECUTE) {
+  cat("=== PREFLIGHT CHECK ===\n")
+
+  # Get HEAD SHA
+  head_sha <- system("git rev-parse HEAD", intern = TRUE)
+  cat(sprintf("HEAD: %s\n", head_sha))
+
+  # Check git status --porcelain (empty = clean)
+  porcelain <- system("git status --porcelain", intern = TRUE)
+  dirty_count <- length(porcelain)
+
+  if (ALLOW_DIRTY) {
+    cat("WARNING: --allow-dirty specified\n")
+    cat(sprintf("Dirty files: %d\n", dirty_count))
+    cat("NON-PUBLISHABLE: tree does not match origin/main\n")
+    cat("This log may NOT be used as evidence of a rebuild.\n\n")
+  } else {
+    # Check tree is clean
+    if (dirty_count > 0) {
+      cat("PREFLIGHT HALT: Tree is dirty\n")
+      cat("Dirty files:\n")
+      for (f in porcelain) cat(sprintf("  %s\n", f))
+      stop("HALT: Uncommitted changes. Use --allow-dirty for development.")
+    }
+
+    # Check HEAD is reachable from origin/main
+    ancestor_check <- system("git merge-base --is-ancestor HEAD origin/main",
+                             ignore.stdout = TRUE, ignore.stderr = TRUE)
+    if (ancestor_check != 0) {
+      origin_main <- system("git rev-parse origin/main 2>/dev/null || echo 'NO_REMOTE'",
+                            intern = TRUE)
+      cat(sprintf("origin/main: %s\n", origin_main))
+      stop("HALT: HEAD is not reachable from origin/main. Push first, or use --allow-dirty.")
+    }
+
+    cat("Tree clean: PASS\n")
+    cat("HEAD reachable from origin/main: PASS\n\n")
+  }
+}
 
 # =============================================================================
 # CONFIGURATION
@@ -235,6 +279,11 @@ if (EXECUTE) {
     log_file <- "output/run_all_log.txt"
     log_con <- file(log_file, open = "wt")
 
+    # Write log header with HEAD SHA
+    writeLines(sprintf("HEAD: %s", head_sha), log_con)
+    if (ALLOW_DIRTY) {
+      writeLines("NON-PUBLISHABLE: tree does not match origin/main", log_con)
+    }
     writeLines(sprintf("run_all.R execution log\nStarted: %s\n", Sys.time()), log_con)
 
     for (i in seq_along(sorted_order)) {

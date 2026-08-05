@@ -345,6 +345,20 @@ reported number; all three make a citation ambiguous.
 - **Status:** DOCUMENTED -- recorded so a later pass does not rediscover them.
 - **Date:** 2026-07-30
 
+### INV-048: T22_theta_A_treated.csv Row Count Mismatch
+- **Issue:** T22_theta_A_treated.csv contained 4120 rows (split-half qualifying pairs)
+  but S30_moment_power.R expected 4182 rows (all treated pairs). The file served two
+  incompatible consumers with different population requirements.
+- **Root cause:** Split-half reliability (SPLITHALF_A_R) is computed on pairs with ≥4
+  post-cells AND ≥2 per half (4120 qualifying). S30's power analysis needs all 4182
+  treated pairs regardless of qualifying status.
+- **Resolution:** Split T22_theta_A_treated.csv into two files:
+  - T22_theta_A_splithalf.csv (n=4120): qualifying pairs for reliability analysis
+  - T22_theta_A_all.csv (n=4182): all treated pairs for S30 power analysis
+- **Verification:** SPLITHALF_A_R = 0.9243 unchanged (computed on 4120 qualifying pairs)
+- **Status:** CLOSED
+- **Date:** 2026-08-05
+
 ## Disambiguated Producers
 
 | Superseded | Canonical | Reason |

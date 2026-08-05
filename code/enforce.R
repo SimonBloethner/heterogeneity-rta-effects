@@ -616,6 +616,50 @@ check_registry_deps <- function(root, report = FALSE) {
 }
 
 # =============================================================================
+# CHECK (j2): Producer script existence - every producer_script must exist
+# =============================================================================
+check_producer_existence <- function(root, report = FALSE) {
+    results <- character()
+    registry_path <- file.path(root, "meta/FILE_REGISTRY.csv")
+    if (!file.exists(registry_path)) return(results)
+
+    registry <- fread(registry_path)
+
+    # Only check non-ARCHIVED rows with code producers
+    active_rows <- registry[status != "ARCHIVED" & !is.na(producer_script)]
+
+    # Exempt producer types that don't need to exist as files
+    exempt_producers <- c("manual", "external", "vendored", "copy", "archived", "NEEDS_SIDECAR")
+
+    checked <- character()
+    for (i in seq_len(nrow(active_rows))) {
+        producer <- active_rows$producer_script[i]
+        file_path <- active_rows$file_path[i]
+
+        # Skip exempt producers
+        if (producer %in% exempt_producers) next
+
+        # Skip already checked (avoid duplicate violations)
+        if (producer %in% checked) next
+        checked <- c(checked, producer)
+
+        # Check if producer script exists
+        producer_path <- file.path(root, producer)
+        if (!file.exists(producer_path)) {
+            msg <- sprintf("producer_script %s does not exist (declared for %s)", producer, file_path)
+            if (report) report_violation("PRODUCER_EXISTS", msg)
+            results <- c(results, paste0("PRODUCER_EXISTS|", msg))
+        }
+    }
+
+    if (report && length(results) == 0) {
+        cat(sprintf("  Checked %d unique producers: all exist\n", length(checked)))
+    }
+
+    results
+}
+
+# =============================================================================
 # CHECK (k): No hardcoded absolute paths in R scripts
 # =============================================================================
 check_absolute_paths <- function(root, report = FALSE) {
@@ -818,6 +862,17 @@ run_all_checks <- function(root = getwd()) {
     if (length(v_j) == 0) cat("  All dependencies and stage ordering valid: PASS\n")
     cat("\n")
 
+    # (j2)
+    cat("=== CHECK (j2): Producer script existence ===\n")
+    if (file.exists(registry_path)) {
+        registry <- fread(registry_path)
+        active_rows <- registry[status != "ARCHIVED" & !is.na(producer_script)]
+        cat(sprintf("  Non-archived rows with producers: %d\n", nrow(active_rows)))
+    }
+    v_j2 <- check_producer_existence(root, report = TRUE)
+    if (length(v_j2) == 0) cat("  All producer scripts exist: PASS\n")
+    cat("\n")
+
     # (k)
     cat("=== CHECK (k): Absolute paths in R scripts ===\n")
     all_scripts <- list.files(file.path(root, "code"), pattern = "\\.R$", full.names = TRUE, recursive = TRUE)
@@ -889,4 +944,28 @@ if (exists("FIXTURE_MODE") && FIXTURE_MODE) {
     cat("  PASS: violation correctly fired\n\n")
 
     cat("=== FIXTURE TEST COMPLETE ===\n")
+
+    # Fixture: check_producer_existence
+    cat("\n=== FIXTURE TEST: check_producer_existence ===\n")
+
+    # Known-pass: real registry producers should all exist
+    cat("Known-pass (real registry):\n")
+    v_prod_pass <- check_producer_existence(root, report = TRUE)
+    stopifnot(length(v_prod_pass) == 0)
+    cat("  PASS: no violations\n\n")
+
+    # Known-fail: create temp registry with fake producer
+    cat("Known-fail (injected non-existent producer):\n")
+    registry <- fread(file.path(root, "meta/FILE_REGISTRY.csv"))
+    fake_row <- data.table(file_path = "output/FAKE_OUTPUT.csv",
+                           producer_script = "code/NONEXISTENT_PRODUCER.R",
+                           status = "BUILT")
+    registry_bad <- rbind(registry, fake_row, fill = TRUE)
+    fwrite(registry_bad, file.path(tmp_meta, "FILE_REGISTRY.csv"))
+    v_prod_fail <- check_producer_existence(tmp_dir, report = TRUE)
+    stopifnot(length(v_prod_fail) > 0)
+    stopifnot(any(grepl("NONEXISTENT_PRODUCER", v_prod_fail)))
+    cat("  PASS: violation correctly fired\n\n")
+
+    cat("=== ALL FIXTURE TESTS COMPLETE ===\n")
 }

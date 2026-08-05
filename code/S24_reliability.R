@@ -1,10 +1,11 @@
 #!/usr/bin/env Rscript
-# S24_reliability.R v3 - Split-half reliability, Definition A throughout
-# OUTPUTS: output/T22_reliability.csv, output/T22_theta_A_treated.csv,
-#          output/T22_theta_A_placebo.csv, meta/T22_reliability.csv.sidecar
+# S24_reliability.R v4 - Split-half reliability, Definition A throughout
+# OUTPUTS: output/T22_reliability.csv, output/T22_theta_A_splithalf.csv (4120),
+#          output/T22_theta_A_all.csv (4182), output/T22_theta_A_placebo.csv
 # INPUTS:  data/S5R_bhat.rds, data/S1R_ppml.rds
 # SEED:    20260719
 # EXPECTED_N: 4182
+# EXPECTED_SPLITHALF_N: 4120
 # GATES:   G1 n == 4182; G2 split-half computed; G3 placebo stats computed
 #
 # Definition A: theta_A(pair) = mean over post cells of [log(trade) - log(y_hat_0)]
@@ -24,6 +25,7 @@ suppressPackageStartupMessages(library(data.table))
 set.seed(20260719)
 
 EXPECTED_N <- 4182
+EXPECTED_SPLITHALF_N <- 4120
 
 # Retired pack values (for comparison only, not targets)
 RETIRED <- list(
@@ -229,18 +231,59 @@ if (placebo_result$n_qualifying >= 3) {
 cat("G3 placebo stats computed: PASS\n")
 
 # -----------------------------------------------------------------------------
-# SAVE PER-PAIR DATA (for S24b consumption)
+# SAVE PER-PAIR DATA (split into two populations)
 # -----------------------------------------------------------------------------
 cat("\n=== SAVING PER-PAIR DATA ===\n")
 
+# 1. T22_theta_A_splithalf.csv - the 4120 qualifying pairs (for S24_reliability itself)
+#    These are the pairs that qualify for split-half: >=4 cells, >=2 per half
 if (treated_result$n_qualifying > 0) {
-  treated_pairs_out <- treated_data[, .(pair, theta_A = theta_A_full, n_post_cells)]
-  write.csv(treated_pairs_out, file.path(RTA_ROOT, "output/T22_theta_A_treated.csv"), row.names = FALSE)
-  cat(sprintf("Saved: output/T22_theta_A_treated.csv (%d pairs)\n", nrow(treated_pairs_out)))
+  splithalf_pairs_out <- treated_data[, .(pair, theta_A = theta_A_full, n_post_cells)]
+  stopifnot(nrow(splithalf_pairs_out) == EXPECTED_SPLITHALF_N)
+  write.csv(splithalf_pairs_out, file.path(RTA_ROOT, "output/T22_theta_A_splithalf.csv"), row.names = FALSE)
+  cat(sprintf("Saved: output/T22_theta_A_splithalf.csv (%d pairs, split-half qualifying)\n", nrow(splithalf_pairs_out)))
 }
 
+# 2. T22_theta_A_all.csv - ALL 4182 treated pairs (for S30_moment_power.R)
+#    S30 needs post-cell counts for all pairs regardless of split-half qualification
+compute_theta_A_all <- function(pairs_dt, ppml_dt, adoption_col = "adoption_year") {
+  pair_list <- pairs_dt$pair
+  adoption_years <- setNames(pairs_dt[[adoption_col]], pairs_dt$pair)
+
+  results <- list()
+  for (p in pair_list) {
+    adopt_yr <- adoption_years[p]
+    ppml_pair <- ppml_dt[pair == p]
+    post_cells <- ppml_pair[year > adopt_yr + 1 & trade > 0 & y_hat_0 > 0]
+
+    if (nrow(post_cells) > 0) {
+      log_gaps <- log(post_cells$trade) - log(post_cells$y_hat_0)
+      theta_A <- mean(log_gaps, na.rm = TRUE)
+    } else {
+      theta_A <- NA_real_
+    }
+
+    results[[p]] <- data.table(
+      pair = p,
+      theta_A = theta_A,
+      n_post_cells = nrow(post_cells)
+    )
+  }
+  rbindlist(results)
+}
+
+treated_all <- compute_theta_A_all(
+  pairs_dt = base[, .(pair, adoption_year)],
+  ppml_dt = ppml,
+  adoption_col = "adoption_year"
+)
+stopifnot(nrow(treated_all) == EXPECTED_N)
+write.csv(treated_all, file.path(RTA_ROOT, "output/T22_theta_A_all.csv"), row.names = FALSE)
+cat(sprintf("Saved: output/T22_theta_A_all.csv (%d pairs, all treated)\n", nrow(treated_all)))
+
+# 3. T22_theta_A_placebo.csv - placebo qualifying pairs (no qualifies column)
 if (placebo_result$n_qualifying > 0) {
-  placebo_pairs_out <- placebo_data[, .(pair, theta_A = theta_A_full, n_post_cells, qualifies = TRUE)]
+  placebo_pairs_out <- placebo_data[, .(pair, theta_A = theta_A_full, n_post_cells)]
   write.csv(placebo_pairs_out, file.path(RTA_ROOT, "output/T22_theta_A_placebo.csv"), row.names = FALSE)
   cat(sprintf("Saved: output/T22_theta_A_placebo.csv (%d pairs)\n", nrow(placebo_pairs_out)))
 }

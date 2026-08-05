@@ -22,7 +22,9 @@ article/        LaTeX source, bibliography, prop_constants.tex
 | output/T21_arms.csv | Noise arms, SD_true set, TW_MEAN | BUILT |
 | output/T22_reliability.csv | Split-half reliability | BUILT |
 | output/T22_theta_A_placebo.csv | Per-pair theta_A, placebo (n=17200) | BUILT |
-| output/T22_theta_A_treated.csv | Per-pair theta_A, treated (n=4182) | BUILT |
+| output/T22_theta_A_splithalf.csv | Per-pair theta_A, split-half qualifying (n=4120) | BUILT |
+| output/T22_theta_A_all.csv | Per-pair theta_A, all treated pairs (n=4182) | BUILT |
+| output/T22_theta_A_treated.csv | SUPERSEDED by T22_theta_A_splithalf/all (INV-048) | ARCHIVED |
 | output/T25_prop_verification.csv | Proposition verification | BUILT |
 | output/T27_gradient_B.csv | Size gradient, Definitions B and D | BUILT |
 | output/T28_v1c_pairlevel.csv | V1c arms 0/1/2, diagnostic (G5 FAIL is the finding) | BUILT |
@@ -67,6 +69,7 @@ not significant. See canonical_facts.md, Gradient section, shape note.
 | INV-039 | CLOSED | archive/retired_pack/ enrolled (77 rows); check (d) additionally structural against archive/ |
 | INV-046 | CLOSED | Registry existence reconciliation; 26 absent rows resolved, check (i) added |
 | INV-047 | CLOSED | S17 silent fallback; Arm A provenance corrected (N1 -> T11) |
+| INV-048 | CLOSED | T22 split: T22_theta_A_treated.csv (4120 qualifying) served S30 (needs 4182); split into T22_theta_A_splithalf.csv (4120) and T22_theta_A_all.csv (4182) |
 
 ## Residuals
 

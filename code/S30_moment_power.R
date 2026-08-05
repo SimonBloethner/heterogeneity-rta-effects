@@ -40,16 +40,16 @@ cat("  N =", N, "\n")
 cat("  ESIGMA2 =", ESIGMA2, "\n")
 cat("  VAR_SIGMA2 =", VAR_SIGMA2, "\n")
 
-T22 <- fread(file.path(RTA_ROOT, "output/T22_theta_A_treated.csv"))
+# Read all treated pairs (4182) - NOT the split-half qualifying subset (4120)
+T22 <- fread(file.path(RTA_ROOT, "output/T22_theta_A_all.csv"))
 stopifnot("n_post_cells" %in% names(T22))
+stopifnot(nrow(T22) == 4182)  # Must be all treated pairs
 T_post_empirical <- T22$n_post_cells
 stopifnot(length(T_post_empirical) == N)
 stopifnot(all(!is.na(T_post_empirical)))
 
-cat("  T_post: n =", length(T_post_empirical), ", range = [", 
+cat("  T_post: n =", length(T_post_empirical), ", range = [",
     min(T_post_empirical), ",", max(T_post_empirical), "]\n\n")
-
-stopifnot(nrow(T22) == 4182)
 
 # =============================================================================
 # 2. SIGMA^2 DISTRIBUTION
