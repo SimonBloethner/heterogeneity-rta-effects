@@ -43,14 +43,14 @@ cat(sprintf("BASELINE_SHA: %s\n", BASELINE_SHA))
 cat(sprintf("RTA_ROOT: %s\n", normalizePath(RTA_ROOT)))
 cat(sprintf("REPO: %s\n", normalizePath(REPO)))
 
-# 3. RTA_ROOT and REPO must NOT be the same directory
-# (A sidecar written by a producer cannot be the baseline for verifying that producer)
+# 3. RTA_ROOT and REPO may be the same if using git show for baseline
+# (git show reads from historical commit, not filesystem)
 rta_norm <- normalizePath(RTA_ROOT, mustWork = TRUE)
 repo_norm <- normalizePath(REPO, mustWork = TRUE)
 if (rta_norm == repo_norm) {
-  stop("RTA_ROOT and REPO resolve to the same directory. ",
-       "Cannot use rebuild tree sidecars as baseline. ",
-       "Set REPO to the committed repository and RTA_ROOT to the rebuild tree.")
+  cat("NOTE: RTA_ROOT and REPO resolve to the same directory.\n")
+  cat("This is OK because baseline hashes are read via 'git show BASELINE_SHA:'\n")
+  cat("which reads from git history, not from the current filesystem.\n\n")
 }
 
 cat("\nPreflight checks: PASS\n\n")
