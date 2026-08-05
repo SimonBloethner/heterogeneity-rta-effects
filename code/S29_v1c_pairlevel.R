@@ -56,9 +56,11 @@ cat(sprintf("T25a rows: %d\n", nrow(T25a)))
 # =============================================================================
 cat("\n=== FILTERING TO QUALIFYING PAIRS ===\n")
 
-qualifying <- T22[qualifies == TRUE]
+# T22_theta_A_placebo.csv now contains only qualifying pairs (INV-048)
+# All rows are already qualifying (>= 4 post cells, >= 2 per half)
+qualifying <- T22
 n_qualifying <- nrow(qualifying)
-cat(sprintf("Qualifying pairs (qualifies == TRUE): %d\n", n_qualifying))
+cat(sprintf("Qualifying pairs (all rows in T22 are qualifying): %d\n", n_qualifying))
 
 # G1: n used == 15683
 cat(sprintf("\nG1: n used = %d, expected 15683\n", n_qualifying))
