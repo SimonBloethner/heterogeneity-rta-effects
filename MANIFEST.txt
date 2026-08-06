@@ -29,6 +29,7 @@ article/        LaTeX source, bibliography, prop_constants.tex
 | output/T27_gradient_B.csv | Size gradient, Definitions B and D | BUILT |
 | output/T28_v1c_pairlevel.csv | V1c arms 0/1/2, diagnostic (G5 FAIL is the finding) | BUILT |
 | output/T28b_v1c_arm1p.csv | V1c, Arm 1' (canonical) | BUILT |
+| output/T30_threshold_grid.csv | Threshold grid robustness (16 cells) | BUILT |
 | output/TD1R_population_census.csv | Population census (n=4182) | BUILT |
 | meta/canonical_facts.md | Canonical facts ledger, SOLE AUTHORITY | BUILT |
 
