@@ -48,20 +48,25 @@
 \maketitle
 
 \begin{abstract}
-We estimate the distribution of bilateral trade-agreement effects across 4,182
-country pairs, allowing effects to vary where the aggregate literature has
-averaged them. The mean effect is 0.25 log points; the standard deviation of
-true effects lies in [0.74, 1.48], a set-identified interval whose endpoints
-differ in whether persistent pair-specific noise is attributed to the effect or
-removed. The probability that a randomly drawn pair's true effect is
-non-positive lies in [0.37, 0.42]. A size gradient of 0.91 log points---eleven
-standard errors---runs from the smallest to the largest pre-adoption trade
-quintiles, with the largest pairs' effects small and negative. Propagated to
-trade outcomes, the central expectation is roughly 28 percent for a median pair
-and 9 percent for the average traded dollar. Split-half reliability statistics,
-shown to pass on a zero-effect population, certify persistence rather than
-validity. We derive the identified set, report what it forecloses, and state
-five diagnostic practices that survive the failure of the conventional ones.
+Estimates of the effect of regional trade agreements are reported as single
+coefficients, on the implicit assumption that agreements act alike on the pairs
+that sign them. We estimate the distribution of those effects instead, and show
+first that the diagnostics which would ordinarily license pair-level estimation
+cannot do so: split-half reliability on treated pairs is largely reproduced on a
+placebo population with no effects to recover, so what such statistics certify
+is persistence rather than validity. Correcting the identified biases in
+sequence and deconvolving the residual estimation noise, the standard deviation
+of true effects lies in $[\LedgerSDTrueLo,\,\LedgerSDTrueHi]$, an identified set
+% [SD_THETA_TRUE]
+whose endpoints differ in a noise-attribution assumption these data cannot
+settle, and the probability that a randomly drawn adopting pair gains nothing
+lies in $[\LedgerPLo,\,\LedgerPHi]$. Effects fall steeply in pre-adoption trade
+% [P_THETA_LEQ_0]
+and then floor; a conditional general-equilibrium solve finds transmission flat
+across the size distribution, so the gradient in outcomes is a gradient in the
+effect parameter rather than an artifact of scale. The shape of the distribution
+is not identified at this signal share, and no larger sample relieves the limit.
+We state the diagnostic practices that survive.
 \end{abstract}
 
 \textbf{Keywords:}
@@ -1805,8 +1810,8 @@ Neither is recoverable from these data, and we claim neither.
 % A8. [CLOSED 2026-08-06] ¶1 previously deferred level-scale translation to
 %     "Section \ref{sec:results}'s successor" because sec:propagation did not
 %     yet exist. Section 7 is now committed and labelled; ¶1 cites
-%     \ref{sec:propagation} directly. sec:conclusion remains undefined and is
-%     referenced at lines 104 and 392; the coda must carry that label.
+%     \ref{sec:propagation} directly. sec:conclusion is defined by the Section 8
+%     coda as of 2026-08-06; the forward references to it now resolve.
 %
 % A9. [UNVERIFIED CROSS-REFERENCE] ¶14 cites sec:data-population for the
 %     switcher exclusion rules and the non-convex weighting. The switcher
@@ -2362,95 +2367,117 @@ Largest quintile  & Noise-only & $-0.0583$ & $-83.1$ & $-0.4$  & $564.4$  & $39.
 
 % =============================================================================
 % SECTION 8 — CONCLUSION
-% Drafted against meta/canonical_facts.md at commit 3cbabd97.
-% ID budget: 3 IDs maximum in body text. Cross-references permitted freely.
+% Drafted against meta/canonical_facts.md at commit 88d0fb70.
+% ID budget: 3 IDs in body text (SD_THETA_TRUE, P_THETA_LEQ_0, GRADIENT).
+% Cross-references unlimited. Structure per SECTION8-2: P1 takes up the
+% question handed over at the close of sec:prop-reading; P2 is the prediction
+% ledger promised at lines 117 and 405; P3 is method, prospective; P4 is the
+% disclaimer; P5 closes.
 % =============================================================================
 
 \section{Conclusion}
 \label{sec:conclusion}
 
-% P1 — The question this paper asked
-This paper asked what a distribution of agreement effects looks like when the
-pairs that form them are permitted to differ. The aggregate literature has long
-returned a single number, typically between zero and half a log point, and the
-confidence intervals around that number have been taken to mean that the effect
-is measured precisely. What is measured precisely is a weighted average across
-pairs whose individual effects may differ by orders of magnitude, and the
-precision of the average says nothing about the dispersion underneath it.
+% P1a — Take up Section 7's handoff: how one number survived this long.
+Section~\ref{sec:propagation} closes on a question rather than a result: how a
+literature came to report a single number for a quantity this dispersed. The
+answer is not inattention. It is that the two things a researcher would have
+needed in order to know better were unavailable in opposite directions, and
+neither absence announced itself.
 
-% P2 — The answer it found (arm-indexed interval, not a point)
-The answer is an interval rather than a point, and the interval is the finding.
-Across the $\LedgerN$ switching pairs that satisfy the design's inclusion rules,
-the mean effect is $\LedgerMeanThetaD$ log points with a standard error of
-$\LedgerMeanThetaDSE$---a positive, precisely estimated average---and the
-standard deviation of true effects lies in $[\LedgerSDTrueLo,\,\LedgerSDTrueHi]$.
+% P1b — The two facts, and what sits between them.
+The diagnostics that could be computed were confidently wrong. Estimating
+effects pair by pair and asking whether they replicate returns reliability high
+enough to clear any conventional threshold, and
+Section~\ref{sec:empirical-certificate} shows that the same machinery returns
+much of it on a population constructed to have no effects to be reliable about.
+Persistence was measured and validity inferred; Corollary~\ref{cor:rel} states
+the condition under which that inference fails, and the condition is met by
+ordinary features of trade data rather than by anything exotic. The quantities
+most wanted, meanwhile, are not merely hard to compute but beyond computation at
+any sample size: Proposition~\ref{prop:ident}(b) shows that transitory variation
+in the effect and a treatment-coincident change in volatility reach the
+likelihood only through their sum, so no statistic separates them and no larger
+panel will (Section~\ref{sec:limits-equivalence}). A field that could not verify
+its pair-level estimates, and could not in principle resolve the ambiguity
+beneath them, had reason to report the average and move on. Between those two
+facts sits what this paper claims. The dispersion of true effects is an
+identified set, $[\LedgerSDTrueLo,\,\LedgerSDTrueHi]$, whose endpoints are
 % [SD_THETA_TRUE]
-The two endpoints differ in a single assumption: whether the persistent,
-pair-specific component the placebo machinery reproduces is counted as noise to
-be removed or as effect heterogeneity to be retained. The data do not adjudicate
-that assumption, so the interval is the identified object and no point inside it
-is preferred. Under both endpoints the dispersion exceeds the mean by a factor
-of three or more, and the probability that a randomly drawn pair's true effect
-is non-positive lies in $[\LedgerPLo,\,\LedgerPHi]$.
+indexed by a noise-attribution assumption the data do not adjudicate. The
+probability that a randomly drawn adopting pair's effect is non-positive is a
+bracket, $[\LedgerPLo,\,\LedgerPHi]$, and no sharper risk statement is
 % [P_THETA_LEQ_0]
-
-That interval is wide enough to carry a decision. At either endpoint,
-between a third and two-fifths of adopting pairs drew effects at or below zero,
-and at either endpoint the effect for the largest pre-adoption trade quintile is
-small, negative, and statistically distinguishable from zero. The gradient from
-the smallest quintile to the largest spans $\LedgerGradient$ log points, a
-spread of eleven standard errors, and the shape of that gradient---a steep fall
+available at this signal share. The gradient in pair size spans
+$\LedgerGradient$ log points and is sharp enough to carry a policy reading on
 % [GRADIENT]
-across the first three quintiles and then a floor---is the prediction
-Section~\ref{sec:theory-distribution} staked the mechanism on and the one the
-estimator was free to reject. It did not. A smoothly monotone decline would have
-falsified the mechanism. The data show a fall arrested at a common floor, which
-is what exhausted constraints look like.
+its own (Section~\ref{sec:results-gradient}). And the specification spread the
+discipline has treated as fragility is resolved rather than adjudicated: the
+competing estimates are differently weighted averages of one sloped
+distribution (Section~\ref{sec:results-spread}).
 
-% P3 — The diagnostics failure and what it implies for practice
-Sections~\ref{sec:empirical} and~\ref{sec:empirical-certificate} establish a
-narrower claim that governs the wider one. The diagnostics that could be
-computed were confidently wrong. A split-half reliability of $\LedgerSplithalfR$
-on the treated estimates, against $\LedgerPlaceboR$ on a population where the
-effect is zero by construction, certifies persistence and not validity;
-Corollary~\ref{cor:rel} proves the general case, and the gap between treated and
-placebo is what the diagnostic was never designed to see. The consequence for
-practice is direct. Any pair-level estimator returning numbers that pass a
-reliability threshold must be evaluated against what the same machinery returns
-when there is nothing to find, and that comparison is the statistic---either
-number alone is not. The five practices Section~\ref{sec:empirical-diagnostics}
-names follow from the one failure class: reliability against its null, a pair's
-own pre-adoption years as a self-calibrated benchmark, verification on planted
-truth, identified-set reporting with arms labelled, and content-pinning
-assertions in code. Each addresses something this paper's data forced into view.
+% P2 — The prediction ledger promised at lines 117 and 405. Two carry weight,
+% and not equally; one under-identified, one untested. Per sec:results-reconciliation.
+Four predictions were advanced, and Section~\ref{sec:theory-standard} asked that
+they be held jointly because each is weak alone. Two carry weight. Effects
+graded in pair size and prior integration are confirmed, in the fall-then-floor
+form the mechanism requires rather than as a bare negative slope
+(Section~\ref{sec:results-gradient}). Selection on match quality is supported,
+not confirmed, by the placebo and stability evidence of
+Section~\ref{sec:empirical-diagnostics}. Two do not. Right-skewed effects are
+neither confirmed nor refuted: the shape of the effect distribution is not
+identified at the signal share these data achieve, which is a limit of the
+measurement and not a null (Section~\ref{sec:results-reconciliation}).
+Lognormal-type outcome tails are untested here, the prediction concerning the
+marginal distribution of flows and this design reaching it only through a
+normality assumption Section~\ref{sec:limits-tolerances} reports as rejected.
+The two that carry are not worth the same. The gradient is the prediction
+Section~\ref{sec:theory-nonsep} named as the sharpest of the four, because it
+specifies a shape as well as a direction and nominates its own falsifier in a
+smoothly monotone descent; the quintile means were unrestricted, the falsifier
+was available, and it did not appear. Selection corroborates without separating,
+being consistent with almost any account of why governments negotiate. Recording
+the open legs alongside the closed ones is the standard the theory section set
+for itself, and it is the standard on which this paper asks to be read.
 
-% P4 — What was not learned (shape limit, transportability boundary)
-Two limits should be stated with equal weight, because they determine what the
-paper does not learn. The shape of the effect distribution is not identified at
-the signal share these data achieve. Mixture deconvolution does not resolve;
-fitting three components returns duplicates at the standard-deviation floor
-rather than distinct subpopulations. No share-of-winners statistic is therefore
-reported, no tail asymmetry, no skewness, and no density-based risk statement
-beyond the probability bracket above. Section~\ref{sec:limits} formalizes what
-blocks the shape and what would unblock it: the equivalence of
-Proposition~\ref{prop:ident}(b) is exact under the model's normality assumption,
-and separation through higher moments is available under cross-pair independence
-and shape invariance, two conditions this paper does not establish.
+% P3 — Exportable method, prospective. No account of how the paper came to need it.
+The instruments this required are not specific to trade agreements. An effect
+distribution estimated from panel data is certified, if at all, by instruments
+built to be adversarial to it. A placebo population with nothing to recover, run
+through the identical pipeline, converts a reliability statistic from a claim
+about the estimates into a claim about the machinery that produced them. A
+pair's own pre-adoption years supply a null calibrated on the unit itself rather
+than on a pooled reference, which is what makes drift separable from effect.
+Planted truth of known magnitude, recovered end to end, tests the pipeline and
+not merely the estimator at its final step. Identified sets reported with their
+arms labelled keep an assumption visible at the point where a single number
+would launder it into a result. And provenance enforced by machine --- every
+stated quantity bound to a committed artifact, and the binding checked rather
+than asserted --- makes a manuscript auditable against its own outputs.
+Section~\ref{sec:empirical-diagnostics} states these as five practices; taken
+together they are one standard, which is that a number reported about an effect
+is reported alongside what the same procedure returns when there is no effect to
+find.
 
-The second limit is the population over which the estimand is defined. These are
-self-selected matches: pairs that chose an agreement, measured against a
-counterfactual fitted on pairs that did not. Nothing in the design identifies
-the effect of an agreement assigned to a pair that did not choose one. The
-selection that makes the mechanism testable is the selection the estimand
-conditions on, and the conditioning is a constraint any policy reading must
-respect. Section~\ref{sec:limits-transport} proves this as a property of the
-estimating population rather than a caution about external validity.
+% P4 — What the paper does not conclude. Only site at which the introduction's
+% floor/downside/upside triple may be named, and only as failed objects.
+Two things this paper does not conclude deserve stating as plainly as what it
+does. Nothing here evaluates an agreement assigned to a pair that did not choose
+one: the estimand is defined over self-selected matches, and
+Section~\ref{sec:limits-transport} establishes that as a property of the
+estimating population rather than a caution about external validity. And nothing
+here supplies the quantities a decision-maker would most want --- a floor, a
+sharp probability of being made worse off, a realistic upside --- because each is
+a property of a shape this design cannot identify; what is available is the
+bracket above. The paper equips the question. It does not answer it for anyone.
 
-% P5 — The closing sentence
-This paper asked what happens when a single number is allowed to be many. The
-answer is that many of them are small or negative, that the ones that are large
-belong to the pairs that trade least, and that the diagnostics that would
-ordinarily have settled the matter failed to notice.
+% P5 — Close. One callback to the introduction's promise; nothing after.
+The single number was never wrong so much as it was one summary of an object
+that does not reduce to a summary. What stands in its place is a set, a bracket
+and a gradient: less than the introduction promised, and more than was
+previously known. Heterogeneity in the effects of trade agreements is not a
+complication surrounding the answer. It is the quantity the question was always
+about.
 
 \newpage
 \bibliographystyle{aer}
