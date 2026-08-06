@@ -2347,6 +2347,98 @@ Largest quintile  & Noise-only & $-0.0583$ & $-83.1$ & $-0.4$  & $564.4$  & $39.
 % adopting pair the probability of a non-positive effect lies in [0.370, 0.421],
 % and no sharper risk statement is supported at the achievable signal share.
 
+% =============================================================================
+% SECTION 8 — CONCLUSION
+% Drafted against meta/canonical_facts.md at commit 3cbabd97.
+% ID budget: 3 IDs maximum in body text. Cross-references permitted freely.
+% =============================================================================
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+% P1 — The question this paper asked
+This paper asked what a distribution of agreement effects looks like when the
+pairs that form them are permitted to differ. The aggregate literature has long
+returned a single number, typically between zero and half a log point, and the
+confidence intervals around that number have been taken to mean that the effect
+is measured precisely. What is measured precisely is a weighted average across
+pairs whose individual effects may differ by orders of magnitude, and the
+precision of the average says nothing about the dispersion underneath it.
+
+% P2 — The answer it found (arm-indexed interval, not a point)
+The answer is an interval rather than a point, and the interval is the finding.
+Across the $\LedgerN$ switching pairs that satisfy the design's inclusion rules,
+the mean effect is $\LedgerMeanThetaD$ log points with a standard error of
+$\LedgerMeanThetaDSE$---a positive, precisely estimated average---and the
+standard deviation of true effects lies in $[\LedgerSDTrueLo,\,\LedgerSDTrueHi]$.
+% [SD_THETA_TRUE]
+The two endpoints differ in a single assumption: whether the persistent,
+pair-specific component the placebo machinery reproduces is counted as noise to
+be removed or as effect heterogeneity to be retained. The data do not adjudicate
+that assumption, so the interval is the identified object and no point inside it
+is preferred. Under both endpoints the dispersion exceeds the mean by a factor
+of three or more, and the probability that a randomly drawn pair's true effect
+is non-positive lies in $[\LedgerPLo,\,\LedgerPHi]$.
+% [P_THETA_LEQ_0]
+
+That interval is wide enough to carry a decision. At either endpoint,
+between a third and two-fifths of adopting pairs drew effects at or below zero,
+and at either endpoint the effect for the largest pre-adoption trade quintile is
+small, negative, and statistically distinguishable from zero. The gradient from
+the smallest quintile to the largest spans $\LedgerGradient$ log points, a
+spread of eleven standard errors, and the shape of that gradient---a steep fall
+% [GRADIENT]
+across the first three quintiles and then a floor---is the prediction
+Section~\ref{sec:theory-distribution} staked the mechanism on and the one the
+estimator was free to reject. It did not. A smoothly monotone decline would have
+falsified the mechanism. The data show a fall arrested at a common floor, which
+is what exhausted constraints look like.
+
+% P3 — The diagnostics failure and what it implies for practice
+Sections~\ref{sec:empirical} and~\ref{sec:empirical-certificate} establish a
+narrower claim that governs the wider one. The diagnostics that could be
+computed were confidently wrong. A split-half reliability of $\LedgerSplithalfR$
+on the treated estimates, against $\LedgerPlaceboR$ on a population where the
+effect is zero by construction, certifies persistence and not validity;
+Corollary~\ref{cor:rel} proves the general case, and the gap between treated and
+placebo is what the diagnostic was never designed to see. The consequence for
+practice is direct. Any pair-level estimator returning numbers that pass a
+reliability threshold must be evaluated against what the same machinery returns
+when there is nothing to find, and that comparison is the statistic---either
+number alone is not. The five practices Section~\ref{sec:empirical-diagnostics}
+names follow from the one failure class: reliability against its null, a pair's
+own pre-adoption years as a self-calibrated benchmark, verification on planted
+truth, identified-set reporting with arms labelled, and content-pinning
+assertions in code. Each addresses something this paper's data forced into view.
+
+% P4 — What was not learned (shape limit, transportability boundary)
+Two limits should be stated with equal weight, because they determine what the
+paper does not learn. The shape of the effect distribution is not identified at
+the signal share these data achieve. Mixture deconvolution does not resolve;
+fitting three components returns duplicates at the standard-deviation floor
+rather than distinct subpopulations. No share-of-winners statistic is therefore
+reported, no tail asymmetry, no skewness, and no density-based risk statement
+beyond the probability bracket above. Section~\ref{sec:limits} formalizes what
+blocks the shape and what would unblock it: the equivalence of
+Proposition~\ref{prop:ident}(b) is exact under the model's normality assumption,
+and separation through higher moments is available under cross-pair independence
+and shape invariance, two conditions this paper does not establish.
+
+The second limit is the population over which the estimand is defined. These are
+self-selected matches: pairs that chose an agreement, measured against a
+counterfactual fitted on pairs that did not. Nothing in the design identifies
+the effect of an agreement assigned to a pair that did not choose one. The
+selection that makes the mechanism testable is the selection the estimand
+conditions on, and the conditioning is a constraint any policy reading must
+respect. Section~\ref{sec:limits-transport} proves this as a property of the
+estimating population rather than a caution about external validity.
+
+% P5 — The closing sentence
+This paper asked what happens when a single number is allowed to be many. The
+answer is that many of them are small or negative, that the ones that are large
+belong to the pairs that trade least, and that the diagnostics that would
+ordinarily have settled the matter failed to notice.
+
 \newpage
 \bibliographystyle{aer}
 \bibliography{references}
