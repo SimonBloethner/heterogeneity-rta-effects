@@ -1,0 +1,14 @@
+FILE:      T30_threshold_grid.csv
+SHA256:    d3ba961161b9ec38563169c38c69033e3798ee12aa2a3241e1a79f510d76aa27
+PRODUCER:  code/S31_threshold_grid.R (SHA256: 6d2bb146d6b6d1bdd0c5c3690f3277175be364a13c9ca15c4d5c8284167669b2)
+INPUTS:    data/S1R_ppml.rds, data/S3R_theta.rds
+SEED:      20260719
+GRID:      min_pre x min_post in {2,3,4,5} x {2,3,4,5}
+HELD FIXED: ANTICIP=1, ADOPT_LO=1991, ADOPT_HI=2016, size-decile b_hat
+GATE:      C1_baseline [PASS, n=4182, mean=0.2473, se=0.0241]
+N_MIN:     3240
+N_MAX:     4960
+MEAN_MIN:  0.1041
+MEAN_MAX:  0.2863
+R_VERSION: 4.4.1
+CREATED:   2026-08-06 20:53:47
