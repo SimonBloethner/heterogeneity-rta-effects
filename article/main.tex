@@ -1270,10 +1270,10 @@ pair of populations, so the counterfactual, the exclusion band and the
 post-window definition are common to every cell shown. The $D$ row has no
 placebo entry: the correction is defined by subtracting a placebo mean, so its
 zero-effect benchmark is not a column of this table but the held-out validation
-of Table~[X-REF: T9], where the corrected placebo effect on $8{,}545$ pairs the
+of Table~\ref{tab:holdout}, where the corrected placebo effect on $8{,}545$ pairs the
 correction never saw is $0.0188$ with a standard error of $0.0087$.
 % [T9: NA row]
- Reliability is reported separately, in Table~[X-REF: T22], because it is
+ Reliability is reported separately, in Table~\ref{tab:reliability}, because it is
 computed on the subsets with at least two post-adoption years in each half
 ($4{,}120$ treated, $15{,}683$ placebo) and so does not share this table's row
 denominators; it is reported for treated and placebo as a pair, since the
@@ -1825,10 +1825,11 @@ Neither is recoverable from these data, and we claim neither.
 %     algebra referred to in the drafting specification was not located under
 %     any label; if it lives elsewhere, the reference should move.
 %
-% A10. [APPENDIX TABLES ABSENT] Three [X-REF:] placeholders remain in main.tex
-%     (threshold grid, T9, T22) because app:tables is empty. They are outside
-%     this section but block a clean compile without undefined-reference
-%     warnings.
+% A10. [APPENDIX TABLES, PARTIALLY CLOSED 2026-08-06] The T9 and T22
+%     placeholders are resolved: both artifacts were already committed and
+%     ledgered, and are now typeset as tab:holdout and tab:reliability in
+%     app:tables. One [X-REF:] placeholder remains, for the threshold grid,
+%     which has no artifact in the tree and requires a compute run.
 %
 % A11. [WORD COUNT] Body prose is approximately 1,770 words, below the
 %     specified 2,400-3,200 band. Paragraph 7 was shortened when the quintile
@@ -2494,6 +2495,103 @@ about.
 
 \section{Additional Tables and Figures}
 \label{app:tables}
+
+% =============================================================================
+% APPENDIX TABLE — DRIFT-CALIBRATION HOLDOUT (T9)
+% Body: output/T9_placebo_holdout.csv (producer code/S5R_bhat_split.R).
+% Row NA is the pooled validation set; rows 1-10 are size deciles.
+% Ledger rows: HOLDOUT_N, HOLDOUT_MEAN, HOLDOUT_D3_MEAN, HOLDOUT_D3_N,
+% HOLDOUT_D3_SE, HOLDOUT_D1_N, HOLDOUT_D2_N, HOLDOUT_D8_N,
+% HOLDOUT_MAX_ABS_EX_D3.
+% =============================================================================
+
+\begin{table}[htbp]
+\centering
+\caption{Held-out validation of the drift correction}
+\label{tab:holdout}
+\begin{tabular}{lccc}
+\toprule
+Size decile & Validation pairs & Corrected placebo effect & SE \\
+\midrule
+Pooled & $8{,}545$ & $0.0188$ & $0.0087$ \\ % [HOLDOUT_N, HOLDOUT_MEAN]
+\midrule
+1  & $19$    & $0.0464$  & $0.1525$ \\ % [HOLDOUT_D1_N]
+2  & $94$    & $0.0532$  & $0.0928$ \\ % [HOLDOUT_D2_N]
+3  & $\HoldoutDThreeN$   & $\HoldoutDThreeMean$ & $0.0591$ \\ % [HOLDOUT_D3_N, HOLDOUT_D3_MEAN, HOLDOUT_D3_SE]
+4  & $630$   & $0.0314$  & $0.0362$ \\
+5  & $1{,}019$ & $0.0569$  & $0.0302$ \\ % [HOLDOUT_MAX_ABS_EX_D3]
+6  & $1{,}238$ & $0.0299$  & $0.0266$ \\
+7  & $1{,}343$ & $0.0514$  & $0.0228$ \\
+8  & $1{,}365$ & $0.0078$  & $0.0214$ \\ % [HOLDOUT_D8_N]
+9  & $1{,}327$ & $-0.0082$ & $0.0166$ \\
+10 & $1{,}196$ & $0.0023$  & $0.0148$ \\
+\bottomrule
+\end{tabular}
+
+\vspace{0.5em}
+\begin{minipage}{0.95\textwidth}
+\footnotesize
+\emph{Notes.} The drift correction of Definition~$D$ subtracts a size-cell
+placebo mean. This table applies the correction out of sample: cell means are
+estimated on one split of the placebo population and applied to a validation
+split the estimation never saw. If the correction were fitting noise, the
+corrected effect on the validation pairs would depart from zero, which is the
+value the placebo population's construction guarantees. Pooled, it does not.
+Decile~3 is the one cell whose mean is more than one standard error from zero,
+and it is also the cell whose sign is negative; excluding it, the largest
+absolute decile mean is $\HoldoutMaxAbsExDThree$. The thinnest folds carry
+standard errors an order of magnitude above the pooled figure, so the
+per-decile columns discipline the pooled result rather than standing on their
+own.
+\end{minipage}
+\end{table}
+
+% =============================================================================
+% APPENDIX TABLE — SPLIT-HALF RELIABILITY (T22)
+% Body: output/T22_reliability.csv (producer code/S24_reliability.R).
+% Ledger rows: SPLITHALF_A_R, SPLITHALF_A_RELIABILITY, THETA_A_MEAN,
+% THETA_A_SD, PLACEBO_A_R, PLACEBO_A_RELIABILITY, PLACEBO_A_MEAN,
+% PLACEBO_A_SD, PLACEBO_A_N, TREATED_TH, PLACEBO_TH, TREATED_TPOST,
+% PLACEBO_TPOST.
+% Population differs from tab:correction: the >=2-post-cells-per-half rule.
+% =============================================================================
+
+\begin{table}[htbp]
+\centering
+\caption{Split-half reliability under Definition~$A$, treated and placebo}
+\label{tab:reliability}
+\begin{tabular}{lcc}
+\toprule
+ & Switching pairs & Zero-effect benchmark \\
+\midrule
+Mean $\theta_A$                  & $-0.2548$ & $\LedgerPlaceboAMean$ \\ % [THETA_A_MEAN, PLACEBO_A_MEAN]
+SD $\theta_A$                    & $1.6318$  & $\LedgerPlaceboASD$ \\ % [THETA_A_SD, PLACEBO_A_SD]
+\addlinespace
+Split-half Pearson $r$           & $\LedgerSplithalfR$ & $\LedgerPlaceboR$ \\ % [SPLITHALF_A_R, PLACEBO_A_R]
+Spearman--Brown reliability      & $0.9607$  & $0.8547$ \\ % [SPLITHALF_A_RELIABILITY, PLACEBO_A_RELIABILITY]
+\addlinespace
+Mean post cells per split half   & $5.88$    & $5.46$ \\ % [TREATED_TH, PLACEBO_TH]
+Mean post cells per pair         & $11.76$   & $10.91$ \\ % [TREATED_TPOST, PLACEBO_TPOST]
+\addlinespace
+$n$                              & $4{,}120$ & $\LedgerPlaceboN$ \\ % [PLACEBO_A_N]
+\bottomrule
+\end{tabular}
+
+\vspace{0.5em}
+\begin{minipage}{0.95\textwidth}
+\footnotesize
+\emph{Notes.} Both columns are computed on the subset of pairs with at least
+two post-adoption cells in each split half, which is why the row denominators
+differ from those of Table~\ref{tab:correction}. The placebo column is the
+same estimator applied to never-treated pairs carrying pseudo-adoption dates,
+whose true effect is zero by construction. The comparison is the point of the
+table: a reliability coefficient of $\LedgerSplithalfR$ on the treated pairs
+is not evidence that the estimates recover effects, because the identical
+procedure returns $\LedgerPlaceboR$ where there are no effects to recover.
+Corollary~\ref{cor:rel} gives the condition under which this holds, and the
+post-cell rows report the window lengths that enter it.
+\end{minipage}
+\end{table}
 
 \section{Proofs}
 \label{app:proofs}
