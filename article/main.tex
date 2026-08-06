@@ -99,15 +99,15 @@ The natural escape is to stop averaging: estimate the effect pair by pair and st
 
 % --------------------------------------------------------------------------- % P6 — Stakes assembled; the distribution is the object; downside asymmetry % names the decision-relevant deliverables (seeds the discussion). % ---------------------------------------------------------------------------
 
-Assembled, the exposures compound. Whoever relies on an average agreement effect is exposed three times over: the average answers a question about the treaty stock rather than the question asked; the nonlinear chain it feeds amplifies whatever it conceals; and the diagnostics that should sound the alarm are structurally silent. None of this is visible in the point estimate or its standard error, which may be small, stable, and beside the point. What would resolve all three exposures is the same object: the distribution of agreement effects across pairs — its center, its spread, its skew, and its variation across the kinds of pairs that policy distinguishes. The resolution is more than formal. Decisions made under uncertainty are rarely symmetric in their stakes: the quantities a decision-maker actually needs are the floor, the probability of being made worse off, and the realistic upside — and these are properties of a distribution's shape that no mean, however precisely estimated, contains. With the distribution in hand, the question a government asks has an answer in the form it was posed; the nonlinear model can be fed what it actually requires; and the disagreement among specifications becomes decomposable rather than embarrassing.
+Assembled, the exposures compound. Whoever relies on an average agreement effect is exposed three times over: the average answers a question about the treaty stock rather than the question asked; the nonlinear chain it feeds amplifies whatever it conceals; and the diagnostics that should sound the alarm are structurally silent. None of this is visible in the point estimate or its standard error, which may be small, stable, and beside the point. What would resolve all three exposures is the same object: the distribution of agreement effects across pairs — its center, its spread, its skew, and its variation across the kinds of pairs that policy distinguishes. The resolution is more than formal. Decisions made under uncertainty are rarely symmetric in their stakes, and what a decision-maker needs from an effect estimate — how bad the bad case is, how likely it is, and how good the good case gets — is a property of the distribution's shape rather than of its mean, however precisely that mean is estimated. Whether a shape at that resolution can be recovered from data of this kind is not obvious in advance, and it is one of the questions this paper settles. With the distribution in hand, the question a government asks has an answer in the form it was posed; the nonlinear model can be fed what it actually requires; and the disagreement among specifications becomes decomposable rather than embarrassing. One qualification travels with all three: such a distribution is estimated over the pairs that chose to sign, and Section~\ref{sec:limits-transport} shows that this is a property of the design rather than a caution about it.
 
 % --------------------------------------------------------------------------- % P7 — Why the distribution should have structure: multiplicativity as the % default character of economic change (grounds the mechanism section). % ---------------------------------------------------------------------------
 
-There is, moreover, a reason to expect this distribution to have structure rather than being an amorphous cloud of noise. Economic magnitudes evolve by compounding: growth arrives as relative change applied to an existing state, so that trade between two economies at any moment is the residue of multiplied increments rather than summed ones \citep{gibrat1931, sutton1997gibrat, Jones2016, Beare2022}. A policy acting on such a process plausibly acts the same way — scaling what is there rather than adding to it — and multiplicative action by unmeasured conditions carries testable signatures: lognormal outcomes, asymmetry in effects, effects graded in the size of what they act upon, and selection of agreements on the very conditions that shape them \citep{mitzenmacher2004brief}. These signatures are the bridge between the motivation above and the evidence below: they are what the data would display if the contingency argued for in this introduction is real, and what they should not jointly display if it is not.
+There is, moreover, a reason to expect this distribution to have structure rather than being an amorphous cloud of noise. Economic magnitudes evolve by compounding: growth arrives as relative change applied to an existing state, so that trade between two economies at any moment is the residue of multiplied increments rather than summed ones \citep{gibrat1931, sutton1997gibrat, Jones2016, Beare2022}. A policy acting on such a process plausibly acts the same way — scaling what is there rather than adding to it — and multiplicative action by unmeasured conditions carries testable signatures: lognormal outcomes, asymmetry in effects, effects graded in the size of what they act upon, and selection of agreements on the very conditions that shape them \citep{mitzenmacher2004brief}. These signatures are the bridge between the motivation above and the evidence below: they are what the data would display if the contingency argued for in this introduction is real. How many of the four a design of this kind can actually adjudicate is a further question, and one the paper reports on rather than assumes away.
 
 % --------------------------------------------------------------------------- % P8 — Contributions, one qualitative paragraph. % ---------------------------------------------------------------------------
 
-This paper estimates the distribution of agreement effects for the flagship empirical model of trade, and makes four contributions along the way. First, we derive the failure of the diagnostics formally: we show why naive pair-level estimation produces estimates that are simultaneously badly biased and nearly perfectly reliable, and we state the conditions under which no persistence-based diagnostic can distinguish artifact from effect. Second, we construct the corrected distribution, removing the identified biases in sequence and the remaining estimation noise by deconvolution; where the data are genuinely silent — on the boundary between transitory effect variation and treatment-coincident volatility — we report a set rather than an assumption-dependent point, which is the same honesty applied at the second moment that motivates the paper at the first. Third, we resolve the disagreement among specifications constructively, showing that the estimates standard structures produce are differently weighted averages of the one distribution we recover, so that the specification spread is explained rather than adjudicated. Fourth, we propagate the distribution through general equilibrium and show that its shape — not merely its mean or its variance — governs the decision-relevant answers: the floor, the downside probability, and the upside; imposing a convenient shape in its place manufactures conclusions, including apparent risks of loss, that the data do not contain.
+This paper estimates the distribution of agreement effects for the flagship empirical model of trade, and makes four contributions along the way. First, we derive the failure of the diagnostics formally: we show why naive pair-level estimation produces estimates that are simultaneously badly biased and nearly perfectly reliable, and we state the conditions under which no persistence-based diagnostic can distinguish artifact from effect. Second, we construct the corrected distribution, removing the identified biases in sequence and the remaining estimation noise by deconvolution; where the data are genuinely silent — on the boundary between transitory effect variation and treatment-coincident volatility — we report a set rather than an assumption-dependent point, which is the same honesty applied at the second moment that motivates the paper at the first. Third, we resolve the disagreement among specifications constructively, showing that the estimates standard structures produce are differently weighted averages of the one distribution we recover, so that the specification spread is explained rather than adjudicated. Fourth, we propagate the distribution through general equilibrium and report what survives transmission and under what conditions: the size gradient survives, so that variation in outcomes across pairs is variation in the effect parameter rather than an artifact of scale, while every propagated range remains indexed by the dispersion arm it was computed under and by a distributional form imposed where the shape is not identified. Whoever quotes one of these numbers inherits both conditions, and we report them as part of the result rather than as caveats appended to it.
 
 % --------------------------------------------------------------------------- % P9 — Roadmap (compressed). % ---------------------------------------------------------------------------
 
@@ -116,8 +116,10 @@ it commits to. Section~\ref{sec:data} describes the data and the construction of
 the estimating population. Section~\ref{sec:empirical} presents the naive
 estimator and its diagnostics, derives the reliability results as formal
 propositions, and sets out the corrections. Section~\ref{sec:results} reports the
-corrected distribution, its variation across pair types, the reconciliation of the
-specification spread, and the identification boundary.
+corrected distribution, its variation across pair types, and the reconciliation
+of the specification spread. Section~\ref{sec:limits} establishes the boundary of
+what these data can identify, and shows that part of that boundary does not move
+with sample size.
 Section~\ref{sec:propagation} propagates the distribution through general
 equilibrium. Section~\ref{sec:conclusion} concludes and reports which of the four
 predictions survived. Proofs are collected in Appendix~\ref{app:proofs}.
@@ -401,14 +403,18 @@ effects \emph{and} effects graded in size and prior integration \emph{and}
 selection on the conditions that do the modulating. Each rival that explains one
 of these comfortably explains at least one of the others badly or not at all,
 and to our knowledge no single alternative currently on the table predicts all
-four together. This is abduction, not proof: the conjunction is evidence for the
+four together. Whether the four can be held jointly against these data is a
+separate question from whether the mechanism predicts them jointly, and
+Section~\ref{sec:results-reconciliation} reports that only two of the four were
+reached. This is abduction, not proof: the conjunction is evidence for the
 mechanism in the sense that the mechanism would render it unsurprising and its
 rivals would not, and a mechanism we have not considered may do as well or
-better. Sections~\ref{sec:empirical} and~\ref{sec:results} test each prediction
-in turn --- (i) in the distributional diagnostics, (ii) and (iii) in the
-corrected effect distribution and its variation across pair types, and (iv) in the
-composition of the treated population --- and Section~\ref{sec:conclusion}
-reports which survived.
+better. Sections~\ref{sec:empirical} and~\ref{sec:results} take up those of the
+four the design can reach --- (ii) and (iii) in the corrected effect distribution
+and its variation across pair types, and (iv) in the composition of the treated
+population. Prediction (i) concerns the marginal distribution of flows and is not
+tested here, for the reason given in the paragraph below.
+Section~\ref{sec:conclusion} reports which survived.
 
 % ¶N — States the scorecard in advance so the reader holds the conjunction
 %      with the right expectations; mirrors §5.4 and the coda.
@@ -1508,7 +1514,7 @@ quintile differing from zero at the five percent level where the fourth does
 not.
 
 % ¶8 — Why fall-then-floor is the predicted shape, not a weaker version of monotonicity.
-The shape matters as much as the slope. Section~\ref{sec:theory-primitive}
+The shape matters as much as the slope. Section~\ref{sec:theory-nonsep}
 predicts effects that decline in prior integration and then settle at a common
 floor once the constraints an agreement removes have stopped binding, and it is
 explicit that a smoothly monotone decline continuing through the largest pairs
@@ -1638,7 +1644,7 @@ particular pair.
 \label{sec:results-reconciliation}
 
 % ¶16 — Predictions (i) and (iii): confirmed.
-Section~\ref{sec:theory-distribution} advanced four predictions and asked that
+Section~\ref{sec:theory} advanced four predictions and asked that
 they be held jointly. Two now carry evidence, and the reason the third does not
 is worth stating rather than eliding. Lognormal-type outcome tails were to be
 tested in the distributional diagnostics; no such diagnostic is reported, and the
