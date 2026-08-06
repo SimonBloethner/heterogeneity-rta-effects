@@ -836,8 +836,8 @@ population the average effect goes from $-0.2837$ under $A$ to $0.0758$ under % 
 $B$:
  the sign flip happens here, at an arithmetic layer, before any correction that
 uses information about untreated pairs. The zero-effect population moves in the
-same direction and by more. Measured on the same $17{,}200$ never-treated pairs
-by the same producer, its mean rises from $-0.6880$ under $A$ to $-0.2072$ under % [T23: A,placebo_mean; B,placebo_mean]
+same direction and by more. Measured on the same $\LedgerPlaceboN$ never-treated pairs
+by the same producer, its mean rises from $\LedgerPlaceboAMean$ under $A$ to $-0.2072$ under % [T23: A,placebo_mean; B,placebo_mean]
 $B$.
  It does not, however, reach zero. Against the validity threshold of $0.05$ % [GATE_THRESHOLD]
 carried by the pipeline's gate library, the uncorrected placebo mean under
@@ -1210,7 +1210,7 @@ to find, and the accompaniment should be enforced rather than remembered.
 \cmidrule(lr){2-4}\cmidrule(lr){5-7}
 Definition & Mean & SD & $n$ & Mean & SD & $n$ \\
 \midrule
-$A$: mean of log ratios     & $-0.2837$  & $1.6630$ & $4{,}182$ & $-0.6880$  & $1.1187$ & $17{,}200$ \\ % [T23: A]
+$A$: mean of log ratios     & $-0.2837$  & $1.6630$ & $4{,}182$ & $\LedgerPlaceboAMean$  & $\LedgerPlaceboASD$ & $\LedgerPlaceboN$ \\ % [T22/T23: A]
                             & $(0.0257)$ &          &           & $(0.0085)$ &          &            \\
 \addlinespace
 $B$: log of ratio of sums   & $0.0758$   & $1.5799$ & $4{,}182$ & $-0.2072$  & $0.8244$ & $17{,}200$ \\ % [T23: B]
@@ -1230,10 +1230,10 @@ $D$: $B$ less cell drift    & $\LedgerMeanThetaD$   & $1.5614$ & $\LedgerN$ & --
 \emph{Notes.} Each row is a pair-level effect definition applied to the
 canonical population of $4{,}182$ switching pairs,
 % [T23: treated_n]
- and each is paired with the same definition applied to the $17{,}200$
-never-treated pairs carrying pseudo-adoption dates, for which the effect is zero
-by construction.
-% [T23: placebo_n; INV-036]
+ and each is paired with the same definition applied to never-treated pairs
+carrying pseudo-adoption dates, for which the effect is zero by construction
+($\LedgerPlaceboN$ qualifying pairs for $A$; $17{,}200$ for $B$).
+% [T22/T23: placebo_n; INV-036 -> INV-049]
  Definition~$A$ averages the log ratio of realized to imputed trade over a
 pair's post-adoption years. Definition~$B$ takes the log of the ratio of the
 sums over the same years, aggregating before the logarithm rather than after,
@@ -1288,7 +1288,7 @@ Definition~$A$.
 %
 %   Ledger/output split on theta_A moments ....... T22 now carries n; S4.1 and
 %       S4.2 state the qualifying counts (4,120 treated, 15,683 placebo) in text.
-%   Six placebo counts ........................... INV-036 CLOSED; 17,200 frozen.
+%   Six placebo counts ........................... INV-036 -> INV-049; now 15,683 qualifying.
 %   T7 partial run / extrapolated seed ........... superseded by T24, demoted.
 %   Fabricated seed rows in T24 .................. removed; 11 rows.
 %   Anchor table did not exist ................... T23, single producer.
@@ -1959,6 +1959,363 @@ diagnostics that could be computed were confidently wrong, the quantities that
 mattered most are bounded rather than free, and the section between those two
 facts is where this paper's positive claims live.
 
+
+% =============================================================================
+% SECTION 7 — PROPAGATION AND IMPLICATIONS
+% Sources: meta/canonical_facts.md (via article/ledger_constants.tex macros);
+%          output/T20_ge_bracket.csv  (partial-equilibrium distributional bracket)
+%          output/T42_ge_twodyad.csv  (conditional GE, common mean, two dyads)
+%          output/T43_ge_gradient.csv (conditional GE, quintile-conditional means)
+% All ledgered quantities are cited by macro. Table cells are cited by
+% % [Txx: row, col] comments on their own lines.
+% =============================================================================
+
+\section{Propagation and Implications}
+\label{sec:propagation}
+
+\subsection{From Parameters to Outcomes}
+\label{sec:prop-design}
+
+% ¶1 — What the translation needs before it can run.
+Everything reported to this point is a log effect. A reader who wants to know
+what an agreement does to trade needs that quantity on the scale trade is
+measured in, and the translation is not a change of units. It requires three
+inputs the previous sections supply separately: a scale map, which is the
+exponential; a dispersion, which this design identifies only up to an interval;
+and, wherever the question concerns a quantile rather than a location, a shape,
+which at the signal share these data achieve is not identified at all
+(Section~\ref{sec:results}). This section performs the translation with each of
+those inputs named where it enters, and reports the result as a bracket rather
+than a number.
+
+% ¶2 — Two propagation designs, and what each can and cannot answer.
+Two exercises are reported, and they answer different questions. The first is
+distributional and partial: it maps the estimated effect distribution onto the
+level scale pair by pair, holding multilateral resistances, third-country
+reallocation, incomes and expenditures fixed. It says what the spread of
+outcomes looks like across the population of adopters, and nothing about
+equilibrium adjustment. The second is a conditional general-equilibrium
+counterfactual: a structural gravity system solved on the terminal
+cross-section, with an elasticity of substitution of five taken as the
+literature standard, incomes and expenditures held at their data values, and
+prices and multilateral resistances allowed to adjust
+\citep{anderson2003gravity}. Because incomes are fixed, every quantity it
+returns is a change in bilateral trade, not in welfare, and it is reported as
+such throughout.
+
+% ¶3 — The calibrated dyads, and why two.
+The equilibrium exercise must be evaluated at a particular pair, and the choice
+of pair is itself a modeling decision, so two are used rather than one. Both are
+drawn from the adopting population and from opposite ends of the pre-adoption
+trade distribution: the median pair of the smallest quintile and the median pair
+of the largest, on the same quintile partition that generates the size gradient
+in Section~\ref{sec:results-gradient}. Reporting both, separately, is what
+allows the equilibrium response to be distinguished from the parameter it
+propagates --- a distinction the next subsections turn on.
+
+% ¶4 — The imposed form, stated as an imposition.
+Where a quantile is required and the shape is unidentified, a form must be
+imposed. The form imposed here is a symmetric normal with the ledgered mean and
+the arm's standard deviation, and both exercises are run at both endpoints of
+the identified set for the dispersion of true effects,
+$[\LedgerSDTrueLo,\,\LedgerSDTrueHi]$, with no endpoint preferred. Symmetry is
+an assumption of convenience where the data are silent, not a finding, and
+nothing below should be read as evidence about the shape of the effect
+distribution.
+
+% ¶5 — The governing sentence, before any number.
+One sentence governs every figure in this section. Each outcome range below is
+doubly conditional --- on which admissible null model sets the dispersion arm,
+and on the symmetric form imposed where the shape is unidentified --- and
+neither condition is a technicality the reader may discharge and forget. The
+first is set-identified by construction; the second is the measurement limit
+stated in Section~\ref{sec:results} and formalised in Section~\ref{sec:limits}.
+What follows are brackets of brackets. A figure lifted out of one and quoted
+alone will be wrong in a direction the lifter cannot sign.
+
+\subsection{The Typical Pair and the Typical Dollar}
+\label{sec:prop-typical}
+
+% ¶6 — The mean effect propagated, with the Jensen caveat Section 5 deferred here.
+The mean agreement effect is $\LedgerMeanThetaD$ with a standard error of
+$\LedgerMeanThetaDSE$, which exponentiates to a trade increase of
+$\LedgerMeanThetaDPct$ percent. The label on that number requires the care
+Section~\ref{sec:results} flagged and deferred. Exponentiating the mean of a log
+effect returns the level change for a pair at the centre of the log-effect
+distribution --- under the symmetric form imposed here, the median pair --- and
+not the average level change across pairs. The latter is larger by a Jensen term
+in the dispersion, and since the dispersion is set-identified the average level
+change is set-identified too and is not ledgered. The central pair gains about
+$\LedgerMeanThetaDPct$ percent. The average pair gains more, by an amount this
+design does not pin down.
+
+% ¶7 — The dollar-weighted counterpart and the endogeneity-of-weights clause.
+Weighting by trade rather than by pair, the same quantity is $\LedgerTWMean$, or
+$\LedgerTWMeanPct$ percent. The weights are pre-adoption trade, for the reason
+given in Section~\ref{sec:results}: post-adoption volume is a function of the
+effect being weighted, so weighting by it would let large effects purchase their
+own importance. On honest weights the dollar-weighted answer is roughly a third
+of the pair-weighted one.
+
+% ¶8 — Why two audiences get answers three times apart.
+Two audiences therefore receive answers differing by a factor of about three,
+and the gap is not a disagreement about the data. A trade ministry asking what
+an agreement will do for a country pair is asking a pair-weighted question; a
+finance ministry asking what a programme of agreements will do to aggregate
+trade is asking a dollar-weighted one. Both are answered correctly from the same
+distribution, and they differ because the effect is systematically smaller where
+the dollars are.
+
+% ¶9 — What the gap is not.
+It is worth stating what that gap is not. It is not a bias in either figure, and
+it is not resolved by a longer panel or a different fixed-effect structure. Both
+averages come from the same pair-level estimates under the same correction and
+differ only in the weight attached to each pair. Any weighting scheme is an
+implicit choice of whose question is being answered, and on a distribution with
+a slope this steep the choice is consequential. A literature reporting one
+number is not reporting a compromise between the two; it is reporting one of
+them, usually without saying which.
+
+\subsection{Size-Conditional Expectations}
+\label{sec:prop-size}
+
+% ¶10 — The gradient, propagated.
+Sorted into quintiles of pre-adoption trade, the effect runs from
+$\LedgerGradientQOne$ with a standard error of $\LedgerGradientQOneSE$ in the
+smallest quintile to $\LedgerGradientQFive$ with a standard error of
+$\LedgerGradientQFiveSE$ in the largest. On the level scale that is a central
+expectation of a $\LedgerGradientQOnePct$ percent increase for a pair in the
+smallest quintile and a $\LedgerGradientQFivePct$ percent change for a pair in
+the largest. The largest-quintile figure is small, negative, and not zero: it
+lies two standard errors below zero.
+% [ledger shape note: t = -2.11]
+It should be reported as what it is --- a small, precisely estimated, negative
+central expectation --- rather than rounded rhetorically to nothing in either
+direction. The spread between the endpoints is $\LedgerGradient$ with a standard
+error of $\LedgerGradientSE$, and Section~\ref{sec:results-gradient} establishes
+that the profile falls and then floors rather than declining throughout.
+
+% ¶11 — The equilibrium exercise separates transmission from parameter.
+Two propagations at the same two dyads separate the equilibrium response from
+the parameter it carries. Given a common effect distribution, the smallest- and
+largest-quintile calibrations return almost the same proportional outcome: the
+central expectation differs by less than a percentage point between them, and
+the ninety-to-ten ratio by less than one part in a hundred.
+% [T42: lo arm, both dyads, q50 and RANGE_1090]
+Both pairs are negligible shares of their countries' expenditure, so
+multilateral resistance barely moves in either case, and equilibrium
+transmission is effectively flat across the size distribution. The consequence
+is worth stating plainly: the size gradient in outcomes is a gradient in the
+effect parameter, not in the equilibrium response to it.
+
+% ¶12 — The gradient propagated through the equilibrium system.
+Propagating each quintile's own central effect through the same system, the
+smallest-quintile calibration returns a median trade change of $141$ percent and
+the largest-quintile calibration one of $-3$ percent at the hardened arm.
+% [T43: lo, LUX_ATG, q50; lo, NLD_CRI, q50]
+Equilibrium adjustment moves both toward the middle relative to the partial
+figures above, and moves neither far. The gradient survives the general
+equilibrium intact.
+
+% ¶13 — The consequence for practice.
+The consequence for anyone consulting an estimated agreement effect is direct.
+The unconditional coefficient is an average over this slope, addressed to no
+particular pair, and the single most decision-relevant conditioning variable is
+one every negotiator possesses before any estimation is done: how much the two
+countries currently trade with each other. A coefficient reported without that
+conditioning is not wrong so much as unaddressed. It answers a question about a
+population average that no individual party to an agreement occupies, and at the
+endpoints of the trade distribution the distance between that average and the
+party's own size-conditional expectation exceeds the average itself.
+
+% ¶14 — What conditioning does not buy.
+Conditioning on size sharpens the location of the expectation and not the
+uncertainty around it. The standard errors above are standard errors of quintile
+means; they describe how precisely the conditional average is estimated, not how
+widely true effects are spread within a quintile. That residual dispersion --- 
+the quantity a pair would want, having established which quintile it occupies
+--- is not separately ledgered, and this paper does not report it. Nothing in
+the gradient licenses the inference that a given small pair will gain
+$\LedgerGradientQOnePct$ percent. What it licenses is that small pairs gain, on
+average, a great deal more than large ones, by a margin many times their common
+standard errors.
+
+\subsection{Uncertainty, Stated Honestly}
+\label{sec:prop-uncertainty}
+
+% ¶15 — The arm-indexed distributional ranges.
+Table~\ref{tab:propagation} reports the outcome distribution implied by each
+dispersion arm under the imposed symmetric normal form. At the hardened arm the
+tenth percentile of the implied trade change is $-50.1$ percent, the median
+$28.2$ percent and the ninetieth $231.1$ percent, a ninety-to-ten ratio of
+$6.64$.
+% [T20: C_hardened, q10/q50/q90/RANGE_1090]
+At the noise-only arm the same three quantiles under the same form are $-81.2$
+percent, $23.5$ percent and $737.2$ percent, a ratio of $44.44$.
+% [T20: A_noise_only, q10/q50/q90/RANGE_1090]
+The two ratios differ by a factor of nearly seven, and the difference is not
+evidence about the world. It is the price of an assumption the data do not
+adjudicate, displayed rather than hidden.
+
+% ¶16 — How to read the width of the arm bracket.
+That width should be read as information rather than noise. What separates the
+arms is a single substantive question --- whether the persistent, pair-specific
+component the placebo machinery reproduces belongs to the effect or to the error
+--- and the propagated consequence of answering it one way rather than the other
+is a ninetieth percentile of $231$ percent against one of $737$ percent. A
+design resolving that question would collapse the bracket to one column.
+Section~\ref{sec:limits} explains why the resolution is unavailable from data of
+this length rather than of this size; the bracket is not a confidence statement
+and does not narrow with more pairs.
+
+% ¶17 — The mechanical asymmetry, with the mechanism named.
+Within either arm the upside spread exceeds the downside. The distance from the
+median to the ninetieth percentile is $2.59$ times the distance from the tenth
+to the median at the hardened arm and $6.82$ times it at the noise-only arm.
+% [derived: T20 quantile differences per arm]
+This asymmetry is mechanical, not empirical: the parameter distribution imposed
+here is symmetric by construction and the exponential map is convex, so an
+asymmetric outcome distribution follows from a symmetric parameter distribution
+without any asymmetry in the underlying effects. It is reported so that a reader
+encountering skewed outcome ranges elsewhere knows how little must be assumed to
+produce them. It is not evidence that the effect distribution is skewed.
+
+% ¶18 — The probability bracket, quoted once.
+For a pair drawn at random from the adopting population, the probability that
+its true effect is non-positive lies in $[\LedgerPLo,\,\LedgerPHi]$, where the
+lower endpoint is the normal-form probability evaluated at the hardened arm and
+the upper endpoint is capped at the empirical share of non-positive estimates
+because the normal form at the noise-only arm returns a value exceeding that
+share. That bracket is the sharpest risk statement this design supports, and it
+is quoted here once.
+
+% ¶19 — The abstention.
+Sharper statements are available in the literature and are not available here.
+At the signal share these data achieve the shape of the effect distribution is
+not identified, and every quantity a risk-minded reader would next ask for is a
+statement about shape: the probability of a loss exceeding a threshold, the
+quantiles of the effect distribution, the weight of an adverse tail, the share
+of adopters for whom the agreement was a mistake. Each requires locating mass in
+a density this design does not recover. The bracket above is a probability of
+sign, obtained from two assumptions stated in the sentence reporting it, and it
+does not generalise to a probability of magnitude. This paper reports no
+density-based risk statement beyond it, and readers should treat the absence as
+a finding about what these data can bear rather than as an omission.
+
+\subsection{The Evaluator's Reading}
+\label{sec:prop-reading}
+
+% ¶20 — Commitments (i)-(iii).
+An evaluator holding these results should carry six commitments away from them.
+The first is to condition on size before consulting any coefficient, because the
+conditional and unconditional expectations diverge by more than the
+unconditional one at both ends of the trade distribution. The second follows: a
+large, heavily trading pair should expect a small negative central effect rather
+than a large positive one, while a small, thinly integrated pair should expect a
+proportional gain that is large in percentage terms precisely because its base
+is small. The third is that these compose to a modest aggregate --- weighted by
+the dollars actually at stake, the average agreement effect is
+$\LedgerTWMeanPct$ percent, not $\LedgerMeanThetaDPct$ percent, and a programme
+of agreements moves aggregate trade correspondingly less than the pair-level
+headline suggests.
+
+% ¶21 — Commitments (iv)-(v).
+The fourth commitment is to the ledgered bracket and no further: for a randomly
+drawn adopting pair the probability of no gain or of a loss lies in the interval
+reported in Section~\ref{sec:prop-uncertainty}, and no sharper risk statement is
+available at this signal share. The fifth is that every propagated range here is
+conditional on a dispersion arm and an imposed distributional form, and a user
+quoting one inherits both conditions whether or not they are restated. Neither
+is a caveat appended to a result. Each is part of the result.
+
+% ¶22 — Commitment (vi) and the handoff.
+The sixth is the binding one. Everything above describes self-selected matches:
+pairs that chose an agreement, measured against a counterfactual fitted on pairs
+that did not. The design identifies nothing about what an agreement would do to
+a pair that did not choose one, and Section~\ref{sec:limits-transport}
+establishes that this is a property of the estimating population rather than a
+caution about external validity. Any policy reading extending these numbers to
+non-adopters crosses a boundary the design cannot cross with it, and that is
+where this section stops. What it leaves is a question about how a literature
+came to report a single number for a quantity this dispersed, which the closing
+section takes up.
+
+% =============================================================================
+% TABLES
+% =============================================================================
+
+\begin{table}[htbp]
+\centering
+\caption{Implied trade outcomes by dispersion arm}
+\label{tab:propagation}
+\begin{tabular}{lrrrrr}
+\toprule
+Arm & SD of true effects & $q_{10}$ & $q_{50}$ & $q_{90}$ & Range \\
+\midrule
+Hardened drift (C) & $0.740$ & $-50.1$ & $28.2$ & $231.1$ & $6.64$ \\
+Noise-only (A)     & $1.475$ & $-81.2$ & $23.5$ & $737.2$ & $44.44$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% Note to Table~\ref{tab:propagation}. Percentage changes in bilateral trade
+% implied by the estimated effect distribution, at both endpoints of the
+% identified set for the standard deviation of true effects; no arm is
+% preferred. The mean is the ledgered pair-level mean effect. Because the SHAPE
+% of the effect distribution is not identified at this signal share, a form must
+% be imposed to obtain quantiles: a symmetric normal with the ledgered mean and
+% the arm's standard deviation, 10,000 draws under a fixed seed. This
+% propagation is PARTIAL: each pair's effect is mapped onto its own trade with
+% multilateral resistances, third-country reallocation, incomes and expenditures
+% held fixed. Range is (1 + q90/100)/(1 + q10/100). Every figure is conditional
+% on both the arm and the imposed form.
+
+\begin{table}[htbp]
+\centering
+\caption{Conditional-GE trade changes at two calibrated dyads}
+\label{tab:gradient-ge}
+\begin{tabular}{llrrrrr}
+\toprule
+Calibration & Arm & Mean effect & $q_{10}$ & $q_{50}$ & $q_{90}$ & Range \\
+\midrule
+Smallest quintile & Hardened   & $0.8554$  & $-0.6$  & $140.7$ & $524.7$  & $6.28$ \\
+Smallest quintile & Noise-only & $0.8554$  & $-57.9$ & $147.3$ & $1533.6$ & $38.79$ \\
+Largest quintile  & Hardened   & $-0.0583$ & $-60.0$ & $-3.1$  & $152.3$  & $6.31$ \\
+Largest quintile  & Noise-only & $-0.0583$ & $-83.1$ & $-0.4$  & $564.4$  & $39.22$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% Note to Table~\ref{tab:gradient-ge}. Percentage changes in bilateral trade from
+% a conditional general-equilibrium solve of a structural gravity system on the
+% terminal cross-section: incomes and expenditures held at their data values,
+% prices and multilateral resistances adjusting. Elasticity of substitution
+% sigma = 5, taken as the literature standard and not estimated here. Two
+% calibrations, both drawn from the adopting population: the median pair of the
+% smallest pre-adoption trade quintile and the median pair of the largest, on
+% the partition of Section~\ref{sec:results-gradient}. Each calibration draws
+% 500 effects from a symmetric normal centred on its own quintile mean, at both
+% endpoints of the identified set for the dispersion of true effects. Range is
+% (1 + q90/100)/(1 + q10/100). Because incomes are fixed, every entry is a change
+% in bilateral trade and not a welfare quantity.
+
+% =============================================================================
+% ABSTRACT FEED
+% =============================================================================
+% Propagated to trade outcomes, the estimated distribution implies a central
+% expectation of roughly a 28 percent increase for a pair at the centre of the
+% effect distribution and roughly 9 percent for the average traded dollar, a gap
+% that is a consequence of the size gradient rather than a discrepancy.
+% Conditioning on pre-adoption trade, the central expectation runs from about
+% +135 percent in the smallest quintile to about -5.7 percent in the largest, and
+% a conditional general-equilibrium solve at calibrated dyads from each end shows
+% the gradient survives equilibrium adjustment: transmission is flat across the
+% size distribution, so the gradient in outcomes is a gradient in the effect
+% parameter. Uncertainty is reported as a bracket of brackets: ranges are indexed
+% by which admissible null model sets the dispersion of true effects and by the
+% symmetric form imposed where shape is unidentified. For a randomly drawn
+% adopting pair the probability of a non-positive effect lies in [0.370, 0.421],
+% and no sharper risk statement is supported at the achievable signal share.
 
 \newpage
 \bibliographystyle{aer}

@@ -34,7 +34,7 @@ Status: NO OPEN INVESTIGATIONS. enforce.R reports zero violations at commit 4325
 | ID | Quantity | Value | SE | Producer |
 |----|----------|-------|-----|----------|
 | MEAN_THETA_D | Mean theta_D | 0.2473 | 0.0241 | data/S5R_bhat.rds$baseline (n=4182) |
-| SD_THETA_TRUE | SD(theta_true) | [0.74, 1.48] | - | INV-027 |
+| SD_THETA_TRUE | SD(theta_true) | [0.74, 1.48] | - | code/S24_arms_canonical.R -> output/T21_arms.csv (INV-027) |
 | RAW_SHARE | Share theta_D <= 0 | 0.4211 | - | data/S5R_bhat.rds$baseline (n=4182) |
 | TW_MEAN | Trade-weighted mean theta_D | 0.0898 | - | code/S24_arms_canonical.R -> output/T21_arms.csv |
 
@@ -129,6 +129,7 @@ Note: the four are, in order, (B) bilateral only, (C) country fixed effects, (CY
 | PLACEBO_A_SD | SD theta_A (placebo) | 1.0814 | 15683 | A (mean of log gaps) | code/S24_reliability.R -> output/T22_reliability.csv |
 | PLACEBO_A_R | Split-half Pearson r (placebo) | 0.7463 | 15683 | A (mean of log gaps) | code/S24_reliability.R -> output/T22_reliability.csv |
 | PLACEBO_A_RELIABILITY | Spearman-Brown reliability (placebo) | 0.8547 | 15683 | A (mean of log gaps) | code/S24_reliability.R -> output/T22_reliability.csv |
+| PLACEBO_A_N | Count theta_A (placebo, qualifying) | 15683 | 15683 | A (mean of log gaps) | code/S24_reliability.R -> output/T22_reliability.csv |
 
 Note: Split rule is odd/even post-years (1st,3rd,5th->H1; 2nd,4th,6th->H2), >=2 cells per half required.
 

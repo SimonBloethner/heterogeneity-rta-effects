@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
 # S45_ledger_constants.R - Generate main body macros from canonical_facts.md
-# Emits: article/ledger_constants.tex (30 macros)
+# Emits: article/ledger_constants.tex (33 macros)
 # Gates: G1 (all IDs resolve), G2 (string identity), G3 (no Prop*/Atwo* collision), G4 (round-trip)
 
 # =============================================================================
@@ -61,7 +61,12 @@ MACROS <- list(
 
     # Jensen/reliability parameters (not colliding with Prop* in prop_constants.tex)
     LedgerEsigmaSq = list(id = "ESIGMA2", precision = 4, is_integer = FALSE, is_interval = FALSE),
-    LedgerSigma = list(id = "SIGMA", precision = 4, is_integer = FALSE, is_interval = FALSE)
+    LedgerSigma = list(id = "SIGMA", precision = 4, is_integer = FALSE, is_interval = FALSE),
+
+    # Placebo moments (Definition A, qualifying subset)
+    LedgerPlaceboAMean = list(id = "PLACEBO_A_MEAN", precision = 4, is_integer = FALSE, is_interval = FALSE),
+    LedgerPlaceboASD = list(id = "PLACEBO_A_SD", precision = 4, is_integer = FALSE, is_interval = FALSE),
+    LedgerPlaceboN = list(id = "PLACEBO_A_N", precision = 0, is_integer = TRUE, is_interval = FALSE)
 )
 
 # Expected values for verification (at stated precision)
@@ -95,7 +100,10 @@ EXPECTED <- list(
     LedgerSplithalfR = 0.9243,
     LedgerPlaceboR = 0.7463,
     LedgerEsigmaSq = 1.3642,
-    LedgerSigma = 1.1680
+    LedgerSigma = 1.1680,
+    LedgerPlaceboAMean = -0.6821,
+    LedgerPlaceboASD = 1.0814,
+    LedgerPlaceboN = 15683
 )
 
 # =============================================================================
@@ -198,8 +206,8 @@ for (macro_name in names(MACROS)) {
     parsed_values[[macro_name]] <- val
     cat(sprintf("  %s -> \\%s = %s\n", cfg$id, macro_name, val))
 }
-cat("G1: PASS - all 30 IDs resolve\n")
-stopifnot("G1: exactly 30 macros defined" = length(parsed_values) == 30)
+cat("G1: PASS - all 33 IDs resolve\n")
+stopifnot("G1: exactly 33 macros defined" = length(parsed_values) == 33)
 
 # =============================================================================
 # G2: String identity (not numeric tolerance)
@@ -232,7 +240,7 @@ for (macro_name in names(EXPECTED)) {
     cat(sprintf("  \\%s: '%s' == '%s' OK\n", macro_name, trimws(parsed_str), trimws(expected_str)))
 }
 cat("G2: PASS - all parsed values match expected (string identity)\n")
-stopifnot("G2: all 30 values verified" = length(EXPECTED) == 30)
+stopifnot("G2: all 33 values verified" = length(EXPECTED) == 33)
 
 # =============================================================================
 # G3: No Prop*/Atwo* collision
@@ -321,7 +329,7 @@ cat("G4: PASS - all values round-trip correctly\n")
 # =============================================================================
 newcommand_lines <- grep("^\\\\newcommand", emitted_content, value = TRUE)
 n_macros <- length(newcommand_lines)
-stopifnot("Exactly 30 macros emitted" = n_macros == 30)
+stopifnot("Exactly 33 macros emitted" = n_macros == 33)
 
 cat("\n=== All gates passed ===\n")
 cat(sprintf("Emitted %d macros to %s\n", n_macros, OUTPUT_PATH))

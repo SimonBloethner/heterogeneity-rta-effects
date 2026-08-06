@@ -359,6 +359,23 @@ reported number; all three make a citation ambiguous.
 - **Status:** CLOSED
 - **Date:** 2026-08-05
 
+### INV-049: T23_anchor.csv Stale Placebo Values
+- **Issue:** T23_anchor.csv committed values for Definition-A placebo were stale
+  (mean=-0.6880, SD=1.1187, n=17200). The rebuild produced corrected values from
+  the qualifying subset (mean=-0.6821, SD=1.0814, n=15683).
+- **Root cause:** T23 was generated before INV-048 split T22 into qualifying subsets.
+  The rebuild regenerated T23 from the updated S24b_anchor_table.R which reads
+  T22_theta_A_placebo.csv (now 15683 qualifying pairs, not 17200 full set).
+- **Manuscript sites affected:**
+  - article/main.tex:839-840 (prose): now uses \LedgerPlaceboN, \LedgerPlaceboAMean
+  - article/main.tex:1213 (Table 2, Def A placebo): now uses macros
+  - article/main.tex:1233 (Table 2 notes): clarifies A uses 15,683 qualifying
+- **T21_arms.csv source_INV:** The rebuild changed the C_OOS row's source_INV label
+  from "INV-027 corrected" to "G4 (N1b × sym weights)". The SD_true value (0.7423)
+  is substantively unchanged. SD_THETA_TRUE producer updated in canonical_facts.md.
+- **Status:** CLOSED
+- **Date:** 2026-08-06
+
 ## Disambiguated Producers
 
 | Superseded | Canonical | Reason |
