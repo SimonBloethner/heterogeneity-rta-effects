@@ -3,8 +3,9 @@
 # N1_oos_null.R - Out-of-Sample Pseudo-Effect Null
 # =============================================================================
 # OUTPUTS: output/T12_N1_oos_null.csv, output/T12_N1b_horizon.csv
-# INPUTS:  data/S1R_ppml.rds
+# INPUTS:  data/S1R_ppml.rds, data/S5R_bhat.rds
 # SEED:    20260719
+# EXPECTED_N: 4182 (baseline pairs from S5R_bhat.rds)
 # =============================================================================
 
 RTA_ROOT <- Sys.getenv("RTA_ROOT", unset = ".")
@@ -214,6 +215,7 @@ print(horizon_var)
 # Get treated post-window lengths for the 4,182 baseline pairs
 S5R <- readRDS(file.path(RTA_ROOT, "data/S5R_bhat.rds"))
 baseline <- S5R$baseline
+stopifnot("N1 EXPECTED_N: baseline must have 4182 pairs" = nrow(baseline) == 4182)
 say("")
 say("Baseline pairs: %d", nrow(baseline))
 

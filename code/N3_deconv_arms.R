@@ -6,6 +6,7 @@
 # INPUTS:  data/S5R_bhat.rds, data/N1_oos_null.rds, data/N2_placebo.rds
 # SEED:    20260719
 # B:       500 (pair-level bootstrap)
+# EXPECTED_N: 4182 (baseline pairs from S5R_bhat.rds)
 # =============================================================================
 
 RTA_ROOT <- Sys.getenv("RTA_ROOT", unset = ".")
@@ -30,6 +31,7 @@ say("================================================================")
 # Load inputs
 S5R <- readRDS(file.path(RTA_ROOT, "data/S5R_bhat.rds"))
 baseline <- S5R$baseline
+stopifnot("N3 EXPECTED_N: baseline must have 4182 pairs" = nrow(baseline) == 4182)
 
 # Arm A noise variance: mean(se_total^2) from archive/retired_2026-07-29/output/T11_se_decomposition.csv
 # This constant was live under a silent fallback from script creation until INV-047 (2026-08-04).

@@ -1,21 +1,20 @@
-FILE:      T22_reliability.csv
-SHA256:    7fbd8fdcdec11ffdbf1ffa960f32a0f1d7f62430f425efca3f9102f492acc3ab
-PRODUCER:  code/S24_reliability.R
-PRODUCER_SHA256: fa1499c9bf15f68df2c3fca1dfded9e85b8210033a4982dc5849caa422c1a372
-INPUTS:
-  data/S5R_bhat.rds: NOT_IN_REPO
-  data/S1R_ppml.rds: NOT_IN_REPO
-SEED:      20260719
-
-SPECIFICATION:
-  Split-half reliability table (Definition A)
-  Treated and placebo statistics
-  Includes SPLITHALF_A_R, PLACEBO_A_R, T_h values
-
+PRODUCER: code/S24_reliability.R
+INPUTS: data/S5R_bhat.rds, data/S1R_ppml.rds
+SEED: 20260719
+EXPECTED_N: 4182
+DEFINITION: A (mean of log gaps) - theta_A = mean over post cells of [log(trade) - log(y_hat_0)]
+SPLIT_RULE: Order post years ascending; 1st,3rd,5th->H1; 2nd,4th,6th->H2
+REQUIREMENT: >= 2 cells per half
+T_H: treated 5.8809, placebo 5.4555 (mean post cells per half)
+T_POST: treated 11.7619, placebo 10.9111 (mean post cells per pair)
 GATES:
-  G1: n == 4182 (treated pairs): PASS
-  G2: split-half n == 4120: PASS
-  G3: placebo n == 15683 (qualifying): PASS
-  G4: T_h >= 2 for treated and placebo: PASS
-
-CREATED: 2026-08-02 08:26:32
+  G1: n = 4182 - PASS
+  G2: treated split-half r = 0.924344682321206 - PASS
+  G3: placebo split-half r = 0.746308416718780 - PASS
+  REPRODUCTION: all 8 pre-existing values match to 1e-12 - PASS
+  T_h >= 2: treated=5.88, placebo=5.46 - PASS (C1.3)
+STATUS: BUILT
+DATE: 2026-08-06
+TREATED_QUALIFYING: 4120 of 4182
+PLACEBO_QUALIFYING: 15683 of 17200
+SHA256: 7fbd8fdcdec11ffdbf1ffa960f32a0f1d7f62430f425efca3f9102f492acc3ab

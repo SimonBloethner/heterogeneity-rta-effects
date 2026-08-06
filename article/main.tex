@@ -2146,13 +2146,11 @@ standard errors.
 % ¶15 — The arm-indexed distributional ranges.
 Table~\ref{tab:propagation} reports the outcome distribution implied by each
 dispersion arm under the imposed symmetric normal form. At the hardened arm the
-tenth percentile of the implied trade change is $-50.1$ percent, the median
-$28.2$ percent and the ninetieth $231.1$ percent, a ninety-to-ten ratio of
-$6.64$.
-% [T20: C_hardened, q10/q50/q90/RANGE_1090]
-At the noise-only arm the same three quantiles under the same form are $-81.2$
-percent, $23.5$ percent and $737.2$ percent, a ratio of $44.44$.
-% [T20: A_noise_only, q10/q50/q90/RANGE_1090]
+tenth percentile of the implied trade change is $-50.1$ percent, the median % [T20: C_hardened, q10]
+$28.2$ percent and the ninetieth $231.1$ percent, a ninety-to-ten ratio of % [T20: C_hardened, q50; C_hardened, q90]
+$6.64$. % [T20: C_hardened, RANGE_1090]
+At the noise-only arm the same three quantiles under the same form are $-81.2$ % [T20: A_noise_only, q10]
+percent, $23.5$ percent and $737.2$ percent, a ratio of $44.44$. % [T20: A_noise_only, q50; A_noise_only, q90; A_noise_only, RANGE_1090]
 The two ratios differ by a factor of nearly seven, and the difference is not
 evidence about the world. It is the price of an assumption the data do not
 adjudicate, displayed rather than hidden.
@@ -2170,9 +2168,8 @@ and does not narrow with more pairs.
 
 % ¶17 — The mechanical asymmetry, with the mechanism named.
 Within either arm the upside spread exceeds the downside. The distance from the
-median to the ninetieth percentile is $2.59$ times the distance from the tenth
-to the median at the hardened arm and $6.82$ times it at the noise-only arm.
-% [derived: T20 quantile differences per arm]
+median to the ninetieth percentile is $2.59$ times the distance from the tenth % [derived: T20 (q90-q50)/(q50-q10) C_hardened]
+to the median at the hardened arm and $6.82$ times it at the noise-only arm. % [derived: T20 (q90-q50)/(q50-q10) A_noise_only]
 This asymmetry is mechanical, not empirical: the parameter distribution imposed
 here is symmetric by construction and the exponential map is convex, so an
 asymmetric outcome distribution follows from a symmetric parameter distribution
@@ -2252,8 +2249,8 @@ section takes up.
 \toprule
 Arm & SD of true effects & $q_{10}$ & $q_{50}$ & $q_{90}$ & Range \\
 \midrule
-Hardened drift (C) & $0.740$ & $-50.1$ & $28.2$ & $231.1$ & $6.64$ \\
-Noise-only (A)     & $1.475$ & $-81.2$ & $23.5$ & $737.2$ & $44.44$ \\
+Hardened drift (C) & $0.740$ & $-50.1$ & $28.2$ & $231.1$ & $6.64$ \\ % [T20: C_hardened, symmetric]
+Noise-only (A)     & $1.475$ & $-81.2$ & $23.5$ & $737.2$ & $44.44$ \\ % [T20: A_noise_only, symmetric]
 \bottomrule
 \end{tabular}
 \end{table}
@@ -2278,10 +2275,10 @@ Noise-only (A)     & $1.475$ & $-81.2$ & $23.5$ & $737.2$ & $44.44$ \\
 \toprule
 Calibration & Arm & Mean effect & $q_{10}$ & $q_{50}$ & $q_{90}$ & Range \\
 \midrule
-Smallest quintile & Hardened   & $0.8554$  & $-0.6$  & $140.7$ & $524.7$  & $6.28$ \\
-Smallest quintile & Noise-only & $0.8554$  & $-57.9$ & $147.3$ & $1533.6$ & $38.79$ \\
-Largest quintile  & Hardened   & $-0.0583$ & $-60.0$ & $-3.1$  & $152.3$  & $6.31$ \\
-Largest quintile  & Noise-only & $-0.0583$ & $-83.1$ & $-0.4$  & $564.4$  & $39.22$ \\
+Smallest quintile & Hardened   & $0.8554$  & $-0.6$  & $140.7$ & $524.7$  & $6.28$ \\ % [T43: lo, LUX_ATG, Q1]
+Smallest quintile & Noise-only & $0.8554$  & $-57.9$ & $147.3$ & $1533.6$ & $38.79$ \\ % [T43: hi, LUX_ATG, Q1]
+Largest quintile  & Hardened   & $-0.0583$ & $-60.0$ & $-3.1$  & $152.3$  & $6.31$ \\ % [T43: lo, NLD_CRI, Q5]
+Largest quintile  & Noise-only & $-0.0583$ & $-83.1$ & $-0.4$  & $564.4$  & $39.22$ \\ % [T43: hi, NLD_CRI, Q5]
 \bottomrule
 \end{tabular}
 \end{table}

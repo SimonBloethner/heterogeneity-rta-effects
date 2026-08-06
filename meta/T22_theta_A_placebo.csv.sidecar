@@ -1,5 +1,5 @@
 FILE:      T22_theta_A_placebo.csv
-SHA256:    aeaa1148c90507e089216c4474ef8f0301805c232949e79bd3a3b3bbd0edde18
+SHA256:    a925b37bf563fa0c0b87c3bced444f554d748436ed5b1c5263ff26d76cc2cc30
 PRODUCER:  S24_reliability.R
 INPUTS:
   data/S5R_bhat.rds: d46910ef55f0a22018baf8bd218dac5548bde98150d798ad85aa1914af8d12d8
@@ -11,25 +11,16 @@ DEFINITION: A (mean of log gaps)
 
 COLUMNS:
   pair:         Pair identifier
-  theta_A:      Definition A effect estimate (NA if no post cells)
+  theta_A:      Definition A effect estimate
   n_post_cells: Number of qualifying post cells
-  qualifies:    TRUE if >= 2 cells in each split half
 
-TOTAL_PAIRS: 17200
-QUALIFYING:  15683
+ROWS: 15683
+SUBSET: Placebo pairs, split-half qualifying (>= 2 cells in each split half)
 
-NESTING VERIFICATION:
-  Full population mean (n=17200):     -0.687984245233330
-  Qualifying subset mean (n=15683): -0.682105675259160
-  T23 uses full population; T22 uses qualifying subset.
+INV-048 NOTE:
+  This file now contains only the 15683 qualifying placebo pairs (previously
+  17200 full population). The qualifies column has been removed since all rows
+  in this file qualify by construction. The full population (17200) is used by
+  T23_anchor.csv; this subset (15683) is used for reliability analysis.
 
-PRODUCER NOTE (2026-07-30):
-  This field previously read "S24_PROV.R (provenance verification)", which is
-  not a producer. S24_PROV.R was the task wrapper used to regenerate this file
-  on 2026-07-29; it writes to SCRATCH_DIR and is not part of the pipeline.
-  The canonical producer is code/S24_reliability.R, whose OUTPUTS header
-  declares output/T22_reliability.csv, output/T22_theta_A_treated.csv and
-  output/T22_theta_A_placebo.csv. Content unchanged; SHA256 above still holds.
-
-CREATED: 2026-07-29 16:22:10
-AMENDED: 2026-07-30 (producer corrected)
+CREATED: 2026-08-06 (INV-048 update)
