@@ -69,9 +69,10 @@ is not identified at this signal share, and no larger sample relieves the limit.
 We state the diagnostic practices that survive.
 \end{abstract}
 
-\textbf{Keywords:}
+\textbf{Keywords:} regional trade agreements; gravity model; treatment
+effect heterogeneity; partial identification; split-half reliability
 
-\textbf{JEL Codes:}
+\textbf{JEL Codes:} F14, F15, C23, C14
 
 \newpage
 
@@ -602,9 +603,9 @@ exclusion band, removing $353$ and $475$ pairs respectively.
 % [TD1R, R4 and R5]
  A pair-level effect estimated on one or two years is dominated by whichever
 shocks fall in them, and the minimum buys enough within-pair observations for
-the effect and its sampling error to be separately estimable. Robustness across
-the threshold grid is reported in Appendix~\ref{app:tables}~[X-REF: threshold
-grid].
+the effect and its sampling error to be separately estimable. The minimum is a judgment rather
+than a discovery: it trades sample size against within-pair precision, and we do
+not claim to have resolved that trade-off here.
 
 % ¶11 — What rule (e) implies about the margin, stated plainly.
 
@@ -1825,11 +1826,12 @@ Neither is recoverable from these data, and we claim neither.
 %     algebra referred to in the drafting specification was not located under
 %     any label; if it lives elsewhere, the reference should move.
 %
-% A10. [APPENDIX TABLES, PARTIALLY CLOSED 2026-08-06] The T9 and T22
-%     placeholders are resolved: both artifacts were already committed and
-%     ledgered, and are now typeset as tab:holdout and tab:reliability in
-%     app:tables. One [X-REF:] placeholder remains, for the threshold grid,
-%     which has no artifact in the tree and requires a compute run.
+% A10. [CLOSED 2026-08-06] The T9 and T22 placeholders are resolved as
+%     tab:holdout and tab:reliability. The threshold-grid placeholder is
+%     removed rather than filled: the robustness claim it pointed to is
+%     withdrawn from Section 3, because output/T30_threshold_grid.csv has not
+%     been independently re-derived. The artifact and its producer remain in
+%     the tree, registered and uncited. No placeholder of that form remains.
 %
 % A11. [WORD COUNT] Body prose is approximately 1,770 words, below the
 %     specified 2,400-3,200 band. Paragraph 7 was shortened when the quintile
@@ -2518,13 +2520,13 @@ Pooled & $8{,}545$ & $0.0188$ & $0.0087$ \\ % [HOLDOUT_N, HOLDOUT_MEAN]
 1  & $19$    & $0.0464$  & $0.1525$ \\ % [HOLDOUT_D1_N]
 2  & $94$    & $0.0532$  & $0.0928$ \\ % [HOLDOUT_D2_N]
 3  & $\HoldoutDThreeN$   & $\HoldoutDThreeMean$ & $0.0591$ \\ % [HOLDOUT_D3_N, HOLDOUT_D3_MEAN, HOLDOUT_D3_SE]
-4  & $630$   & $0.0314$  & $0.0362$ \\
+4  & $630$   & $0.0314$  & $0.0362$ \\ % [T9: decile 4]
 5  & $1{,}019$ & $0.0569$  & $0.0302$ \\ % [HOLDOUT_MAX_ABS_EX_D3]
-6  & $1{,}238$ & $0.0299$  & $0.0266$ \\
-7  & $1{,}343$ & $0.0514$  & $0.0228$ \\
+6  & $1{,}238$ & $0.0299$  & $0.0266$ \\ % [T9: decile 6]
+7  & $1{,}343$ & $0.0514$  & $0.0228$ \\ % [T9: decile 7]
 8  & $1{,}365$ & $0.0078$  & $0.0214$ \\ % [HOLDOUT_D8_N]
-9  & $1{,}327$ & $-0.0082$ & $0.0166$ \\
-10 & $1{,}196$ & $0.0023$  & $0.0148$ \\
+9  & $1{,}327$ & $-0.0082$ & $0.0166$ \\ % [T9: decile 9]
+10 & $1{,}196$ & $0.0023$  & $0.0148$ \\ % [T9: decile 10]
 \bottomrule
 \end{tabular}
 
