@@ -1091,24 +1091,3 @@ what an instrument had actually measured rather than what it reported.
   macro. Sections 7 and 8 inherit this and are not exempt.
 
 Status: register closed. Sections 7 and 8 are the remaining work.
-
-## Threshold Grid (T30)
-
-Robustness of estimates to minimum-window thresholds. Grid over MIN_PRE × MIN_POST
-in {2,3,4,5} × {2,3,4,5}, 16 cells total. Baseline specification (3,3) matches
-Table~\ref{tab:correction} with n=4182, mean=0.2473, SE=0.0241.
-
-| ID | Quantity | Value | Producer |
-|----|----------|-------|----------|
-| TGRID_N_MIN | Minimum n across grid | 2612 | code/S31_threshold_grid.R -> output/T30_threshold_grid.csv |
-| TGRID_N_MAX | Maximum n across grid | 4960 | code/S31_threshold_grid.R -> output/T30_threshold_grid.csv |
-| TGRID_MEAN_MIN | Minimum mean theta_D across grid | 0.1041 | code/S31_threshold_grid.R -> output/T30_threshold_grid.csv |
-| TGRID_MEAN_MAX | Maximum mean theta_D across grid | 0.2863 | code/S31_threshold_grid.R -> output/T30_threshold_grid.csv |
-| TGRID_GRADIENT_MIN | Minimum Q1-Q5 spread across grid | 0.8304 | code/S31_threshold_grid.R -> output/T30_threshold_grid.csv |
-| TGRID_GRADIENT_MAX | Maximum Q1-Q5 spread across grid | 0.9286 | code/S31_threshold_grid.R -> output/T30_threshold_grid.csv |
-
-Note (binding on prose): the mean moves with the pre-adoption threshold, from 0.2863
-at MIN_PRE=2 to 0.1041 at MIN_PRE=5. That movement is the size gradient acting through
-the selection rule: a longer required pre-period retains only pairs with denser trading
-histories, so the population begins further up the size distribution. What does not move
-is the shape: the gradient (Q1-Q5 spread) stays within [0.83, 0.93] across all 16 cells.
