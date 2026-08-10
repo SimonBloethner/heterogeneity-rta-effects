@@ -158,3 +158,6 @@ Rscript code/enforce.R
 Historical: `QUARANTINE` (produced under a premise later found invalid) was
 retired under INV-029 and INV-046; all such rows were recoded to `ARCHIVED`.
 
+## Contact
+
+For questions about this replication package, contact the authors.

@@ -389,3 +389,6 @@ meta/S47_ge_gradient.rds.sidecar,meta,code/S47_ge_gradient.R,data/S47_ge_gradien
 code/S31_threshold_grid.R,code,manual,data/S1R_ppml.rds;data/S3R_theta.rds,,20260719,syntax_valid,15,BUILT
 output/T30_threshold_grid.csv,output,code/S31_threshold_grid.R,data/S1R_ppml.rds;data/S3R_theta.rds,,20260719,C1_baseline_PASS,15,BUILT
 output/T30_threshold_grid.csv.sidecar,meta,code/S31_threshold_grid.R,output/T30_threshold_grid.csv,,NONE,sha256_match,15,BUILT
+code/S48_environment.R,code,manual,NONE,,NONE,syntax_valid,0,BUILT
+meta/ENVIRONMENT.txt,meta,code/S48_environment.R,NONE,,NONE,exists,0,BUILT
+meta/ENVIRONMENT.txt.sidecar,meta,code/S48_environment.R,NONE,,NONE,sha256_match,0,BUILT
