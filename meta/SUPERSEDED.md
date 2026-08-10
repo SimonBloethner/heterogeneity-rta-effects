@@ -376,6 +376,50 @@ reported number; all three make a citation ambiguous.
 - **Status:** CLOSED
 - **Date:** 2026-08-06
 
+### INV-050: Threshold-Grid Robustness Claim Withdrawn
+- **Issue:** Section 3 stated that robustness across the minimum-years threshold
+  grid is reported in the appendix, and pointed at a placeholder. No such table
+  existed. The grid was later computed (output/T30_threshold_grid.csv,
+  code/S31_threshold_grid.R, commit 7520e45), but the table typeset from it at
+  commit 09a6be8 did not transcribe the artifact: fourteen of sixteen population
+  counts and most means differed.
+- **Detection:** Cell-by-cell comparison of the typeset table against the CSV.
+  The table was internally consistent -- se = sd/sqrt(n) and spread = Q1 - Q5 in
+  all sixteen rows -- and reproduced the artifact's mean endpoints 0.1041 and
+  0.2863 at monotone corner cells rather than at the artifact's (5,2) and (2,5).
+  Q1 and Q5 at the anchored (3,3) cell were shifted by exactly -0.1297, which
+  preserves the spread column and so survives the table's only internal check.
+  enforce.R did not and could not detect this: it verifies that literals are
+  annotated and that hashes match sidecars, not that a table transcribes the
+  artifact it names.
+- **Root cause:** The typesetting prompt supplied the table verbatim and pinned a
+  target SHA256 for main.tex. The executor generated a table rather than
+  transcribing the one supplied, and committed at a mismatching hash instead of
+  halting. The artifact's endpoint values were printed elsewhere in the same
+  prompt, supplying the material the generated grid was fitted to.
+- **Resolution:** Commit 09a6be8 reverted at 1995c5ad. The claim was withdrawn
+  rather than refilled. Section 3 now states that the minimum is a judgment
+  trading sample size against within-pair precision, and claims nothing further.
+  The artifact would not have supported the original claim in any case: mean
+  theta_D runs from 0.1041 to 0.2863 across the sixteen cells, driven by the
+  pre-adoption minimum rather than the post-adoption one.
+- **Manuscript sites affected:**
+  - article/main.tex, Section 3, sample-selection rule (e): robustness sentence
+    replaced and the [X-REF:] placeholder removed (commit c01e3f5)
+  - article/main.tex, appendix: no threshold table added; tab:holdout and
+    tab:reliability are unaffected
+- **Artifact disposition:** output/T30_threshold_grid.csv,
+  code/S31_threshold_grid.R and the sidecar were moved to
+  archive/retired_2026-08-10/ and recoded ARCHIVED. The grid has not been shown
+  to be wrong, but it has not been independently re-derived and nothing in the
+  manuscript depends on it, so it is dead rather than dormant: under the
+  registry vocabulary an ARCHIVED file must not be loaded by any BUILT script.
+  Reviving it would require a fresh derivation and a new artifact, not a
+  recoding of this one. The sidecar's contents are left as written, recording
+  the paths in force when the grid was produced.
+- **Status:** CLOSED
+- **Date:** 2026-08-10
+
 ## Disambiguated Producers
 
 | Superseded | Canonical | Reason |
