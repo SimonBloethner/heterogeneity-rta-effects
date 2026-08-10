@@ -1,0 +1,8 @@
+FILE:             meta/ENVIRONMENT.txt
+SHA256:           de5a594ab8e13459ec77382a5f3f7fc987e39e442f9d3156445b5dda28dfb1eb
+PRODUCER:         code/S48_environment.R
+PRODUCER_SHA256:  e0eb0bec890b0e5ade24e4e75061b7211b173cb8dbc88c1cd0bdcf792d54d2c5
+INPUTS:           code/*.R
+SEED:             none
+R_VERSION:        R version 4.4.1 (2024-06-14)
+CREATED:          2026-08-10 13:10:30 CEST
