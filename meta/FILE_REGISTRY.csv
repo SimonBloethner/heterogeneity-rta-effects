@@ -386,9 +386,9 @@ data/S47_ge_gradient.rds,data,code/S47_ge_gradient.R,data/S5R_bhat.rds;code/vend
 output/T43_ge_gradient.csv,output,code/S47_ge_gradient.R,data/S5R_bhat.rds;code/vendor/gravity_functions.R;data/ITPDE_total.rds;meta/canonical_facts.md,,20260803,G1_G2_G3_G4_G5_E_PASS,14,BUILT
 meta/T43_ge_gradient.csv.sidecar,meta,code/S47_ge_gradient.R,output/T43_ge_gradient.csv,,NONE,sha256_match,14,BUILT
 meta/S47_ge_gradient.rds.sidecar,meta,code/S47_ge_gradient.R,data/S47_ge_gradient.rds,,NONE,sha256_match,14,BUILT
-archive/retired_2026-08-10/code/S31_threshold_grid.R,code,manual,data/S1R_ppml.rds;data/S3R_theta.rds,,20260719,syntax_valid,15,ARCHIVED
-archive/retired_2026-08-10/output/T30_threshold_grid.csv,output,archive/retired_2026-08-10/code/S31_threshold_grid.R,data/S1R_ppml.rds;data/S3R_theta.rds,,20260719,C1_baseline_PASS,15,ARCHIVED
-archive/retired_2026-08-10/meta/T30_threshold_grid.csv.sidecar,meta,archive/retired_2026-08-10/code/S31_threshold_grid.R,archive/retired_2026-08-10/output/T30_threshold_grid.csv,,NONE,sha256_match,15,ARCHIVED
+code/S31_threshold_grid.R,code,manual,data/S1R_ppml.rds;data/S3R_theta.rds,,20260719,syntax_valid,15,BUILT
+output/T30_threshold_grid.csv,output,code/S31_threshold_grid.R,data/S1R_ppml.rds;data/S3R_theta.rds,,20260719,C1_baseline_PASS,15,BUILT
+output/T30_threshold_grid.csv.sidecar,meta,code/S31_threshold_grid.R,output/T30_threshold_grid.csv,,NONE,sha256_match,15,BUILT
 code/S48_environment.R,code,manual,NONE,,NONE,syntax_valid,0,BUILT
 meta/ENVIRONMENT.txt,meta,code/S48_environment.R,NONE,,NONE,exists,0,BUILT
 meta/ENVIRONMENT.txt.sidecar,meta,code/S48_environment.R,NONE,,NONE,sha256_match,0,BUILT
